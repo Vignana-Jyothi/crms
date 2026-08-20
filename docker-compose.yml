@@ -26,9 +26,8 @@ services:
       - "4000:4000"
     env_file:
       - ./crms-backend/.env
-    # Add extra hosts if you are running PostgreSQL on the host machine of the runner
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    links:
+      - db:db
 
   crms-main-frontend:
     build:
