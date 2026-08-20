@@ -345,7 +345,6 @@ export default function Resources() {
           <table className="w-full min-w-[1000px] text-left text-sm">
           <thead className="border-b border-line bg-paper text-xs uppercase tracking-wide text-ink/50">
             <tr>
-              <th className="px-4 py-3">ID</th>
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">Type</th>
               <th className="px-4 py-3">Department</th>
@@ -359,7 +358,6 @@ export default function Resources() {
           <tbody className="divide-y divide-line">
             {filteredResources.map((r) => (
               <tr key={r.resourceId} className="hover:bg-paper/30">
-                <td className="px-4 py-3 font-mono text-xs text-ink/50">{r.resourceId}</td>
                 <td className="px-4 py-3 font-medium text-ink">{r.resourceName}</td>
                 <td className="px-4 py-3 text-ink/70">{r.resourceType?.typeName || '—'}</td>
                 <td className="px-4 py-3 text-ink/70">{r.department?.departmentName || 'Institute (Shared)'}</td>
@@ -407,7 +405,6 @@ export default function Resources() {
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="font-semibold text-navy text-base">{r.resourceName}</h3>
-                  <p className="mt-0.5 text-xs font-mono text-ink/50">{r.resourceId}</p>
                 </div>
                 <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${r.status === 'Active' ? 'bg-forest-light text-forest' : 'bg-ink/10 text-ink/50'}`}>
                   {r.status}

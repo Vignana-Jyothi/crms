@@ -93,7 +93,6 @@ export default function ResourceDetail() {
         ← Back to search
       </button>
 
-      <p className="font-mono text-xs text-ink/40">{resource.resourceId}</p>
       <h1 className="font-display text-3xl font-semibold text-navy">{resource.resourceName}</h1>
       <div className="mt-2 flex flex-wrap gap-4 text-sm text-ink/60">
         <span>{resource.resourceType?.typeName}</span>
