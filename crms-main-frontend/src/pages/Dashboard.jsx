@@ -273,7 +273,7 @@ export default function Dashboard() {
           No resources match those filters. Try widening your search.
         </p>
       ) : (
-        <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredResources.map((r) => {
             const liveData = liveStatusMap[r.resourceId];
             const isFree = liveData ? liveData.isFree : true;
