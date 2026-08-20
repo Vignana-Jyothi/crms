@@ -23,6 +23,9 @@ yarn-error.log*
 scratch/
 scratch.*
 
+# AI Agent files
+.agents/
+
 # OS generated files
 .DS_Store
 Thumbs.db
