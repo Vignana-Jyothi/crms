@@ -287,20 +287,19 @@ export default function Dashboard() {
                       filterDate: selectedDate,
                       filterStartTime: getFilterTimes().startTimeParam,
                       filterEndTime: getFilterTimes().endTimeParam
-                    }}
-                    className="block rounded-lg border border-line bg-white p-3 transition-shadow hover:shadow-md"
+                    className="block h-full flex flex-col rounded-lg border border-line bg-white p-3 transition-shadow hover:shadow-md"
                   >
                     <ResourceCardContent r={r} isFree={true} />
                   </Link>
                 ) : isAdmin ? (
                   <button 
                     onClick={() => setSelectedRoom(liveData)}
-                    className="w-full text-left block rounded-lg border border-brick/30 bg-brick-light/30 p-3 opacity-75 hover:opacity-100 transition-opacity cursor-pointer"
+                    className="w-full h-full flex flex-col text-left block rounded-lg border border-brick/30 bg-brick-light/30 p-3 opacity-75 hover:opacity-100 transition-opacity cursor-pointer"
                   >
                     <ResourceCardContent r={r} isFree={false} occupant={liveData?.occupant} since={liveData?.since} until={liveData?.until} />
                   </button>
                 ) : (
-                  <div className="block rounded-lg border border-brick/30 bg-brick-light/30 p-3 opacity-75 cursor-default">
+                  <div className="block h-full flex flex-col rounded-lg border border-brick/30 bg-brick-light/30 p-3 opacity-75 cursor-default">
                     <ResourceCardContent r={r} isFree={false} occupant={liveData?.occupant} since={liveData?.since} until={liveData?.until} />
                   </div>
                 )}
@@ -406,10 +405,12 @@ function ResourceCardContent({ r, isFree, occupant, since, until }) {
           )}
         </div>
       </div>
-      <div className="mt-1.5 flex items-center gap-3 text-xs text-ink/60">
-        {r.department && <span>{r.department.departmentName}</span>}
-        {r.block && <span>Block {r.block.blockCode}{r.floor ? `, Floor ${r.floor}` : ''}</span>}
-        {r.capacityOrAreaSqm && <span>Capacity {r.capacityOrAreaSqm}</span>}
+      <div className="mt-auto pt-2">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink/60">
+          {r.department && <span>{r.department.departmentName}</span>}
+          {r.block && <span>Block {r.block.blockCode}{r.floor ? `, Floor ${r.floor}` : ''}</span>}
+          {r.capacityOrAreaSqm && <span>Capacity {r.capacityOrAreaSqm}</span>}
+        </div>
       </div>
       {!isFree && occupant && (
         <div className="mt-2 rounded border border-brick/10 bg-brick/5 p-1.5 text-xs font-medium text-brick-dark">
