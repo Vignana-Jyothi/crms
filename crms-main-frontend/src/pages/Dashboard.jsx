@@ -288,19 +288,19 @@ export default function Dashboard() {
                       filterStartTime: getFilterTimes().startTimeParam,
                       filterEndTime: getFilterTimes().endTimeParam
                     }}
-                    className="block rounded-lg border border-line bg-white p-4 transition-shadow hover:shadow-md"
+                    className="block rounded-lg border border-line bg-white p-3 transition-shadow hover:shadow-md"
                   >
                     <ResourceCardContent r={r} isFree={true} />
                   </Link>
                 ) : isAdmin ? (
                   <button 
                     onClick={() => setSelectedRoom(liveData)}
-                    className="w-full text-left block rounded-lg border border-brick/30 bg-brick-light/30 p-4 opacity-75 hover:opacity-100 transition-opacity cursor-pointer"
+                    className="w-full text-left block rounded-lg border border-brick/30 bg-brick-light/30 p-3 opacity-75 hover:opacity-100 transition-opacity cursor-pointer"
                   >
                     <ResourceCardContent r={r} isFree={false} occupant={liveData?.occupant} since={liveData?.since} until={liveData?.until} />
                   </button>
                 ) : (
-                  <div className="block rounded-lg border border-brick/30 bg-brick-light/30 p-4 opacity-75 cursor-default">
+                  <div className="block rounded-lg border border-brick/30 bg-brick-light/30 p-3 opacity-75 cursor-default">
                     <ResourceCardContent r={r} isFree={false} occupant={liveData?.occupant} since={liveData?.since} until={liveData?.until} />
                   </div>
                 )}
@@ -389,7 +389,7 @@ function ResourceCardContent({ r, isFree, occupant, since, until }) {
     <>
       <div className="flex items-start justify-between">
         <div>
-          <p className="font-display text-lg font-semibold text-ink">{r.resourceName}</p>
+          <p className="font-display text-base font-semibold text-ink">{r.resourceName}</p>
         </div>
         <div className="flex flex-col items-end gap-2">
           <span
@@ -406,13 +406,13 @@ function ResourceCardContent({ r, isFree, occupant, since, until }) {
           )}
         </div>
       </div>
-      <div className="mt-3 flex items-center gap-4 text-xs text-ink/60">
+      <div className="mt-1.5 flex items-center gap-3 text-xs text-ink/60">
         {r.department && <span>{r.department.departmentName}</span>}
         {r.block && <span>Block {r.block.blockCode}{r.floor ? `, Floor ${r.floor}` : ''}</span>}
         {r.capacityOrAreaSqm && <span>Capacity {r.capacityOrAreaSqm}</span>}
       </div>
       {!isFree && occupant && (
-        <div className="mt-3 rounded border border-brick/10 bg-brick/5 p-2 text-xs font-medium text-brick-dark">
+        <div className="mt-2 rounded border border-brick/10 bg-brick/5 p-1.5 text-xs font-medium text-brick-dark">
           {occupant}
           {since && until && (
             <div className="mt-1 font-mono text-xs text-brick-dark/70">
