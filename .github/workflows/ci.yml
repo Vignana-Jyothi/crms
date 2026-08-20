@@ -1,0 +1,35 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    # Use the self-hosted runner explicitly requested by the user
+    runs-on: gamma
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Because it's a self-hosted runner, we assume Docker is already installed.
+      # We just bring up the full stack using docker-compose.
+      - name: Deploy with Docker Compose
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+        run: |
+          # Write environment variables to .env files so docker-compose can use them
+          echo "DATABASE_URL=$DATABASE_URL" > crms-backend/.env
+          echo "JWT_SECRET=$JWT_SECRET" >> crms-backend/.env
+          
+          # Write frontend env vars
+          echo "VITE_API_BASE_URL=$VITE_API_BASE_URL" > crms-main-frontend/.env
+
+          # Bring down any old containers, rebuild the images, and start the new ones
+          docker-compose down
+          docker-compose up -d --build
