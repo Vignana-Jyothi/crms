@@ -1,0 +1,17 @@
+# Since your Postgres is installed directly on dev-ai (not
+# containerized), this backend container needs to reach it via the
+# host, not "localhost" inside its own network namespace. On Linux,
+# host.docker.internal isn't automatic — the extra_hosts entry below
+# adds it. Your DATABASE_URL in .env should then use
+# host.docker.internal instead of localhost.
+services:
+  crms-backend:
+    build: .
+    container_name: crms-backend
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

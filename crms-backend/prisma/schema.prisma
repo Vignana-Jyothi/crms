@@ -1,0 +1,211 @@
+// =========================================================
+// CRMS Prisma Schema
+// Matches the already-live campus_resource_management database
+// (roles, departments, blocks, resource_types, resources, users,
+// timetable, bookings, approvals, announcements, audit_logs).
+//
+// IMPORTANT: your database already exists with real data.
+// Do NOT run `prisma migrate dev` blindly against it — that
+// tries to create tables from scratch and will conflict.
+//
+// Recommended first step:
+// npx prisma db pull
+// This reverse-engineers the schema from your live DB and merges
+// with/replaces this file. Compare the result against this file,
+// resolve any drift, THEN run `npx prisma generate`.
+//
+// For the NEW columns this backend needs (password_hash on users,
+// employee_id, etc.) that don't exist live yet, use the migration
+// in prisma/migrations/000_add_auth_columns.sql (see README).
+// =========================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+model Role {
+  roleId Int @id @default(autoincrement()) @map("role_id")
+  roleName String @unique @map("role_name") @db.VarChar(50)
+  description String?
+
+  users User[]
+  approvals Approval[]
+
+  @@map("roles")
+}
+
+model Department {
+  departmentId Int @id @default(autoincrement()) @map("department_id")
+  branchCode String @unique @map("branch_code") @db.VarChar(20)
+  departmentName String @map("department_name") @db.VarChar(150)
+  groupType String? @map("group_type") @db.VarChar(30)
+
+  users User[]
+  resources Resource[]
+  timetable Timetable[]
+  announcements Announcement[]
+
+  @@map("departments")
+}
+
+model Block {
+  blockId Int @id @default(autoincrement()) @map("block_id")
+  blockCode String @unique @map("block_code") @db.VarChar(10)
+  blockName String? @map("block_name") @db.VarChar(50)
+
+  resources Resource[]
+
+  @@map("blocks")
+}
+
+model ResourceType {
+  resourceTypeId Int @id @default(autoincrement()) @map("resource_type_id")
+  typeName String @unique @map("type_name") @db.VarChar(50)
+  description String?
+
+  resources Resource[]
+
+  @@map("resource_types")
+}
+
+model Resource {
+  resourceId String @id @map("resource_id") @db.VarChar(20)
+  resourceName String @map("resource_name") @db.VarChar(100)
+  resourceTypeId Int @map("resource_type_id")
+  departmentId Int? @map("department_id")
+  blockId Int? @map("block_id")
+  floor String? @db.VarChar(10)
+  capacityOrAreaSqm Decimal? @map("capacity_or_area_sqm") @db.Decimal(10, 2)
+  allocationNote String? @map("allocation_note") @db.VarChar(60)
+  status String @default("Active") @db.VarChar(20)
+
+  // EduPrime Integration Mapping
+  allocatedSemester String? @map("allocated_semester") @db.VarChar(50)
+  allocatedBranch String? @map("allocated_branch") @db.VarChar(50)
+  allocatedSection String? @map("allocated_section") @db.VarChar(50)
+
+  resourceType ResourceType @relation(fields: [resourceTypeId], references: [resourceTypeId])
+  department Department? @relation(fields: [departmentId], references: [departmentId])
+  block Block? @relation(fields: [blockId], references: [blockId])
+  timetable Timetable[]
+  bookings Booking[]
+
+  @@map("resources")
+}
+
+model User {
+  userId Int @id @default(autoincrement()) @map("user_id")
+  name String @db.VarChar(100)
+  email String? @unique @db.VarChar(150)
+  phone String @db.VarChar(20) // NOT NULL + regex-checked at DB level
+  roleId Int? @map("role_id")
+  departmentId Int? @map("department_id")
+  notes String? @db.VarChar(150)
+  roomNo String? @map("room_no") @db.VarChar(20)
+  status String @default("Active") @db.VarChar(20)
+
+  // --- added by prisma/migrations/000_add_auth_columns.sql, not yet in the live table ---
+  employeeId String? @unique @map("employee_id") @db.VarChar(30)
+  passwordHash String? @map("password_hash") @db.VarChar(255)
+  refreshToken String? @map("refresh_token") @db.Text
+  lastLoginAt DateTime? @map("last_login_at")
+
+  role Role? @relation(fields: [roleId], references: [roleId])
+  department Department? @relation(fields: [departmentId], references: [departmentId])
+
+  uploadedTimetables Timetable[] @relation("TimetableUploader")
+  bookings Booking[] @relation("BookingRequester")
+  approvalsGiven Approval[] @relation("ApprovalApprover")
+  announcementsPosted Announcement[] @relation("AnnouncementPoster")
+  auditLogs AuditLog[]
+
+  @@map("users")
+}
+
+model Timetable {
+  timetableId Int @id @default(autoincrement()) @map("timetable_id")
+  resourceId String? @map("resource_id") @db.VarChar(20)
+  departmentId Int? @map("department_id")
+  dayOfWeek String? @map("day_of_week") @db.VarChar(10)
+  startTime DateTime? @map("start_time") @db.Time()
+  endTime DateTime? @map("end_time") @db.Time()
+  courseCode String? @map("course_code") @db.VarChar(20)
+  section String? @db.VarChar(20)
+  academicYear String? @map("academic_year") @db.VarChar(20)
+  facultyName String? @map("faculty_name") @db.VarChar(100)
+  uploadedByUserId Int? @map("uploaded_by_user_id")
+
+  resource Resource? @relation(fields: [resourceId], references: [resourceId])
+  department Department? @relation(fields: [departmentId], references: [departmentId])
+  uploadedBy User? @relation("TimetableUploader", fields: [uploadedByUserId], references: [userId])
+
+  @@map("timetable")
+}
+
+model Booking {
+  bookingId Int @id @default(autoincrement()) @map("booking_id")
+  resourceId String? @map("resource_id") @db.VarChar(20)
+  requesterUserId Int? @map("requester_user_id")
+  bookingDate DateTime @map("booking_date") @db.Date
+  startTime DateTime @map("start_time") @db.Time()
+  endTime DateTime @map("end_time") @db.Time()
+  purpose String?
+  status String @default("Pending") @db.VarChar(20) // Pending / Approved / Rejected / Cancelled
+  createdAt DateTime @default(now()) @map("created_at")
+
+  resource Resource? @relation(fields: [resourceId], references: [resourceId])
+  requester User? @relation("BookingRequester", fields: [requesterUserId], references: [userId])
+  approvals Approval[]
+
+  @@map("bookings")
+}
+
+model Approval {
+  approvalId Int @id @default(autoincrement()) @map("approval_id")
+  bookingId Int? @map("booking_id")
+  approverUserId Int? @map("approver_user_id")
+  approverRoleId Int? @map("approver_role_id")
+  decision String? @db.VarChar(20) // Approved / Rejected
+  decisionAt DateTime? @map("decision_at")
+  remarks String?
+
+  booking Booking? @relation(fields: [bookingId], references: [bookingId])
+  approverUser User? @relation("ApprovalApprover", fields: [approverUserId], references: [userId])
+  approverRole Role? @relation(fields: [approverRoleId], references: [roleId])
+
+  @@map("approvals")
+}
+
+model Announcement {
+  announcementId Int @id @default(autoincrement()) @map("announcement_id")
+  title String @db.VarChar(200)
+  body String?
+  departmentId Int? @map("department_id")
+  postedByUserId Int? @map("posted_by_user_id")
+  postedAt DateTime @default(now()) @map("posted_at")
+  expiresAt DateTime? @map("expires_at")
+
+  department Department? @relation(fields: [departmentId], references: [departmentId])
+  postedBy User? @relation("AnnouncementPoster", fields: [postedByUserId], references: [userId])
+
+  @@map("announcements")
+}
+
+model AuditLog {
+  auditId Int @id @default(autoincrement()) @map("audit_id")
+  userId Int? @map("user_id")
+  action String? @db.VarChar(100)
+  entityType String? @map("entity_type") @db.VarChar(50)
+  entityId String? @map("entity_id") @db.VarChar(50)
+  details String?
+  timestamp DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [userId])
+
+  @@map("audit_logs")
+}
