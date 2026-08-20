@@ -406,7 +406,7 @@ function ResourceCardContent({ r, isFree, occupant, since, until }) {
           )}
         </div>
       </div>
-      <div className="mt-auto pt-2">
+      <div className="mt-2">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink/60">
           {r.department && <span>{r.department.departmentName}</span>}
           {r.block && <span>Block {r.block.blockCode}{r.floor ? `, Floor ${r.floor}` : ''}</span>}
