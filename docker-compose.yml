@@ -27,6 +27,6 @@ services:
     restart: unless-stopped
     network_mode: bridge
     ports:
-      - "3000:80"
+      - "8085:80"
     depends_on:
       - crms-backend
