@@ -273,7 +273,7 @@ export default function Dashboard() {
           No resources match those filters. Try widening your search.
         </p>
       ) : (
-        <ul className="mt-6 grid grid-cols-1 items-start gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredResources.map((r) => {
             const liveData = liveStatusMap[r.resourceId];
             const isFree = liveData ? liveData.isFree : true;
@@ -288,19 +288,19 @@ export default function Dashboard() {
                       filterStartTime: getFilterTimes().startTimeParam,
                       filterEndTime: getFilterTimes().endTimeParam
                     }}
-                    className="block h-full flex flex-col rounded-lg border border-line bg-white p-3 transition-shadow hover:shadow-md"
+                    className="block h-[170px] flex flex-col rounded-lg border border-line bg-white p-3 transition-shadow hover:shadow-md"
                   >
                     <ResourceCardContent r={r} isFree={true} />
                   </Link>
                 ) : isAdmin ? (
                   <button 
                     onClick={() => setSelectedRoom(liveData)}
-                    className="w-full h-full flex flex-col text-left block rounded-lg border border-brick/30 bg-brick-light/30 p-3 opacity-75 hover:opacity-100 transition-opacity cursor-pointer"
+                    className="w-full h-[170px] flex flex-col text-left block rounded-lg border border-brick/30 bg-brick-light/30 p-3 opacity-75 hover:opacity-100 transition-opacity cursor-pointer"
                   >
                     <ResourceCardContent r={r} isFree={false} occupant={liveData?.occupant} since={liveData?.since} until={liveData?.until} />
                   </button>
                 ) : (
-                  <div className="block h-full flex flex-col rounded-lg border border-brick/30 bg-brick-light/30 p-3 opacity-75 cursor-default">
+                  <div className="block h-[170px] flex flex-col rounded-lg border border-brick/30 bg-brick-light/30 p-3 opacity-75 cursor-default">
                     <ResourceCardContent r={r} isFree={false} occupant={liveData?.occupant} since={liveData?.since} until={liveData?.until} />
                   </div>
                 )}
