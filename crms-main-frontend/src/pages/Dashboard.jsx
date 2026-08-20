@@ -287,6 +287,7 @@ export default function Dashboard() {
                       filterDate: selectedDate,
                       filterStartTime: getFilterTimes().startTimeParam,
                       filterEndTime: getFilterTimes().endTimeParam
+                    }}
                     className="block h-full flex flex-col rounded-lg border border-line bg-white p-3 transition-shadow hover:shadow-md"
                   >
                     <ResourceCardContent r={r} isFree={true} />
