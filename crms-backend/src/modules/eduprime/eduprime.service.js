@@ -33,13 +33,17 @@ async function getClassTimeTable(semester, branch, section) {
     );
 
     const result = response.data;
-    if (result && result.Status === 1 && result.Data && Array.isArray(result.Data.Entries)) {
-      return result.Data.Entries;
+    
+    if (result && result.Status === 1) {
+      if (result.Data && Array.isArray(result.Data.Entries)) {
+        return result.Data.Entries;
+      }
+      return []; // Success, but no entries
     }
     
-    // If not successful or entries missing, return empty array
-    console.warn('EduPrime API returned non-success or empty entries', result);
-    return [];
+    // If not successful, EduPrime puts the error message in the Data field
+    const errMsg = result && typeof result.Data === 'string' ? result.Data : 'Unknown EduPrime Error';
+    throw new Error(`EduPrime API Error: ${errMsg} (Status: ${result?.Status})`);
   } catch (error) {
     const errorMsg = error.response?.data?.Message || error.message;
     console.error(`Failed to fetch EduPrime ClassTimeTable for ${semester} ${branch} ${section}:`, errorMsg);
