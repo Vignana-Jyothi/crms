@@ -42,8 +42,8 @@ async function main() {
 
   for (const dept of departments) {
     await prisma.department.upsert({
-      where: { branchCode: dept.branchCode },
-      update: { departmentName: dept.departmentName, groupType: dept.groupType },
+      where: { departmentId: dept.departmentId },
+      update: { branchCode: dept.branchCode, departmentName: dept.departmentName, groupType: dept.groupType },
       create: dept,
     });
   }
@@ -59,8 +59,8 @@ async function main() {
 
   for (const block of blocks) {
     await prisma.block.upsert({
-      where: { blockCode: block.blockCode },
-      update: { blockName: block.blockName },
+      where: { blockId: block.blockId },
+      update: { blockCode: block.blockCode, blockName: block.blockName },
       create: block,
     });
   }
@@ -76,8 +76,8 @@ async function main() {
 
   for (const rt of resourceTypes) {
     await prisma.resourceType.upsert({
-      where: { typeName: rt.typeName },
-      update: { description: rt.description },
+      where: { resourceTypeId: rt.resourceTypeId },
+      update: { typeName: rt.typeName, description: rt.description },
       create: rt,
     });
   }
