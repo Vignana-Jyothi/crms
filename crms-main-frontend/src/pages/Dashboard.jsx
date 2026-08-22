@@ -413,16 +413,22 @@ function ResourceCardContent({ r, isFree, occupant, since, until }) {
           {r.capacityOrAreaSqm && <span>Capacity {r.capacityOrAreaSqm}</span>}
         </div>
       </div>
-      {!isFree && occupant && (
-        <div className="mt-2 rounded border border-brick/10 bg-brick/5 p-1.5 text-xs font-medium text-brick-dark">
-          {occupant}
-          {since && until && (
-            <div className="mt-1 font-mono text-xs text-brick-dark/70">
-              {formatTime(since)} to {formatTime(until)}
-            </div>
-          )}
-        </div>
-      )}
+      <div className="mt-auto pt-3">
+        {isFree ? (
+          <div className="flex h-14 flex-col items-center justify-center rounded border border-forest/20 bg-forest-light/30 px-3 py-1.5 text-xs font-semibold text-forest-dark">
+            Available Now
+          </div>
+        ) : occupant ? (
+          <div className="flex h-14 flex-col justify-center rounded border border-brick/10 bg-brick/5 px-3 py-1.5 text-xs font-medium text-brick-dark">
+            <span className="truncate">{occupant}</span>
+            {since && until && (
+              <span className="mt-0.5 font-mono text-[10px] text-brick-dark/70">
+                {formatTime(since)} to {formatTime(until)}
+              </span>
+            )}
+          </div>
+        ) : null}
+      </div>
     </>
   );
 }
