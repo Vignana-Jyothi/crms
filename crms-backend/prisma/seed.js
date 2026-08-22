@@ -275,6 +275,48 @@ async function main() {
     },
   ];
 
+  // Dynamically generate EduPrime mapped Classrooms for all 4 years
+  const branches = [
+    { code: 'CSE', deptId: 1 },
+    { code: 'ECE', deptId: 2 },
+    { code: 'EEE', deptId: 3 },
+    { code: 'MECH', deptId: 4 },
+    { code: 'CIVIL', deptId: 5 },
+    { code: 'IT', deptId: 6 }
+  ];
+  const years = [
+    { label: '1st', semName: 'B.Tech I Year I Semester' },
+    { label: '2nd', semName: 'B.Tech II Year I Semester' },
+    { label: '3rd', semName: 'B.Tech III Year I Semester' },
+    { label: '4th', semName: 'B.Tech IV Year I Semester' }
+  ];
+  const sections = ['A', 'B', 'C'];
+
+  let resourceCounter = 1;
+
+  for (const branch of branches) {
+    for (const year of years) {
+      for (const section of sections) {
+        const roomId = `${branch.code}-${year.label.substring(0, 1)}0${section === 'A' ? 1 : section === 'B' ? 2 : 3}`;
+        resources.push({
+          resourceId: roomId,
+          resourceName: `${year.label} Year ${branch.code} - Sec ${section}`,
+          resourceTypeId: 1, // Classroom
+          departmentId: branch.deptId,
+          blockId: branch.deptId > 4 ? 1 : branch.deptId, // Assign random blocks
+          floor: '1',
+          capacityOrAreaSqm: 65,
+          allocationNote: 'EduPrime Sync Enabled Classroom',
+          status: 'Active',
+          allocatedSemester: year.semName,
+          allocatedBranch: branch.code,
+          allocatedSection: section
+        });
+        resourceCounter++;
+      }
+    }
+  }
+
   for (const res of resources) {
     await prisma.resource.upsert({
       where: { resourceId: res.resourceId },
@@ -287,6 +329,9 @@ async function main() {
         capacityOrAreaSqm: res.capacityOrAreaSqm,
         allocationNote: res.allocationNote,
         status: res.status,
+        allocatedSemester: res.allocatedSemester,
+        allocatedBranch: res.allocatedBranch,
+        allocatedSection: res.allocatedSection
       },
       create: res,
     });
