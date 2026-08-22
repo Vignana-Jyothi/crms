@@ -41,10 +41,9 @@ async function getClassTimeTable(semester, branch, section) {
     console.warn('EduPrime API returned non-success or empty entries', result);
     return [];
   } catch (error) {
-    console.error('Failed to fetch EduPrime ClassTimeTable:', error.message);
-    // Depending on requirements, we can throw the error or return an empty array to allow booking if EduPrime is down.
-    // We will return an empty array to not block the whole system if EduPrime is unreachable.
-    return [];
+    const errorMsg = error.response?.data?.Message || error.message;
+    console.error(`Failed to fetch EduPrime ClassTimeTable for ${semester} ${branch} ${section}:`, errorMsg);
+    throw new Error(`EduPrime API Error: ${errorMsg}`);
   }
 }
 
