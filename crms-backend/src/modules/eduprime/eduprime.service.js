@@ -18,16 +18,16 @@ async function getClassTimeTable(semester, branch, section) {
 
   try {
     const response = await axios.post(
-      `${EDUPRIME_BASE_URL}/api/HostelApp/Timetable`,
+      `${EDUPRIME_BASE_URL}/api/Academics/ClassTimeTable`,
       {
-        academicYear: parseInt(semester, 10) || 2025,
-        branch: branch,
-        section: section,
+        Semester: semester,
+        Branch: branch,
+        Section: section,
       },
       {
         headers: {
           'Content-Type': 'application/json',
-          'X-App-Key': EDUPRIME_RELIC_TOKEN,
+          'Relic': EDUPRIME_RELIC_TOKEN,
         },
       }
     );
