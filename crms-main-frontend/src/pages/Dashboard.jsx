@@ -415,11 +415,11 @@ function ResourceCardContent({ r, isFree, occupant, since, until }) {
       </div>
       <div className="mt-auto pt-3">
         {isFree ? (
-          <div className="flex h-14 flex-col items-center justify-center rounded border border-forest/20 bg-forest-light/30 px-3 py-1.5 text-xs font-semibold text-forest-dark">
+          <div className="flex h-10 flex-col items-center justify-center rounded border border-forest/20 bg-forest-light/30 px-3 py-1 text-xs font-semibold text-forest-dark">
             Available Now
           </div>
         ) : occupant ? (
-          <div className="flex h-14 flex-col justify-center rounded border border-brick/10 bg-brick/5 px-3 py-1.5 text-xs font-medium text-brick-dark">
+          <div className="flex h-10 flex-col justify-center rounded border border-brick/10 bg-brick/5 px-3 py-1 text-xs font-medium text-brick-dark">
             <span className="truncate">{occupant}</span>
             {since && until && (
               <span className="mt-0.5 font-mono text-[10px] text-brick-dark/70">
