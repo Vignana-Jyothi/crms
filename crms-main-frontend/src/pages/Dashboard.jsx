@@ -390,9 +390,15 @@ function ResourceCardContent({ r, isFree, occupant, since, until }) {
       <div className="flex items-start justify-between">
         <div>
           <p className="font-display text-base font-semibold text-ink">
-            {r.resourceId}
-            {r.resourceName !== r.resourceId && (
-              <span className="block text-sm font-normal text-ink/70 mt-0.5">{r.resourceName}</span>
+            {r.resourceId?.startsWith('RM-') ? (
+              r.resourceName
+            ) : (
+              <>
+                {r.resourceId}
+                {r.resourceName && r.resourceName !== r.resourceId && (
+                  <span className="block text-sm font-normal text-ink/70 mt-0.5">{r.resourceName}</span>
+                )}
+              </>
             )}
           </p>
         </div>
