@@ -358,7 +358,20 @@ export default function Resources() {
           <tbody className="divide-y divide-line">
             {filteredResources.map((r) => (
               <tr key={r.resourceId} className="hover:bg-paper/30">
-                <td className="px-4 py-3 font-medium text-ink">{r.resourceName}</td>
+                <td className="px-4 py-3">
+                  <div className="font-medium text-ink">
+                    {r.resourceId?.startsWith('RM-') ? (
+                      r.resourceName
+                    ) : (
+                      <>
+                        {r.resourceId}
+                        {r.resourceName && r.resourceName !== r.resourceId && (
+                          <span className="block text-xs font-normal text-ink/70 mt-0.5">{r.resourceName}</span>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </td>
                 <td className="px-4 py-3 text-ink/70">{r.resourceType?.typeName || '—'}</td>
                 <td className="px-4 py-3 text-ink/70">{r.department?.departmentName || 'Institute (Shared)'}</td>
                 <td className="px-4 py-3 text-ink/60">{r.block?.blockCode ? `Block ${r.block.blockCode}` : '—'}</td>
@@ -404,7 +417,18 @@ export default function Resources() {
             <div key={r.resourceId} className="rounded-lg border border-line bg-white p-4 shadow-sm flex flex-col gap-2">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="font-semibold text-navy text-base">{r.resourceName}</h3>
+                  <h3 className="font-semibold text-navy text-base">
+                    {r.resourceId?.startsWith('RM-') ? (
+                      r.resourceName
+                    ) : (
+                      <>
+                        {r.resourceId}
+                        {r.resourceName && r.resourceName !== r.resourceId && (
+                          <span className="block text-sm font-normal text-ink/70 mt-0.5">{r.resourceName}</span>
+                        )}
+                      </>
+                    )}
+                  </h3>
                 </div>
                 <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${r.status === 'Active' ? 'bg-forest-light text-forest' : 'bg-ink/10 text-ink/50'}`}>
                   {r.status}
