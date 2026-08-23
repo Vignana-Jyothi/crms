@@ -25,6 +25,7 @@ export default function Bookings() {
   const [cancelModalBooking, setCancelModalBooking] = useState(null);
   const [cancelling, setCancelling] = useState(false);
   const [actionAlert, setActionAlert] = useState(null);
+  const [cancelReason, setCancelReason] = useState('');
 
   useEffect(() => {
     masterDataApi.departments().then(setDepartments).catch(() => {});
