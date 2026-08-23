@@ -389,7 +389,12 @@ function ResourceCardContent({ r, isFree, occupant, since, until }) {
     <>
       <div className="flex items-start justify-between">
         <div>
-          <p className="font-display text-base font-semibold text-ink">{r.resourceName}</p>
+          <p className="font-display text-base font-semibold text-ink">
+            {r.resourceId}
+            {r.resourceName !== r.resourceId && (
+              <span className="block text-sm font-normal text-ink/70 mt-0.5">{r.resourceName}</span>
+            )}
+          </p>
         </div>
         <div className="flex flex-col items-end gap-2">
           <span
