@@ -289,7 +289,7 @@ export default function Dashboard() {
                       filterEndTime: getFilterTimes().endTimeParam
                     }}
                     className={`block h-full flex flex-col rounded-lg border p-3 transition-shadow hover:shadow-md ${
-                      filters.status === 'Free' 
+                      filters.availability === 'Free' 
                         ? 'bg-forest-light border-forest/40' 
                         : 'bg-white border-line'
                     }`}
