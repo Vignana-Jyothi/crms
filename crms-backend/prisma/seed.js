@@ -291,13 +291,13 @@ async function main() {
         const roomId = `${branch}-${year.label.substring(0, 1)}0${section === 'A' ? 1 : section === 'B' ? 2 : 3}`;
         resources.push({
           resourceId: roomId,
-          resourceName: `${year.label} Year ${branch} - Sec ${section}`,
+          resourceName: roomId, // Use Room Number as the primary Name
           resourceTypeId: rtMap['Classroom'], // Classroom
           departmentId: deptId,
           blockId: deptId > 4 ? blockMap['A'] : deptId, // Assign random blocks safely
           floor: '1',
           capacityOrAreaSqm: 65,
-          allocationNote: 'EduPrime Sync Enabled Classroom',
+          allocationNote: `${year.label} Year ${branch} - Sec ${section}`, // Move the section name to the note
           status: 'Active',
           allocatedSemester: year.semName,
           allocatedBranch: branch,
