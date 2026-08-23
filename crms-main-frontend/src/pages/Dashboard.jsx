@@ -227,6 +227,19 @@ export default function Dashboard() {
         </select>
 
         <select
+          value={filters.minCapacity}
+          onChange={(e) => setFilters((f) => ({ ...f, minCapacity: e.target.value }))}
+          className="rounded border border-line bg-white px-3 py-2 text-sm w-full"
+        >
+          <option value="">All capacities</option>
+          <option value="30">30+ seats</option>
+          <option value="60">60+ seats</option>
+          <option value="100">100+ seats</option>
+          <option value="200">200+ seats</option>
+          <option value="300">300+ seats</option>
+        </select>
+
+        <select
           value={filters.blockId}
           onChange={(e) => setFilters((f) => ({ ...f, blockId: e.target.value }))}
           className="rounded border border-line bg-white px-3 py-2 text-sm w-full"
@@ -250,19 +263,6 @@ export default function Dashboard() {
               {d.departmentName}
             </option>
           ))}
-        </select>
-
-        <select
-          value={filters.minCapacity}
-          onChange={(e) => setFilters((f) => ({ ...f, minCapacity: e.target.value }))}
-          className="rounded border border-line bg-white px-3 py-2 text-sm w-full"
-        >
-          <option value="">All capacities</option>
-          <option value="30">30+ seats</option>
-          <option value="60">60+ seats</option>
-          <option value="100">100+ seats</option>
-          <option value="200">200+ seats</option>
-          <option value="300">300+ seats</option>
         </select>
       </div>
 
