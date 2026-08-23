@@ -290,7 +290,7 @@ export default function Dashboard() {
                     }}
                     className={`block h-full flex flex-col rounded-lg border p-3 transition-shadow hover:shadow-md ${
                       filters.status === 'Free' 
-                        ? 'bg-forest-light/30 border-forest/30' 
+                        ? 'bg-forest-light border-forest/40' 
                         : 'bg-white border-line'
                     }`}
                   >
