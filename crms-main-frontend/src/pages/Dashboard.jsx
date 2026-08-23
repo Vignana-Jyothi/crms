@@ -288,7 +288,11 @@ export default function Dashboard() {
                       filterStartTime: getFilterTimes().startTimeParam,
                       filterEndTime: getFilterTimes().endTimeParam
                     }}
-                    className="block h-full flex flex-col rounded-lg border border-line bg-white p-3 transition-shadow hover:shadow-md"
+                    className={`block h-full flex flex-col rounded-lg border p-3 transition-shadow hover:shadow-md ${
+                      filters.status === 'Free' 
+                        ? 'bg-forest-light/30 border-forest/30' 
+                        : 'bg-white border-line'
+                    }`}
                   >
                     <ResourceCardContent r={r} isFree={true} />
                   </Link>
