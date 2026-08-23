@@ -37,7 +37,7 @@ const getById = asyncHandler(async (req, res) => {
 });
 
 const cancel = asyncHandler(async (req, res) => {
-  res.json(await service.cancel(req.params.bookingId, req.auth.userId, req.auth));
+  res.json(await service.cancel(req.params.bookingId, req.auth.userId, req.auth, req.body.reason));
 });
 
 module.exports = { create, list, listMy, getById, cancel };

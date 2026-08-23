@@ -213,7 +213,7 @@ async function list(filters) {
   return repo.list(filters);
 }
 
-async function cancel(bookingId, actingUserId, auth) {
+async function cancel(bookingId, actingUserId, auth, reason = null) {
   const booking = await repo.findById(bookingId);
   if (!booking) throw ApiError.notFound(`Booking ${bookingId} not found`);
 
@@ -230,6 +230,21 @@ async function cancel(bookingId, actingUserId, auth) {
   }
 
   const updated = await repo.updateStatus(null, bookingId, 'Cancelled');
+  
+  if (reason) {
+    const { PrismaClient } = require('@prisma/client');
+    const prisma = new PrismaClient();
+    await prisma.approval.create({
+      data: {
+        bookingId,
+        approverUserId: userId,
+        approverRoleId: userAuth?.roleId,
+        decision: 'Cancelled',
+        decisionAt: new Date(),
+        remarks: reason
+      }
+    });
+  }
   await auditService.log({
     userId,
     action: 'CANCEL_BOOKING',

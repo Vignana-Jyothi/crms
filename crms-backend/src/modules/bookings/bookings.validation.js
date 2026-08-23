@@ -23,6 +23,7 @@ const bookingIdParamSchema = z.object({
 
 const cancelBookingSchema = z.object({
   params: z.object({ bookingId: z.coerce.number().int().positive() }),
+  body: z.object({ reason: z.string().optional() }).optional(),
 });
 
 module.exports = { createBookingSchema, bookingIdParamSchema, cancelBookingSchema };
