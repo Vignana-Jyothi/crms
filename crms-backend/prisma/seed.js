@@ -283,6 +283,8 @@ async function main() {
 
   let resourceCounter = 1;
 
+  const blockCounters = { A: 101, B: 101, C: 101, D: 101 };
+
   for (const branch of branchList) {
     const deptId = deptMap[branch];
     if (!deptId) continue;
@@ -295,19 +297,16 @@ async function main() {
 
     for (const year of years) {
       for (const section of sections) {
-        const yearInt = year.label.substring(0, 1);
-        const secNum = section === 'A' ? 1 : section === 'B' ? 2 : 3;
-        
-        // Generate realistic room number, e.g., "A-101"
-        const roomNumber = `${blockCode}-${yearInt}0${secNum}`;
+        // Generate UNIQUE realistic room number, e.g., "A-101", "A-102"
+        const roomNumber = `${blockCode}-${blockCounters[blockCode]++}`;
 
         resources.push({
           resourceId: roomNumber,
-          resourceName: `${year.label} Year ${branch} - Sec ${section}`, // Keep section as Name
+          resourceName: `${year.label} Year ${branch} - Sec ${section}`, // Keep section as Name for the subtitle
           resourceTypeId: rtMap['Classroom'],
           departmentId: deptId,
           blockId: blockId,
-          floor: yearInt, // 1st year = Floor 1, 2nd year = Floor 2, etc.
+          floor: Math.floor(blockCounters[blockCode] / 100).toString(),
           capacityOrAreaSqm: 65,
           allocationNote: 'EduPrime Sync Enabled Classroom',
           status: 'Active',
@@ -319,6 +318,11 @@ async function main() {
       }
     }
   }
+
+  // Clean up any previously generated EduPrime rooms to avoid duplicates
+  await prisma.resource.deleteMany({
+    where: { allocationNote: 'EduPrime Sync Enabled Classroom' }
+  });
 
   for (const res of resources) {
     await prisma.resource.upsert({
