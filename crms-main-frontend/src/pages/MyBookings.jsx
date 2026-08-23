@@ -60,13 +60,14 @@ export default function MyBookings() {
   useEffect(refresh, []);
 
   async function handleCancel(bookingId) {
-    if (!window.confirm('Are you sure you want to cancel this booking?')) {
-      return;
+    const reason = window.prompt('Are you sure you want to cancel this booking? Please provide a reason (optional):');
+    if (reason === null) {
+      return; // user pressed Cancel on the prompt dialog
     }
     setError('');
     setCancellingId(bookingId);
     try {
-      await bookingsApi.cancel(bookingId);
+      await bookingsApi.cancel(bookingId, { reason });
       refresh();
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to cancel booking. Please try again.');
@@ -114,20 +115,20 @@ export default function MyBookings() {
                 </p>
                 <p className="mt-1 text-sm text-ink/70">{b.purpose}</p>
 
-                {b.status === 'Rejected' && (
+                {['Rejected', 'Cancelled'].includes(b.status) && (
                   <div className="mt-2.5 rounded-md border border-brick/20 bg-brick-light/80 px-3 py-2 text-xs text-brick">
                     <p className="font-semibold text-brick flex items-center gap-1.5">
-                      <span>Rejection Reason:</span>
+                      <span>{b.status === 'Cancelled' ? 'Cancellation Reason:' : 'Rejection Reason:'}</span>
                     </p>
                     <p className="mt-0.5 text-ink/80 font-normal">
-                      {b.approvals?.find((a) => a.decision === 'Rejected')?.remarks ||
+                      {b.approvals?.find((a) => a.decision === b.status)?.remarks ||
                         b.approvals?.[0]?.remarks ||
                         b.rejectionRemarks ||
                         'No specific remarks provided.'}
                     </p>
-                    {b.approvals?.find((a) => a.decision === 'Rejected')?.approverUser?.name && (
+                    {b.approvals?.find((a) => a.decision === b.status)?.approverUser?.name && (
                       <p className="mt-1 text-[11px] text-ink/50">
-                        Decided by {b.approvals.find((a) => a.decision === 'Rejected').approverUser.name}
+                        Decided by {b.approvals.find((a) => a.decision === b.status).approverUser.name}
                       </p>
                     )}
                   </div>

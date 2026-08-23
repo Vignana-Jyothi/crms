@@ -77,12 +77,13 @@ export default function Bookings() {
     setCancelling(true);
     setActionAlert(null);
     try {
-      await bookingsApi.cancel(cancelModalBooking.bookingId);
+      await bookingsApi.cancel(cancelModalBooking.bookingId, { reason: cancelReason });
       setActionAlert({
         type: 'success',
         message: `Booking #${cancelModalBooking.bookingId} cancelled successfully.`,
       });
       setCancelModalBooking(null);
+      setCancelReason('');
       refresh();
     } catch (err) {
       setActionAlert({
@@ -372,11 +373,11 @@ export default function Bookings() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/40 backdrop-blur-sm p-4">
           <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl border border-line">
             <h3 className="font-display text-lg font-semibold text-navy">Admin Cancel Booking</h3>
-            <p className="mt-1 text-xs text-ink/60">
+            <p className="mt-1 text-xs text-ink/60 mb-3">
               Are you sure you want to administratively cancel booking #{cancelModalBooking.bookingId}? This will free up the slot immediately.
             </p>
 
-            <div className="mt-3 rounded-lg bg-paper p-3 text-xs text-ink/70">
+            <div className="rounded-lg bg-paper p-3 text-xs text-ink/70">
               <p className="font-semibold text-ink">
                 {cancelModalBooking.resource?.resourceName || cancelModalBooking.resourceId}
               </p>
@@ -387,10 +388,22 @@ export default function Bookings() {
               <p className="mt-0.5 text-ink/50">Purpose: {cancelModalBooking.purpose}</p>
             </div>
 
+            <label className="mt-4 mb-1 block text-sm font-semibold text-ink">Reason for cancellation (optional)</label>
+            <textarea
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              rows={3}
+              placeholder="Why is this being cancelled?"
+              className="w-full rounded border border-line bg-paper px-3 py-2 text-sm focus:border-brand focus:outline-none"
+            />
+
             <div className="mt-5 flex justify-end gap-3">
               <button
                 type="button"
-                onClick={() => setCancelModalBooking(null)}
+                onClick={() => {
+                  setCancelModalBooking(null);
+                  setCancelReason('');
+                }}
                 disabled={cancelling}
                 className="rounded-lg border border-line px-4 py-2 text-xs font-medium text-ink hover:bg-paper"
               >
