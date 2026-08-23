@@ -286,18 +286,30 @@ async function main() {
   for (const branch of branchList) {
     const deptId = deptMap[branch];
     if (!deptId) continue;
+    
+    // Assign blocks logically based on department
+    const blockCode = (branch === 'CSE' || branch === 'CIVIL' || branch === 'IT') ? 'A' :
+                      (branch === 'ECE') ? 'B' :
+                      (branch === 'EEE') ? 'C' : 'D';
+    const blockId = blockMap[blockCode];
+
     for (const year of years) {
       for (const section of sections) {
-        const roomId = `${branch}-${year.label.substring(0, 1)}0${section === 'A' ? 1 : section === 'B' ? 2 : 3}`;
+        const yearInt = year.label.substring(0, 1);
+        const secNum = section === 'A' ? 1 : section === 'B' ? 2 : 3;
+        
+        // Generate realistic room number, e.g., "A-101"
+        const roomNumber = `${blockCode}-${yearInt}0${secNum}`;
+
         resources.push({
-          resourceId: roomId,
-          resourceName: roomId, // Use Room Number as the primary Name
-          resourceTypeId: rtMap['Classroom'], // Classroom
+          resourceId: roomNumber,
+          resourceName: `${year.label} Year ${branch} - Sec ${section}`, // Keep section as Name
+          resourceTypeId: rtMap['Classroom'],
           departmentId: deptId,
-          blockId: deptId > 4 ? blockMap['A'] : deptId, // Assign random blocks safely
-          floor: '1',
+          blockId: blockId,
+          floor: yearInt, // 1st year = Floor 1, 2nd year = Floor 2, etc.
           capacityOrAreaSqm: 65,
-          allocationNote: `${year.label} Year ${branch} - Sec ${section}`, // Move the section name to the note
+          allocationNote: 'EduPrime Sync Enabled Classroom',
           status: 'Active',
           allocatedSemester: year.semName,
           allocatedBranch: branch,
