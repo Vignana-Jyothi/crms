@@ -37,7 +37,7 @@ export default function Dashboard() {
   });
   
   const [selectedDate, setSelectedDate] = useState(todayStr());
-  const [filterType, setFilterType] = useState('Whole'); // Now, Morning, Afternoon, Whole, Custom
+  const [filterType, setFilterType] = useState('Now'); // Now, Morning, Afternoon, Whole, Custom
   const [customStart, setCustomStart] = useState('09:00');
   const [customEnd, setCustomEnd] = useState('17:00');
   
