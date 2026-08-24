@@ -27,6 +27,7 @@ export const masterDataApi = {
   departments: () => client.get('/departments').then((r) => r.data),
   blocks: () => client.get('/blocks').then((r) => r.data),
   resourceTypes: () => client.get('/resource-types').then((r) => r.data),
+  faculty: () => client.get('/faculty').then((r) => r.data),
 };
 
 export const resourcesApi = {
@@ -56,5 +57,6 @@ export const auditApi = {
 };
 
 export const timetableApi = {
+  list: (params) => client.get('/timetable', { params }).then((r) => r.data),
   sync: () => client.post('/timetable/sync').then((r) => r.data),
 };

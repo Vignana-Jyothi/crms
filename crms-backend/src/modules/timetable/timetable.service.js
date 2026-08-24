@@ -7,7 +7,14 @@ const eduprimeService = require('../eduprime/eduprime.service');
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 async function list(filters) {
-  return repo.list(filters);
+  const parsedFilters = { ...filters };
+  if (parsedFilters.startTime) {
+    parsedFilters.startTime = toTimeValue(parsedFilters.startTime);
+  }
+  if (parsedFilters.endTime) {
+    parsedFilters.endTime = toTimeValue(parsedFilters.endTime);
+  }
+  return repo.list(parsedFilters);
 }
 
 async function getById(timetableId) {
