@@ -47,8 +47,8 @@ export default function Dashboard() {
   const [selectedRoom, setSelectedRoom] = useState(null);
 
   const getFilterTimes = () => {
-    let startTimeParam = null;
-    let endTimeParam = null;
+    let startTimeParam = '';
+    let endTimeParam = '';
 
     if (filterType === 'Morning') {
       startTimeParam = '09:00';
@@ -62,7 +62,14 @@ export default function Dashboard() {
     } else if (filterType === 'Custom') {
       startTimeParam = customStart;
       endTimeParam = customEnd;
+    } else if (filterType === 'Now') {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      startTimeParam = `${hours}:${mins}`;
+      endTimeParam = `${hours}:${mins}`;
     }
+
     return { startTimeParam, endTimeParam };
   };
 
