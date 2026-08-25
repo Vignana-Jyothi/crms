@@ -13,4 +13,8 @@ const syncEduPrime = asyncHandler(async (req, res) => {
   res.json(await service.syncEduPrime());
 });
 
-module.exports = { list, getById, syncEduPrime };
+const update = asyncHandler(async (req, res) => {
+  res.json(await service.update(req.params.timetableId, req.body));
+});
+
+module.exports = { list, getById, syncEduPrime, update };

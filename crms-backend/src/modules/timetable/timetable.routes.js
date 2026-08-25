@@ -9,5 +9,6 @@ router.use(authenticate);
 router.get('/', controller.list);
 router.post('/sync', controller.syncEduPrime);
 router.get('/:timetableId', controller.getById);
+router.put('/:timetableId', controller.update);
 
 module.exports = router;

@@ -102,4 +102,14 @@ async function syncEduPrime() {
   return { success: true, totalSynced };
 }
 
-module.exports = { list, getById, syncEduPrime };
+async function update(timetableId, data) {
+  const allowedData = {};
+  if (data.facultyName !== undefined) allowedData.facultyName = data.facultyName;
+  
+  return prisma.timetable.update({
+    where: { timetableId: parseInt(timetableId, 10) },
+    data: allowedData
+  });
+}
+
+module.exports = { list, getById, syncEduPrime, update };

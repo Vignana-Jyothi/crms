@@ -60,4 +60,5 @@ export const auditApi = {
 export const timetableApi = {
   list: (params) => client.get('/timetable', { params }).then((r) => r.data),
   sync: () => client.post('/timetable/sync').then((r) => r.data),
+  update: (id, data) => client.put(`/timetable/${id}`, data).then((r) => r.data),
 };
