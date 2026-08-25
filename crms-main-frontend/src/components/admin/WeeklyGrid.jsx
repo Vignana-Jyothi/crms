@@ -125,20 +125,9 @@ export default function WeeklyGrid({ timetables, onAssignFaculty, facultyList })
                               
                               <div className="mt-1 pt-1 border-t border-line/50">
                                 {t.facultyName ? (
-                                  <span className="text-ink font-medium truncate block">{t.facultyName}</span>
+                                  <div className="text-[10px] text-ink/80 truncate font-medium mt-0.5">{t.facultyName}</div>
                                 ) : (
-                                  <div className="print:hidden">
-                                    <select 
-                                      className="w-full text-[10px] py-1 px-1 border border-line rounded focus:ring-1 focus:ring-navy focus:border-navy bg-white"
-                                      onChange={(e) => onAssignFaculty(t.timetableId, e.target.value)}
-                                      value=""
-                                    >
-                                      <option value="" disabled>Assign Faculty...</option>
-                                      {facultyList.map(f => (
-                                        <option key={f} value={f}>{f}</option>
-                                      ))}
-                                    </select>
-                                  </div>
+                                  <div className="text-[10px] text-ink/40 italic mt-0.5">Unassigned</div>
                                 )}
                                 {!t.facultyName && <span className="hidden print:inline text-ink/40 italic">No Faculty</span>}
                               </div>

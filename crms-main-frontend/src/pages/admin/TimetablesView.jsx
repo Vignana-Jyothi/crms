@@ -505,20 +505,8 @@ export default function TimetablesView() {
                         {t.facultyName ? (
                           t.facultyName
                         ) : (
-                          <div className="print:hidden">
-                            <select 
-                              className="w-full max-w-[150px] text-xs py-1 px-2 border border-line rounded focus:ring-1 focus:ring-navy bg-white"
-                              onChange={(e) => handleAssignFaculty(t.timetableId, e.target.value)}
-                              value=""
-                            >
-                              <option value="" disabled>Assign Faculty...</option>
-                              {facultyList.map(f => (
-                                <option key={f} value={f}>{f}</option>
-                              ))}
-                            </select>
-                          </div>
+                          <span className="text-ink/40 italic">Unassigned</span>
                         )}
-                        {!t.facultyName && <span className="hidden print:inline text-ink/40 italic">No Faculty</span>}
                       </td>
                     </tr>
                   )})}
