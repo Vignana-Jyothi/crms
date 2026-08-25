@@ -67,19 +67,51 @@ async function main() {
     }
 
     let branchStr = branchMatch[1].trim();
-    if (branchStr === 'EVL' || branchStr === 'EIE') branchStr = 'ECE'; // Map sub-branches to main if needed, or leave as string
+    if (branchStr === 'EVL' || branchStr === 'EIE') branchStr = 'ECE'; // Map sub-branches
     
-    // Find department id based on branchCode
     let dept = depts.find(d => branchStr.includes(d.branchCode));
     if (!dept && branchStr.includes('CSE')) dept = depts.find(d => d.branchCode === 'CSE');
     
     const departmentId = dept ? dept.departmentId : null;
-
     const section = sectionMatch[1].trim();
     const defaultRoom = roomMatch ? roomMatch[1].trim() : null;
 
+    // Extract course mapping (Course Code, Name, Room, Faculty)
+    const mappings = {}; // course abbreviation -> { courseCode, facultyName, roomNo }
+    
     const linesArr = text.split('\n').map(l => l.trim()).filter(Boolean);
     
+    // Parse mapping table
+    let inMappingTable = false;
+    for (const line of linesArr) {
+      if (line.includes('Course Code') && line.includes('Name of the Course')) {
+        inMappingTable = true;
+        continue;
+      }
+      if (inMappingTable) {
+        // Example line:
+        // 25BS1MT101 Matrices and Calculus (MAC) D-113 Dr. T Siva Nageswara Rao OTHERS:
+        // 25BS2PH101 Applied Physics Laboratory (AP LAB) C-305 Dr. N Jahangeer / Dr. C. Thirmal (M) / Dr. N.V. Suresh Kumar (T) CVA-L1 Career Vision Approach-Level1
+        
+        // Match course code and the abbreviation in parentheses
+        const abbrevMatch = line.match(/^([0-9A-Z]{10})\s+(.+?)\(([^)]+)\)/i);
+        if (abbrevMatch) {
+          const code = abbrevMatch[1];
+          let abbrev = abbrevMatch[3].trim().toUpperCase();
+          
+          // Try to extract faculty name. Faculty names usually have titles like Dr., Mr., Mrs., Ms.
+          const facultyMatch = line.match(/(Dr\.|Mr\.|Mrs\.|Ms\.|Sri\.)\s*([A-Za-z\s\.\/]+?)(?=\s+(Seminar|Library|Sports|CCA|CVA|MTP|OTHER|Co-Curricular|$))/i);
+          let facultyName = facultyMatch ? facultyMatch[0].trim() : null;
+          
+          // Try to extract room if it looks like D-113, C-305, etc.
+          const roomMapMatch = line.match(/\b([A-Z]-\d{3})\b/);
+          let roomNo = roomMapMatch ? roomMapMatch[1] : defaultRoom;
+
+          mappings[abbrev] = { courseCode: code, facultyName, roomNo };
+        }
+      }
+    }
+
     // Attempt basic parsing for schedule
     for (const day of DAYS) {
       const dayLineIndex = linesArr.findIndex(l => l.startsWith(day));
@@ -92,18 +124,22 @@ async function main() {
       let slotIdx = 0;
       for (let i = 0; i < tokens.length; i++) {
         if (slotIdx >= 6) break;
-        let token = tokens[i];
+        let token = tokens[i].toUpperCase();
+        
+        // Clean up token to match mapping keys
+        let cleanToken = token.replace(/[\*\/]/g, '').replace('LAB', '').trim();
+        let map = mappings[cleanToken] || {};
 
         finalRecords.push({
           departmentId,
-          resourceId: defaultRoom || 'UNKNOWN',
+          resourceId: map.roomNo || defaultRoom || 'UNKNOWN',
           dayOfWeek: day,
           startTime: new Date(TIME_SLOTS[slotIdx].startTime),
           endTime: new Date(TIME_SLOTS[slotIdx].endTime),
-          courseCode: token,
-          section: `${branchStr} - Sec ${section}`, // Combining branch and section
+          courseCode: map.courseCode || token,
+          section: `${branchStr} - Sec ${section}`,
           academicYear: '2026-27',
-          facultyName: 'Assigned Faculty' // Placeholder, extracting perfect faculty mapping from OCR is too fragile
+          facultyName: map.facultyName || null // Null if no faculty mapped
         });
         slotIdx++;
       }
