@@ -328,7 +328,7 @@ export default function TimetablesView() {
                       </td>
                       
                       {viewMode !== 'Faculty' && (
-                        <td className="px-4 py-3 font-medium">{t.facultyName || 'Unknown Faculty'}</td>
+                        <td className="px-4 py-3 font-medium text-ink/80">{t.facultyName || '-'}</td>
                       )}
                     </tr>
                   ))}
