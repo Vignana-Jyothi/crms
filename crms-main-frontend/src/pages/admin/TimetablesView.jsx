@@ -194,7 +194,7 @@ export default function TimetablesView() {
           
           {/* Dynamic Filters based on Mode */}
           {viewMode === 'Classroom' && (
-            <div className="col-span-1 md:col-span-2">
+            <div className="col-span-1">
               <label className="mb-1 block text-xs font-semibold text-navy">Classroom / Lab</label>
               <select
                 value={filters.resourceId}
@@ -210,7 +210,7 @@ export default function TimetablesView() {
           )}
 
           {viewMode === 'Faculty' && (
-            <div className="col-span-1 md:col-span-2">
+            <div className="col-span-1">
               <label className="mb-1 block text-xs font-semibold text-navy">Faculty Name</label>
               <select
                 value={filters.facultyName}
