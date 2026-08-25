@@ -363,12 +363,9 @@ export default function TimetablesView() {
                 <thead className="bg-paper border-b border-line text-xs uppercase text-navy">
                   <tr>
                     <th className="px-4 py-3 font-semibold">Time</th>
-                    
-                    {/* Dynamic Columns based on mode */}
-                    {viewMode !== 'Classroom' && <th className="px-4 py-3 font-semibold">Room</th>}
-                    {viewMode !== 'Section' && <th className="px-4 py-3 font-semibold">Class / Course</th>}
-                    {viewMode === 'Section' && <th className="px-4 py-3 font-semibold">Course</th>}
-                    {viewMode !== 'Faculty' && <th className="px-4 py-3 font-semibold">Faculty Name</th>}
+                    <th className="px-4 py-3 font-semibold">Room</th>
+                    <th className="px-4 py-3 font-semibold">Class / Course</th>
+                    <th className="px-4 py-3 font-semibold">Faculty Name</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-line">
@@ -381,31 +378,25 @@ export default function TimetablesView() {
                         )}
                       </td>
                       
-                      {viewMode !== 'Classroom' && (
-                        <td className="px-4 py-3">
-                          <div className="font-medium">
-                            {t.resource?.resourceName && !/^\d(?:st|nd|rd|th)\s+Year/i.test(t.resource.resourceName) 
-                              ? t.resource.resourceName 
-                              : '-'}
-                          </div>
-                          <div className="text-xs text-ink/60 mt-0.5">
-                            {t.resource?.block?.blockName}
-                          </div>
-                        </td>
-                      )}
+                      <td className="px-4 py-3">
+                        <div className="font-medium">
+                          {t.resource?.resourceName && !/^\d(?:st|nd|rd|th)\s+Year/i.test(t.resource.resourceName) 
+                            ? t.resource.resourceName 
+                            : '-'}
+                        </div>
+                        <div className="text-xs text-ink/60 mt-0.5">
+                          {t.resource?.block?.blockName}
+                        </div>
+                      </td>
                       
                       <td className="px-4 py-3">
                         <div className="font-medium text-navy">{t.courseCode}</div>
-                        {viewMode !== 'Section' && (
-                          <div className="text-xs text-ink/60 mt-0.5">
-                            {t.department?.branchCode} - Sec {t.section}
-                          </div>
-                        )}
+                        <div className="text-xs text-ink/60 mt-0.5">
+                          {t.department?.branchCode} - Sec {t.section}
+                        </div>
                       </td>
                       
-                      {viewMode !== 'Faculty' && (
-                        <td className="px-4 py-3 font-medium text-ink/80">{t.facultyName || '-'}</td>
-                      )}
+                      <td className="px-4 py-3 font-medium text-ink/80">{t.facultyName || '-'}</td>
                     </tr>
                   ))}
                 </tbody>
