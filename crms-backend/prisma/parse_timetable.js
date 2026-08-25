@@ -21,23 +21,8 @@ const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
 
 async function main() {
   console.log('Extracting OCR from transcript...');
-  const lines = fs.readFileSync(TRANSCRIPT_PATH, 'utf-8').split('\n');
-  
-  let ocrContent = '';
-  for (const line of lines) {
-    if (line.includes('==Start of OCR for page')) {
-      try {
-        const obj = JSON.parse(line);
-        if (obj.content && !ocrContent.includes(obj.content.substring(0, 100))) {
-          ocrContent += '\n' + obj.content;
-        }
-      } catch (e) {
-        if (!ocrContent.includes(line.substring(0, 100))) {
-          ocrContent += '\n' + line;
-        }
-      }
-    }
-  }
+  console.log('Reading OCR data...');
+  const ocrContent = fs.readFileSync(TRANSCRIPT_PATH, 'utf-8');
 
   if (!ocrContent) {
     console.error('Could not find OCR content in transcript.');
