@@ -210,7 +210,9 @@ export default function TimetablesView() {
             >
               <option value="">All Blocks</option>
               {blocks.map(b => (
-                <option key={b.blockId} value={b.blockId}>{b.blockName}</option>
+                <option key={b.blockId} value={b.blockId}>
+                  {b.blockCode && b.blockCode.length <= 2 ? `Block ${b.blockCode}` : b.blockName}
+                </option>
               ))}
             </select>
           </div>
