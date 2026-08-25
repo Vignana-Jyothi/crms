@@ -263,7 +263,7 @@ export default function TimetablesView() {
         <div className="flex flex-col md:flex-row md:flex-wrap gap-4 items-end">
           
           {/* Unified Filters */}
-          <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
+          <div className="w-full md:w-48">
             <label className="mb-1 block text-xs font-semibold text-navy">Classroom / Lab</label>
             <select
               value={filters.resourceId}
@@ -277,7 +277,7 @@ export default function TimetablesView() {
             </select>
           </div>
 
-          <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
+          <div className="w-full md:w-48">
             <label className="mb-1 block text-xs font-semibold text-navy">Faculty Name</label>
             <select
               value={filters.facultyName}
@@ -291,7 +291,7 @@ export default function TimetablesView() {
             </select>
           </div>
 
-          <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
+          <div className="w-full md:w-48">
             <label className="mb-1 block text-xs font-semibold text-navy">Branch / Dept</label>
             <select
               value={filters.departmentId}
@@ -305,7 +305,7 @@ export default function TimetablesView() {
             </select>
           </div>
           
-          <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
+          <div className="w-full md:w-48">
             <label className="mb-1 block text-xs font-semibold text-navy">Section</label>
             <select
               value={filters.section}
@@ -321,7 +321,7 @@ export default function TimetablesView() {
           </div>
 
           {/* Shared Filters */}
-          <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
+          <div className="w-full md:w-48">
             <label className="mb-1 block text-xs font-semibold text-navy">Date</label>
             <input
               type="date"
@@ -331,7 +331,7 @@ export default function TimetablesView() {
             />
           </div>
 
-          <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
+          <div className="w-full md:w-48">
             <label className="mb-1 block text-xs font-semibold text-navy">Time Slot</label>
             <select
               value={filters.filterType}
@@ -346,7 +346,7 @@ export default function TimetablesView() {
             </select>
           </div>
 
-          <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
+          <div className="w-full md:w-48">
             <label className="mb-1 block text-xs font-semibold text-navy">Status</label>
             <select
               value={filters.status}
@@ -363,7 +363,7 @@ export default function TimetablesView() {
           </div>
 
           {/* Shared Block Filter */}
-          <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
+          <div className="w-full md:w-48">
             <label className="mb-1 block text-xs font-semibold text-navy">Block</label>
             <select
               value={filters.blockId}

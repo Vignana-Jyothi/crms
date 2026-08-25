@@ -19,6 +19,7 @@ function list({ departmentId, resourceId, dayOfWeek, academicYear, courseCode, s
           resourceId: true,
           resourceName: true,
           resourceTypeId: true,
+          blockId: true,
           capacityOrAreaSqm: true,
           status: true,
           resourceType: { select: { typeName: true } },
