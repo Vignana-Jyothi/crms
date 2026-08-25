@@ -104,10 +104,6 @@ export default function TimetablesView() {
         if (filters.blockId) {
           results = results.filter(t => t.resource?.blockId === Number(filters.blockId));
         }
-        if (viewMode === 'Faculty') {
-          // If searching faculty, filter out slots with no faculty assigned
-          results = results.filter((t) => t.facultyName);
-        }
         setTimetables(results);
       })
       .catch((err) => setError(err.response?.data?.error || 'Failed to load schedule.'))
