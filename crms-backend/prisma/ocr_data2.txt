@@ -1,0 +1,2051 @@
+ 
+                                                                                                                                                   HOD-CE 
+I/C Timetables: Mrs. V. Ramya Krishna     
+ 
+ 
+Class Coordinator: Mrs. J. Soujanya 
+25MN6HS101  Induction Programme (IP)         D-113  Mrs. T. Bhavani Chowdary                         
+25ES2ME101  Engineering Workshop (EW)        C-007  Dr. S.V. Satya Prasad / Dr. B. Sujith / Dr. P. S. Prasad              
+Laboratory (EGBM LAB) 
+25PC2CE101                     D-113  Dr. K Partha Saradhi / Mrs. R. Harika / Dr. Priyam Nath Bhowmik        
+Geology and Building Materials Testing 
+B-112/1 
+Skills Laboratory (ELCS LAB)                                 Placements  
+25HS2EN101                      &   Ms. R Sree Priya / Dr. Akil Ahmed   MTP                
+English Language and Communication                              Mentoring Training & 
+D-507 
+Dr. N.V. Suresh Kumar (T)           Approach-Level1 
+25BS2PH101  Applied Physics Laboratory (AP LAB)    C-305                   CVA-L1               
+Dr. N Jahangeer / Dr. C. Thirmal (M) /       Career Vision 
+Engineering (EEEE) 
+25ES1EE104                     D-113  Mr. P Ramesh            CCA   Co-Curricular Activities   
+Elements of Electrical and Electronics 
+Materials (EGBM)                                  CA    Activities 
+25PC1CE101                     D-113  Mr. P Rama Rao                             
+Engineering Geology and Building                           Sports/E Sports/Extra Curricular 
+25HS1EN101  English for Skill Enhancement (ESE)    D-113  Ms. R Sree Priya           Library  Library          
+25BS1PH101  Applied Physics (AP)           D-113  Dr. N Jahangeer           Seminar  Seminar          
+RS: 
+25BS1MT101  Matrices and Calculus (MAC)       D-113  Dr. T Siva Nageswara Rao                         
+OTHE
+No.                    y                 Faculty 
+Course Code  Name of the Course                Name of the Faculty              Name of the Activity 
+Room                   Categor             Name of the 
+* - Tutorial Class 
+Saturday         AP        MAC       EEEE             EGBM*           MTP 
+Friday         EEEE       MAC        AP               ESE       LIBRARY     SPORTS 
+H 
+C 
+Thursday        EGBM       EEEE       AP                  ELCS Lab          CVA-L1 
+N 
+EW              AP              EGBM          LIBRARY Wednesday 
+U 
+L 
+Tuesday          AP Lab / EGBM Lab        ESE              MAC        ECA       CCA 
+Monday         ESE       MAC       EGBM               EGBM Lab / AP Lab       SPORTS 
+1        2        3              4         5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM     12.00 PM           1.40  PM      2.40  PM     3.40  PM  
+                    Time                            12.00 PM  
+9.00  AM     10.00 AM     11.00  AM          12.40 PM      1.40  PM     2.40  PM  
+Section:      A                       Class Room No:  D-113                            w.e.f: 05/08/2026 
+Regulation:    R25                      Class:      I Year                  Semester: I            
+Academic Year:  2026-27                                Programme:   B.Tech.                 Branch:      CE 
+ 
+CLASS  TIMET ABLE
+DEP AR TMENT   OF  CIVIL  ENGINEERING    
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+----------------Page (0) Break----------------
+                     
+I/C Timetables:  Mrs. V. Ramya Krishna                                                                                                                                                         HOD-CE                                                        
+ 
+ 
+ 
+Class Coordinator: Dr. JYV Shiva Bhushan 
+ 
+25MN6HS101  Induction Programme (IP)         D-114  Dr. B. Murali Krishna                          
+25ES2ME101  Engineering Workshop (EW)        C-007   Mr. B. Chandrashekar / Dr. Ch. Sri Chaitanya / Mr. T. Praveen Kumar      
+Laboratory (EGBM LAB) 
+25PC2CE101                      D-114  Mr. P Rama Rao / Dr. P Arti Sudam / Dr. JYV Shiva Bhushan         
+Geology and Building Materials Testing 
+Skills Laboratory (ELCS LAB)       510    Bai                    Placements  
+25HS2EN101                                          MTP                  
+English Language and Communication   P-116/D- Dr. Akil Ahmed / Ms. Aswathi         Mentoring Training & 
+(AP LAB)                    Dr. N. Suresh Kumar (T)            Approach-Level1 
+25BS2PH101                      C-305                  CVA-L1                
+Advanced Engineering Physics Laboratory       Dr. G. Suresh / Dr. T. Rajani (M) /        Career Vision 
+Engineering (EEEE) 
+25ES1EE104                      D-114  Dr. G Lakshmi Narayana     CCA    Co-Curricular Activities   
+Elements of Electrical and Electronics 
+Materials (EGBM)                                       Activities 
+25PC1CE101                      D-114  Dr. K Partha Saradhi       Sports/ECA               
+Engineering Geology and Building                                Sports/Extra Curricular 
+25HS1EN101  English for Skill Enhancement (ESE)     D-114  Dr. Akil Ahmed         Library   Library          
+25BS1PH101  Advanced Physics (AP)           D-114  Dr. G Suresh          Seminar   Seminar          
+25BS1MT101  Matrices and Calculus (MAC)         D-114  Dr. G Swapna          OTHERS:                
+Faculty  
+Course  Code            Name  of the Course            Room  No.  Name  of the Faculty         Category    Name  of the Activity  
+Name  of the 
+* - Tutorial Class 
+Saturday        AP        EEEE        MAC              EGBM*           MTP 
+Friday        MAC       ESE        EEEE               AP           LIBRARY 
+H 
+C 
+Thursday      EGBM       ESE         AP               MAC       CVA-L1      SPORTS 
+N 
+Wednesday      ESE       MAC        AP        U          ELCS Lab         LIBRARY 
+L 
+Tuesday            EW             EGBM               EGBM Lab / AP Lab       SPORTS 
+Monday        AP Lab / EGBM Lab         EGBM              EEEE       ECA       CCA 
+1        2         3               4        5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM     12.00 PM           1.40  PM     2.40  PM      3.40  PM  
+               Time                             12.00 PM  
+9.00  AM     10.00 AM     11.00  AM           12.40 PM     1.40  PM      2.40  PM  
+Section:      B                       Class Room No: D-114                                        w.e.f: 05/08/2025 
+Regulation:    R25                      Class:      I Year                  Semester: I            
+Academic Year:  2026-27                     Programme:   B.Tech.                 Branch:  CE 
+CLASS  TIMET ABLE  
+DEP AR TMENT   OF  CIVIL  ENGINEERING    
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+----------------Page (1) Break----------------
+ 
+ 
+I/C Timetables : Dr. B. Neelakanteshwar Rao                                                                                                                                                         HOD-EEE 
+ 
+ 
+Class Coordinator: Mrs. B. Naga Swetha 
+25MN6HS101  Induction Programme (IP)            B-306   Mrs. B. Naga Swetha                       
+25ES2ME101  Engineering Workshop (EW)           C-007   Dr. T. S. Krishna Kumar / Dr. B. Harish Babu / Mr. Vinay Kulkarni 
+(PPS LAB) 
+25ES2CS101                       B-314/315  Dr. B. Jalender / Ms. K. Akhila                   
+Programming for Problem solving Laboratory 
+Laboratory (ELCS LAB)             1    Ujjwala                 Placements  
+25HS2EN101                                           MTP                 
+English Language and Communication Skills  D-507/B-112/ Dr. Waheeda Shafia / Dr. K.         Mentoring Training & 
+Rajani (Th) 
+(AEP LAB)                                           Approach-Level1 
+25BS2PH102                        A-314   D.N. Prasad (W) / Dr. T.   CVA-L1               
+Advance Engineering Physics Laboratory                               Career Vision 
+Dr. L. Srinivasa Rao / Dr. 
+Activities 
+25PC1EE101  Electrical Circuit-I (EC-I)            B-306   Dr. J. Srinivasa Rao     CCA                 
+Co-Curricular 
+Activities 
+25ES1CS101  Programming for Problem Solving (PPS)      B-306   Dr. B. Jalender       Sports/ECA             - 
+Sports/Extra Curricular 
+25HS1EN101  English for Skill Enhancement (ESE)       B-306   Dr. Waheeda Shafia     Library    Library        - 
+25BS1PH102  Advance Engineering Physics (AEP)       B-306   Dr. L. Srinivasa Rao     Seminar   Seminar        - 
+25BS1MT101  Matrices and Calculus (MAC)          B-306   Dr. D. Swarnakar      OTHERS: 
+the Faculty 
+Course Code  Name of the Course              Room No.  Name of the Faculty     Category   Name of the Activity 
+Name of 
+* - Tutorial Class 
+Saturday         MAC       EC-I       AEP                      PPS                                   MTP 
+ELCS Lab           ESE              AEP        EC-I*      LIBRARY Friday 
+H 
+C 
+Thursday         PPS        EC-I       MAC                PPS Lab / AEP Lab        SPORTS 
+N 
+Wednesday         AEP Lab / PPS Lab                   ESE       U       AEP        ECA        CCA 
+L 
+Tuesday         EC-I       MAC       PPS                    EW             CVA-L1 
+Monday         ESE        AEP       PPS              MAC           LIBRARY 
+1        2        3              4         5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM     12.00 PM           1.40  PM      2.40  PM      3.40  PM  
+                    Time                            12.00 PM  
+9.00  AM     10.00 AM     11.00  AM           12.40 PM      1.40  PM      2.40  PM  
+Section:      A                        Class Room No: B-306                                              w.e.f: 05/08/2026 
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                                Programme:   B.Tech.                     Branch:  EEE 
+ 
+ 
+CLASS  TIMET ABLE  
+DEP AR TMENT   ELECTRICAL    AND  ELECTRONICS    ENGINEERING    
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+----------------Page (2) Break----------------
+ 
+I/C Timetables: Dr. B. Neelakanteshwar Rao                                                                                                                                                   HOD-EEE 
+ 
+ 
+ 
+Class Coordinator: Mrs. B. Madhuri 
+25MN6HS101  Induction Programme (IP)         B-307   Mrs. B. Madhuri                          
+25ES2ME101  Engineering Workshop (EW)        C-007   Dr. P. S. Prasad / Dr. B. Sujith / Dr. Jayashri Nair              
+Laboratory (PPS LAB) 
+25ES2CS101                     P-203   Dr. B. Jalander / Ms. P. Sujatha (M) / Ms. R. Yamini Rani (T)       
+Programming for Problem solving 
+Skills Laboratory (ELCS LAB)            Ujjwala                  Placements  
+25HS2EN101                    A-117/118                MTP                
+English Language and Communication         Ms. Aswathi Bai / Dr. K           Mentoring Training & 
+Venkata Sai (T) 
+Laboratory (AEP LAB)                                    Approach-Level1 
+25BS2PH102                     A-314   Suresh Kumar (M) / Dr. D.    CVA-L1               
+Advance Engineering Physics                                 Career Vision 
+Dr. N Suresh Kumar / Dr. N.V. 
+Activities 
+25PC1EE101  Electrical Circuit-I (EC-I)         B-307   Ms. K Sravani           CCA                
+Co-Curricular 
+(PPS)                                           Activities 
+25ES1CS101                     B-307   Dr. B. Jalander        Sports/ECA            - 
+Programming for Problem Solving                               Sports/Extra Curricular 
+25HS1EN101  English for Skill Enhancement (ESE)    B-307   Dr. Somrwita Ghosh       Library   Library        - 
+25BS1PH102  Advance Engineering Physics (AEP)    B-307   Dr. N Suresh Kumar      Seminar   Seminar        - 
+25BS1MT101  Matrices and Calculus (MAC)       B-307   Dr. N Pothanna        OTHERS: 
+Faculty 
+Course Code  Name of the Course           Room No    Name of the Faculty    Category  Name of the Activity 
+Name of the 
+* - Tutorial Class 
+Saturday       PPS        AEP        MAC               ESE            MTP 
+Friday        MAC       PPS        AEP                    EW            CVA-L1 
+H 
+C 
+Thursday       AEP        ESE        EC-I                  ELCS Lab         LIBRARY 
+N 
+ESE        EC-I        MAC               PPS           LIBRARY Wednesday 
+U 
+L 
+Tuesday         PPS Lab / AEP Lab         EC-I*               PPS        ECA       CCA 
+Monday       EC-I       MAC        AEP                AEP Lab / PPS Lab        SPORTS 
+1        2         3               4        5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM     12.00 PM           1.40  PM     2.40  PM     3.40  PM  
+               Time                             12.00 PM  
+9.00  AM     10.00 AM     11.00  AM           12.40 PM     1.40  PM     2.40  PM  
+Section:      B                        Class Room No: B-307                                                   w.e.f: 05/08/2026 
+Regulation:    R25                      Class:      I Year                          Semester: I    
+Academic Year:  2026-27                                Programme:   B.Tech.                         Branch:  EEE 
+ 
+CLASS  TIMET ABLE
+DEP AR TMENT   ELECTRICAL    AND  ELECTRONICS    ENGINEERING    
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+----------------Page (3) Break----------------
+I/C Timetables:                                                                                                                                                                                                HOD-ME 
+ 
+ 
+ 
+Class Coordinator: Mr. P. Narendra 
+ 
+Induction Programme (IP)           D-302   Sri. S. R. Somayajulu                        
+25MN6HS101 
+LAB) 
+25PC2ME101                       D-305   Mr. P. Narendra / Dr. G. Raghu Babu                  
+Manufacturing Processes Laboratory (MP 
+25ES2ME101  Engineering Workshop (EW)          A-007   Dr. B. Satyanarayana/ Dr. B. Sujith / Dr. K. Krishna Murthy        
+Laboratory (ELCS LAB)            P-116   Sreepriya                 Placements  
+25HS2EN101                                           MTP                 
+English Language and Communication Skills   D-510/  Dr. Ayesha Salma/Ms. R.          Mentoring Training & 
+Sumithra (F) 
+Approach-Level1 
+25BS2PH101  Applied Physics Laboratory (AP LAB)      A-314   Venkata Sai (M) / Dr. M.    CVA-L1               
+Career Vision 
+Dr. M. Ramesh / Dr. D. 
+25PC1ME101  Manufacturing Processes (MP)         D-302     Dr. B. Satyanarayana      CCA    Co-Curricular Activities  - 
+Activities 
+25ES1ME101  Engineering Mechanics (EM)          D-302     Dr. P Prasad Kumar      Sports/ECA             - 
+Sports / Extra Curricular 
+25HS1EN101  English for Skill Enhancement (ESE)       D-302     Dr. D. Sudha Rani       Library   Library         - 
+25BS1PH101  Applied Physics (AP)             D-302     Dr. M. Ramesh        Seminar   Seminar        - 
+25BS1MT101  Matrices and Calculus (MAC)          D-302     Dr. R. Vivekananda      OTHERS: 
+Faculty 
+Course Code  Name of the Course             Room No.  Name of the Faculty      Category  Name of the Activity 
+Name of the 
+* - Tutorial Class 
+Saturday         MP        ESE        AP               EM            MTP 
+Friday         MAC        AP        EM                 MP Lab / AP Lab        CVA-L1 
+H 
+C 
+Thursday           ELCS Lab           ESE              MAC        EM*      SPORTS 
+N 
+AP        MP        MAC              ESE        MP*      LIBRARY Wednesday 
+U 
+L 
+Tuesday         MP        AP        MAC              EM        ECA       CCA 
+Monday          AP Lab / MP Lab         EM                    EW            LIBRARY 
+1        2        3              4         5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM     12.00 PM           1.40  PM      2.40  PM     3.40  PM  
+                    Time                            12.00 PM  
+9.00  AM     10.00 AM     11.00  AM          12.40 PM      1.40  PM     2.40  PM  
+Section:      A                        Class Room No: D-302                                                w.e.f: 05/08/2026 
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                            Programme:   B.Tech.                     Branch:      ME 
+ 
+CLASS  TIMET ABLE
+DEP AR TMENT   OF  MECHANICAL     ENGINEERING    
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+                                                                                                                                                                                                                              
+ 
+----------------Page (4) Break----------------
+I/C Timetables:                                                                                                                        HOD-ME 
+ 
+ 
+ 
+Class Coordinator: Dr. S. V. Sathya Prasad 
+ 
+Induction Programme (IP)         D-303  Dr. Ch. Priyadarshini                         
+25MN6HS101 
+(MP LAB) 
+25PC2ME101                     D-305  Dr. Sarath Chandra / Mr. P. Narendra                  
+Manufacturing Processes Laboratory 
+25ES2ME101  Engineering Workshop (EW)        C-007  Dr. B. Sujith / Dr.A. Syam Prasad / Dr. S.V. Satya Prasad          
+Skills Laboratory (ELCS LAB)           Rai                     Placements  
+25HS2EN101                    A-117/118                 MTP                
+English Language and Communication        Dr. Mary Berifin / Ms. Aswathi         Mentoring Training & 
+Kumar                   Approach-Level1 
+25BS2PH101  Applied Physics Laboratory (AP LAB)   A-314                  CVA-L1              
+Dr. M. Ramesh /Dr. P. Pavan          Career Vision 
+Activities 
+25PC1ME101  Manufacturing Processes (MP)       D-303  Dr. Y. Shivaraj Narayana     CCA               - 
+Co-Curricular 
+Curricular Activities 
+25ES1ME101  Engineering Mechanics (EM)       D-303  Dr. S. V. Sathya Prasad      Sports/ECA            - 
+Sports/Extra 
+25HS1EN101  English for Skill Enhancement (ESE)    D-303  Dr. Rachel Irdya Raj       Library   Library        - 
+25BS1PH101  Applied Physics (AP)           D-303  Dr. M Ramesh          Seminar   Seminar       - 
+25BS1MT101  Matrices and Calculus (MAC)       D-303  Dr. G. Gangadhar        OTHERS: 
+Faculty 
+Course Code  Name of the Course           Room No    Name of the Faculty    Category  Name of the Activity 
+Name of the 
+* - Tutorial Class 
+Saturday       MP*       AP         EM               MAC            MTP 
+Friday         AP        MP        MAC               EM        ESE      SPORTS 
+H 
+Thursday        AP Lab / MP Lab          ESE        C       AP        EM*      ECA/CCA 
+N 
+Wednesday      EM       ESE        MAC                 MP Lab / AP Lab        CVA-L1 
+U 
+L              
+Tuesday       MAC       MP         EM                                 SPORTS 
+ELCS Lab 
+Monday            EW              MP                AP           LIBRARY 
+1        2         3               4        5        6 
+Day                                 12.40 PM  
+10.00 AM    11.00  AM     12.00 PM            1.40  PM     2.40  PM     3.40  PM  
+               Time                             12.00 PM  
+9.00  AM     10.00 AM     11.00  AM            12.40 PM     1.40  PM     2.40  PM  
+Section:      B                        Class Room No: D-303                                  w.e.f: 05/08/2026    
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                     Programme:   B.Tech.                     Branch:  ME 
+CLASS  TIMET ABLE  
+DEP AR TMENT   OF  MECHANICAL     ENGINEERING    
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+ 
+----------------Page (5) Break----------------
+I/C Timetables:                                                         HOD- ECE 
+ 
+ 
+ 
+Class Coordinator: Mr. Sk. Khadar Shareef 
+25MN6HS101  Induction Programme (IP)          A-201   Mr. Sk. Khadar Shareef                       
+25ES2ME101  Engineering Workshop (EW)         A-007   Mr. P. Narendra/ Dr. L. Sandeep Raj/ Dr.A. Syam Prasad          
+Laboratory (PPS LAB)                 Bhaskar Reddy (Th)  
+25ES2CS101                       P-202                                    
+Programming for Problem Solving            Mrs. M. Mohana Deepthi / Mrs. K. Jyothsna Latha (T) / Mr. V. Vijaya 
+Skills Laboratory (ELCS LAB)             Matilda                 Placements  
+25HS2EN101                       P-116                 MTP                 
+English Language and Communication          Ms. R. Sreepriya/Dr. Rosy         Mentoring Training & 
+(AEP LAB)                     Kumar (T) / Dr. GV Rao (Th)        Approach-Level1 
+25BS2PH102                      C-308                 CVA-L1               - 
+Advanced Engineering Physics Laboratory        Dr. C. Thirmal / Dr. P. Pavan        Career Vision 
+25ES1EE105  Network Analysis (NA)                Mr. Sk. Khadar Shareef    CCA    Co-Curricular Activities  - 
+A-201 
+Activities 
+25ES1CS101  Programming for Problem Solving (PPS)         Mrs. M. Mohana Deepthi    Sports/ECA              
+A-201                       Sports/Extra Curricular 
+25HS1EN101  English for Skill Enhancement (ESE)           Dr. Prativa Rani Saha     Library   Library         - 
+A-201 
+25BS1PH102  Advanced Engineering Physics (AEP)          Dr. C Thirmal        Seminar   Seminar         - 
+A-201 
+25BS1MT101  Matrices and Calculus (MAC)              Dr. R. Srilatha        OTHERS: 
+A-201 
+Faculty 
+Course Code  Name of the Course            Room No.  Name of the Faculty     Category  Name of the Activity 
+Name of the 
+* - Tutorial Class 
+Saturday         PPS        NA       MAC              ESE            MTP 
+Friday              EW             AEP              NA*        MAC      LIBRARY 
+H 
+C 
+Thursday         MAC       PPS       ESE                AEP Lab/ PPS Lab        CVA-L1 
+N 
+ESE        AEP       PPS              MAC           LIBRARY Wednesday 
+U 
+L 
+Tuesday          PPS Lab / AEP Lab         NA              AEP        ECA       CCA 
+Monday          NA        AEP       PPS                  ELCS Lab           SPORTS 
+1        2        3              4         5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM    12.00 PM           1.40  PM      2.40  PM     3.40  PM  
+                    Time                            12.00 PM  
+9.00  AM     10.00 AM    11.00  AM          12.40 PM      1.40  PM     2.40  PM  
+Section:      A                        Class Room No: A-201                                           w.e.f: 05/08/2026    
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                            Programme:   B.Tech.                     Branch:      ECE 
+ 
+CLASS  TIMET ABLE
+DEP AR TMENT   OF  ELECTRONICS    AND  COMMUNICA   TION  ENGINEERING    
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+ 
+ 
+----------------Page (6) Break----------------
+ 
+ 
+Class Coordinator: Dr. Pradeep Kumar 
+25MN6HS101  Induction Programme (IP)        B-209  Dr. Pradeep Kumar                            
+25ES2ME101  Engineering Workshop (EW)      A-007  Dr. V. Rathinam / Dr. T. S. Krishna Kumar / Mr. B. Chandrashekar        
+Laboratory (PPS LAB)              Reddy (F) 
+25ES2CS101                    P-202                                      
+Programming for Problem Solving         Mrs. K. Jyothsna Latha / Ms. A. Sandhya Rani (M) / Mr. V. Vijaya Bhaskar 
+(ELCS LAB) 
+A-118                         Placements  
+25HS2EN101  Communication Skills Laboratory         Dr. Khamar Zahan/Dr. Ayesha Salma  MTP                 
+A-117&                         Mentoring Training & 
+English Language and 
+Laboratory (AEP LAB)                                    Approach-Level1 
+25BS2PH102                    C-308  Dr. G. V. Rao / Dr. N. Jahanegeer   CVA-L1               - 
+Advanced Engineering Physics                                 Career Vision 
+25ES1EE105  Network Analysis (NA)             Dr. Pradeep Kumar         CCA    Co-Curricular Activities  - 
+B-209 
+(PPS)                                            Activities 
+25ES1CS101                         Mrs. K. Jyothsna Latha       Sports/ECA              
+Programming for Problem Solving    B-209                         Sports/Extra Curricular 
+25HS1EN101  English for Skill Enhancement (ESE)        Dr. Khamar Zahan         Library   Library         - 
+B-209 
+25BS1PH102  Advanced Engineering Physics (AEP)       Dr. G. V. Rao           Seminar   Seminar         - 
+B-209 
+25BS1MT101  Matrices and Calculus (MAC)           Dr. G. Gangadhar          OTHERS: 
+B-209 
+Faculty 
+Course Code  Name of the Course          Room No.  Name of the Faculty        Category  Name of the Activity 
+Name of the 
+* - Tutorial Class   
+Saturday       NA       MAC       AEP                 PPS            MTP 
+Friday        PPS       AEP        NA                  AEP Lab / PPS Lab        LIBRARY 
+H 
+C 
+Thursday           EW             ESE                MAC        PPS      SPORTS 
+N 
+MAC       ESE        NA                    ELCS Lab          CVA-L1 Wednesday 
+U 
+L 
+Tuesday       ESE       AEP        PPS                 NA*        ECA       CCA 
+Monday        PPS Lab / AEP Lab        MAC                AEP           LIBRARY 
+1        2        3                4         5        6 
+Day                                12.40 PM  
+10.00 AM     11.00  AM     12.00 PM             1.40  PM      2.40  PM     3.40  PM  
+               Time                            12.00 PM  
+9.00  AM     10.00 AM     11.00  AM            12.40 PM      1.40  PM     2.40  PM  
+Section:      B                        Class Room No: B-209                                  w.e.f: 05/08/2026  
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                     Programme:   B.Tech.                     Branch:  ECE 
+CLASS  TIMET ABLE  
+DEP AR TMENT   OF  ELECTRONICS    AND  COMMUNICA   TION  ENGINEERING    
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+ 
+ 
+ 
+----------------Page (7) Break----------------
+ 
+Class Coordinator: Dr. G. Vijaya Kumar 
+25MN6HS101  Induction Programme (IP)         C-212  Dr. G. Vijaya Kumar                         
+25ES2ME101  Engineering Workshop (EW)        A-007  Mr. S. N. S. Sai Hari / Dr. D. Sarath Chandra/ Dr. P. Prasad Kumar      
+Laboratory (PPS LAB) 
+25ES2CS101                      P-202  Dr. G. Lakshmi Naga Jayaprada / Mrs. P. Devika              
+Programming for Problem Solving 
+Skills Laboratory (ELCS LAB)       A-118  Rai                    Placements  
+25HS2EN101                                         MTP                 
+English Language and Communication   A-117&  Dr. Mary Berifin/Ms. Aswathi         Mentoring Training & 
+(Th)  
+Laboratory (AEP LAB)                                    Approach-Level1 
+25BS2PH102                     C-308  Prasad (W) /Dr. N. Jahangeer   CVA-L1              - 
+Advanced Engineering Physics                                 Career Vision 
+Dr. K S Rudramamba / Dr. D N 
+25ES1EE105  Network Analysis (NA)          C-212  Dr. G. Vijaya Kumar       CCA    Co-Curricular Activities  - 
+Activities 
+25ES1CS101  Programming for Problem Solving (PPS)   C-212  Dr. G. Lakshmi Naga Jayaprada  Sports/ECA              
+Sports/Extra Curricular 
+25HS1EN101  English for Skill Enhancement (ESE)     C-212  Dr. Mary Berifin        Library   Library         - 
+25BS1PH102  Advanced Engineering Physics (AEP)    C-212  Dr. K S Rudramamba      Seminar   Seminar        - 
+25BS1MT101  Matrices and Calculus (MAC)        C-212  Dr. R. Arpitha         OTHERS: 
+Faculty 
+Course Code  Name of the Course           Room No.  Name of the Faculty      Category  Name of the Activity 
+Name of the 
+* - Tutorial Class 
+Saturday         NA        PPS       AEP              ESE            MTP 
+Friday          PPS       MAC       ESE                   EW             CVA-L1 
+H 
+C 
+Thursday         AEP Lab / PPS Lab         NA               AEP       MAC      LIBRARY 
+N 
+MAC       PPS        NA                PPS Lab / AEP Lab        SPORTS Wednesday 
+U 
+L 
+Tuesday         ESE        AEP       MAC              NA           LIBRARY 
+Monday            ELCS Lab           PPS               AEP       ECA       CCA 
+1        2        3              4        5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM     12.00 PM           1.40  PM     2.40  PM     3.40  PM  
+                    Time                            12.00 PM  
+9.00  AM     10.00 AM     11.00  AM           12.40 PM     1.40  PM     2.40  PM  
+Section:      C                        Class Room No: B-212                      w.e.f: 05/08/2026  
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                           Programme:   B.Tech.                     Branch:     ECE 
+ 
+CLASS  TIMET ABLE
+DEP AR TMENT   OF  ELECTRONICS    AND  COMMUNICA   TION  ENGINEERING    
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+ 
+ 
+ 
+I/C Timetables:                                                          HOD-ECE 
+----------------Page (8) Break----------------
+25ES2ME101  Engineering Workshop (EW)      A-007  Dr. P. S. Prasad / Mr. S. R. Somayajulu/ Dr. M. S. Srinivasa Rao        
+Laboratory (PPS LAB) 
+25ES2CS101                   P-202   Mr. D. Srinivas Rao / Mr. Sk. Khaleel                   
+Programming for Problem Solving 
+(ELCS LAB) 
+P-116                         Placements  
+25HS2EN101  Communication Skills Laboratory         Dr. Rosy Matilda/Dr. Akil Ahmad   MTP                
+D-510                             Mentoring Training & 
+English Language and 
+Laboratory (AEP LAB)             Dr. N. Suresh Kumar (W)            Approach-Level1 
+25BS2PH102                   C-308                   CVA-L1             - 
+Advanced Engineering Physics          Dr. M. Sumithra/ Dr. DN Prasad (T) /       Career Vision 
+Activities 
+25ES1EE105  Network Analysis (NA)        B-213    Mr. N. Syamala           CCA                
+Co-Curricular 
+(PPS)                                     A     Curricular Activities 
+25ES1CS101                   B-213    Mr. D. Srinivas Rao                          
+Programming for Problem Solving                         Sports/EC  Sports/Extra 
+(ESE) 
+25HS1EN101                   B-213    Dr. Y V Sudha Devi         Library   Library        - 
+English for Skill Enhancement 
+(AEP) 
+25BS1PH102                   B-213    Dr. M. Sumithra          Seminar   Seminar        - 
+Advanced Engineering Physics 
+25BS1MT101  Matrices and Calculus (MAC)     B-213    Dr. G. Swapna           OTHERS: 
+Faculty 
+Course Code  Name of the Course         Room No     Name of the Faculty     Category  Name of the Activity 
+Name of the 
+* - Tutorial Class 
+Saturday      AEP       ESE       NA                  PPS             MTP 
+Friday       ESE       AEP       MAC                     ELCS Lab  
+H                           LIBRARY 
+C 
+Thursday      PPS       ESE       AEP                  NA        MAC      SPORTS 
+N 
+PPS Lab / AEP Lab         PPS                  AEP         ECA Wednesday 
+U                            CCA 
+L 
+Tuesday      NA       MAC       PPS                   AEP Lab / PPS Lab        CVA-L1 
+Monday          EW            MAC                  NA*           LIBRARY 
+Day         1        2        3                  4         5        6 
+12.40 PM  
+Time      10.00 AM    11.00  AM    12.00 PM              1.40  PM      2.40  PM     3.40  PM  
+12.00 PM  
+                   9.00  AM    10.00 AM    11.00  AM              12.40 PM      1.40  PM     2.40  PM  
+Section:      D                       Class Room No:  B-213                      w.e.f: 05/08/2026   
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                     Programme:   B.Tech.                     Branch:  ECE 
+CLASS  TIMET ABLE  
+DEP AR TMENT   OF  ELECTRONICS    AND  COMMUNICA   TION  ENGINEERING    
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+ 
+ 
+I/C Timetables:                                                          HOD-ECE 
+ 
+ 
+----------------Page (9) Break----------------
+25ES2ME101  Engineering Workshop (EW)        A-007    Dr. N. Sri Latha / Dr. P. S. Prasad / Dr. B. Sujith            
+Laboratory (PPS LAB)                Nymeesha (F) 
+25ES2CS101                     P-202                                   
+Programming for Problem Solving           Dr. N. Sandeep Chaitanya / Mrs. K. Jyothsna Latha (M) / Dr. S. 
+(ELCS LAB) 
+A-118    Dr. Ayesha Salma             & Placements  
+25HS2EN101  Communication Skills Laboratory                          MTP               
+A-117&   Ms. D. Divya /               Mentoring Training 
+English Language and 
+Dr. N.V. Suresh Kumar (F) 
+Laboratory (AEP LAB)                                    Approach-Level1 
+25BS2PH102                     C-308    Srinivasa Rao (M) /       CVA-L1              
+Advanced Engineering Physics                                 Career Vision 
+Dr. P. Pavan Kumar / Dr. L. 
+Activities 
+25ES1EE105  Network Analysis (NA)                Dr. E. Vijaya Babu       CCA              - 
+C-203                        Co-Curricular 
+(PPS)                                           Curricular Activities 
+25ES1CS101                           Dr. N. Sandeep Chaitanya    Sports/ECA           - 
+Programming for Problem Solving     C-203                        Sports/Extra 
+25HS1EN101  English for Skill Enhancement (ESE)          Ms. D. Divya         Library   Library       - 
+C-203 
+25BS1PH102  Advanced Engineering Physics (AEP)          Dr. P. Pavan Kumar      Seminar   Seminar       - 
+C-203 
+25BS1MT101  Matrices and Calculus (MAC)             Dr. V. Ganesh Kumar     OTHERS: 
+C-203 
+Activity 
+Course Code  Name of the Course           Room No     Name of the Faculty   Category            Name  of the Faculty  
+Name of the 
+* - Tutorial Class 
+Saturday       ESE        AEP        PPS               MAC            MTP 
+Friday          PPS Lab / AEP Lab         NA*               AEP       MAC      SPORTS 
+H 
+C 
+Thursday       MAC        NA        PPS                    EW             CVA-L1 
+N 
+NA        AEP        MAC               ESE       ECA       CCA Wednesday 
+U 
+L 
+Tuesday           ELCS Lab           ESE               PPS           LIBRARY 
+Monday        PPS        NA        AEP                AEP Lab / PPS Lab        SPORTS 
+1         2         3               4        5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM     12.00 PM           1.40  PM     2.40  PM     3.40  PM  
+               Time                             12.00 PM  
+9.00  AM     10.00 AM     11.00  AM           12.40 PM     1.40  PM     2.40  PM  
+Section:      A                        Class Room No: C-203                      w.e.f: 05/08/2026 
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                     Programme:   B.Tech.                     Branch:  EVL 
+CLASS  TIMET ABLE  
+DEP AR TMENT   OF  ELECTRONICS    AND  COMMUNICA   TION  ENGINEERING    
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+       I/C Timetables:                                                                                                                                                                                                                                 HOD-ECE 
+ 
+ 
+      Class Coordinator: Mrs. N. Shyamala 
+1 
+Induction Programme (IP)       B-213  Mrs. N. Syamala                            
+25MN6HS10
+----------------Page (10) Break----------------
+LAB)                 05 
+25ES2EE101                          Dr. K. Veeresham/Dr. J. Viswanatha Rao                   
+Basic Electrical Engineering Lab (BEE  A-309/B-0
+25ES2IT101  IT Workshop (ITW)          E-030/031  Ms. Ch. Sandhya Rani/Ms. A. Sandhya Rani/Mr. V. Vijaya Bhaskar Reddy     
+Laboratory (PPS LAB)               Sudeshna/Ms.S.Ambika             Placements  
+25ES2CS101                     E-103                   MTP                 
+Programming for Problem Solving          Dr. B.V. Kiranmaye/ Ms. S.            Mentoring Training & 
+Balavardhana Rao (F) 
+LAB)                                             Approach-Level1 
+25BS2CH101                     B-308   Brahmayya (W) / Dr. A R      CVA-L1                
+Engineering Chemistry Laboratory (EC                               Career Vision 
+Dr. T. Lakshmi Viveka / Dr. M. 
+Sarath Chandra (Tu) 
+25ES3ME101  Engineering Drawing (ED)       E-014/015  Dr. S.V. Satya Prasad (M) / Dr. D.   CCA    Co-Curricular Activities  - 
+Dr. N. Srilatha/ Dr. G. V. Subhash/ 
+(PPS)                                             Activities 
+25ES1CS101                     E-138   Dr. B.V. Kiranmaye         Sports/ECA             - 
+Programming for Problem Solving                                 Sports/Extra Curricular 
+25ES1EE101  Basic Electrical Engineering (BEE)      E-138   Dr. K. Veeresham          Library   Library         - 
+25BS1CH101  Chemistry for Engineers (CFE)       E-138   Dr. T. Lakshmi Viveka        Seminar   Seminar        - 
+25BS1MT101  Matrices and Calculus (MAC)       E-138   Dr. Ch. Shashi Kumar        OTHERS: 
+Faculty 
+Course Code  Name of the Course           Room No.  Name of the Faculty        Category  Name of the Activity 
+Name of the 
+* - Tutorial Class 
+Saturday         BEE        PPS       MAC                   ITW             MTP 
+Friday           BEE Lab / EC Lab         PPS              CFE        MAC       CVA-L1 
+H 
+C 
+Thursday         MAC       BEE       CFE              PPS           LIBRARY 
+N 
+CFE       MAC       PPS                 EC Lab / PPS Lab        SPORTS Wednesday 
+U 
+L 
+Tuesday                 ED                        BEE        ECA        CCA 
+Monday          PPS Lab / BEE Lab         CFE                        ED 
+1        2        3              4         5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM    12.00 PM           1.40  PM      2.40  PM     3.40  PM  
+                    Time                            12.00 PM  
+9.00  AM     10.00 AM    11.00  AM           12.40 PM      1.40  PM     2.40  PM  
+Section:      A                        Class Room No: E-138                                 w.e.f: 05/08/20256    
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                            Programme:   B.Tech.                     Branch:   CSE    
+ 
+CLASS  TIMET ABLE
+DEP AR TMENT   OF  COMPUTER    SCIENCE   AND  ENGINEERING     
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+ 
+I/C Timetables:                                                                                                   HOD-ECE 
+ 
+ 
+Class Coordinator: Dr. E. Vijaya Babu 
+25MN6HS101  Induction Programme (IP)         C-203    Dr. E. Vijaya Babu                        
+----------------Page (11) Break----------------
+25ES2IT101  IT Workshop (ITW)         E-115/116   Mr. K. Prathap Joshi /Ms. M. Srijitha / Ms. Sana Inayath         
+Laboratory (PPS LAB)               Deepthi/Ms. A. Sandhya Rani         Placements  
+25ES2CS101                     E-103                  MTP                
+Programming for Problem Solving          Dr, V. Baby/ Ms. M. Mohana         Mentoring Training & 
+Mamatha (W) 
+(EC LAB)                                         Approach-Level1 
+25BS2CH101                     B-308   Pratyusha (T) / Dr. Dr. N     CVA-L1               
+Engineering Chemistry Laboratory                               Career Vision 
+Dr. S. Rambabu / Dr. S 
+Athani 
+Activities 
+25ES3ME101  Engineering Drawing (ED)       E-030/031  Prasad / Mr. Mohamad Aziz   CCA               - 
+Co-Curricular 
+Mr. M. Krishna / Dr. GVL 
+(PPS)                                           Activities 
+25ES1CS101                     E-139   Dr, V. Baby          Sports/ECA            - 
+Programming for Problem Solving                               Sports/Extra Curricular 
+25ES1EE101  Basic Electrical Engineering (BEE)     E-139   Dr. K. Veeresham        Library   Library        - 
+25BS1CH101  Chemistry for Engineers (CFE)      E-139   Dr. S. Rambabu        Seminar   Seminar        - 
+25BS1MT101  Matrices and Calculus (MAC)       E-139   Dr. B. Naga Malleswari     OTHERS: 
+Faculty 
+Course Code  Name of the Course          Room No     Name of the Faculty    Category  Name of the Activity 
+Name of the 
+* - Tutorial Class 
+Saturday       CFE       MAC        BEE                    ITW            SPORTS 
+Friday         PPS       CFE        MAC               BEE         BEE Lab / PPS Lab 
+H 
+C 
+Thursday       MAC       PPS        BEE               CFE           LIBRARY 
+N 
+PPS Lab / EC Lab          MAC                         ED Wednesday 
+U 
+L 
+Tuesday         EC Lab / BEE Lab          CFE                PPS       CVA-L1      MTP 
+Monday                 ED                         PPS        ECA       CCA 
+1        2         3               4         5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM     12.00 PM            1.40  PM      2.40  PM     3.40  PM  
+               Time                             12.00 PM  
+9.00  AM     10.00 AM     11.00  AM           12.40 PM      1.40  PM     2.40  PM  
+Section:      B                        Class Room No: E-139                                w.e.f: 05/08/2026    
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                     Programme:   B.Tech.                     Branch:  CSE 
+CLASS  TIMET ABLE   
+DEP AR TMENT   OF  COMPUTER    SCIENCE   AND  ENGINEERING     
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+ 
+              I/C Timetables:                                                                                                                                                                            HOD-CSE 
+ 
+ 
+ 
+Class Coordinator: Ms. S. Ambika 
+25MN6HS101  Induction Programme (IP)         E-138   Mr. Saddam Hussain                           
+----------------Page (12) Break----------------
+25ES2IT101  IT Workshop (ITW)          E-030/031  Ms. S. Jahnavi / Ms. Sana Inayath / S. Ambika                
+Laboratory (PPS LAB)          T)    Sravanthi                   Placements  
+25ES2CS101                                           MTP                 
+Programming for Problem Solving   E-102(F)/103( Ms. K. Jhansi Lakshmi/Ms. S.           Mentoring Training & 
+Tiwari (F) 
+(EC LAB)                                           Approach-Level1 
+25BS2CH101                    B-308   Lakshmi Viveka (Th)/Dr. Shuchi    CVA-L1               
+Engineering Chemistry Laboratory                                 Career Vision 
+Dr. S. Nagarjuna Kumar/Dr. T 
+Kumar (W) 
+25ES3ME101  Engineering Drawing (ED)       E-014/015  Dr. N. Srilatha (M) / Dr. P. Prasad   CCA    Co-Curricular Activities  - 
+Mr. S. N. S. Sai Hari / Dr. H. Naresh / 
+(PPS)                                             Activities 
+25ES1CS101                     E-140   Ms. K. Jhansi Lakshmi        Sports/ECA             - 
+Programming for Problem Solving                                 Sports/Extra Curricular 
+25ES1EE101  Basic Electrical Engineering (BEE)     E-140   Ms. B. Harshini           Library   Library         - 
+25BS1CH101  Chemistry for Engineers (CFE)      E-140   Dr. S. Nagarjuna Kumar       Seminar   Seminar        - 
+25BS1MT101  Matrices and Calculus (MAC)       E-140   Dr. S. Viswas            OTHERS: 
+the Faculty 
+Course Code  Name of the Course           Room No.   Name of the Faculty       Category  Name of the Activity 
+Name of 
+* - Tutorial Class 
+Saturday         CFE        PPS       MAC              BEE        MTP       CCA 
+Friday          BEE       MAC       CFE                PPS Lab / EC Lab         ECA 
+H 
+C 
+Thursday          EC Lab / BEE Lab         BEE               PPS           LIBRARY 
+N 
+MAC       PPS       CFE                        ED Wednesday 
+U 
+L 
+Tuesday         PPS       MAC       CFE               PPS Lab / BEE Lab        CVA-L1 
+Monday                  ED                            ITW            SPORTS 
+1        2        3               4        5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM    12.00 PM           1.40  PM      2.40  PM     3.40  PM  
+                    Time                            12.00 PM  
+9.00  AM     10.00 AM    11.00  AM           12.40 PM     1.40  PM     2.40  PM  
+Section:      C                        Class Room No: E-140                      w.e.f: 05/08/2026    
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                            Programme:   B.Tech.                     Branch:      CSE 
+ 
+CLASS  TIMET ABLE
+DEP AR TMENT   OF  COMPUTER    SCIENCE   AND  ENGINEERING    
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+ 
+I/C Timetables:                                                                                                                                                                           HOD-CSE 
+ 
+ 
+                Class Coordinator: Ms. M. Mohana Deepthi 
+25MN6HS101  Induction Programme (IP)        E-139   Mrs. K. Jyothsna Latha                       
+(BEE LAB)  
+25ES2EE101                     P-014   Dr. O. Sobhana / Dr. E. Shiva Prasad                  
+Basic Electrical Engineering Lab 
+----------------Page (13) Break----------------
+25ES2IT101  IT Workshop (ITW)           E-115/116  Ms. S Jahnavi/Ms. M.  Srijitha / Ms. S. Sudeshna            
+Laboratory (PPS LAB)                Prasanna                 Placements  
+25ES2CS101                                         MTP                
+Programming for Problem Solving      E-101    Dr. D N Vasundhara / Ms. P.         Mentoring Training & 
+Lakshmi Viveka (Th) 
+LAB)                                           Approach-Level1 
+25BS2CH101                     B-308   Suchi Tiwari (M)/Dr. T     CVA-L1               
+Engineering Chemistry Laboratory (EC                             Career Vision 
+Dr. Chander A Pawar/Dr. 
+Rao/Mr.T.Praveen Kumar 
+Activities 
+25ES3ME101  Engineering Drawing (ED)        E-014/015  Kulkarni/Dr.T.Srinivasa    CCA               - 
+Co-Curricular 
+Mr.Vinay 
+(PPS)                                           Curricular Activities 
+25ES1CS101                      E-106   Dr. D N Vasundhara      Sports/ECA            - 
+Programming for Problem Solving                               Sports/Extra 
+25ES1EE101  Basic Electrical Engineering (BEE)      E-106   Mr. G C Prabhakar      Library   Library        - 
+25BS1CH101  Chemistry for Engineers (CFE)       E-106   Dr. Chander A Pawar     Seminar   Seminar        - 
+25BS1MT101  Matrices and Calculus (MAC)        E-106   Dr. R. Vivekananda      OTHERS: 
+Faculty 
+Course Code  Name of the Course           Room No    Name of the Faculty   Category  Name of the Activity 
+Name of the 
+* - Tutorial Class 
+Saturday       MAC       CFE        PPS                BEE            MTP 
+Friday         PPS Lab / BEE Lab         BEE                PPS           LIBRARY 
+H 
+C 
+Thursday       BEE       CFE        MAC                         ED 
+N 
+ED                         MAC       CFE      ECA /CCA Wednesday 
+U 
+L 
+Tuesday           ITW              PPS                 BEE Lab / EC Lab        SPORTS 
+Monday         EC Lab / PPS Lab          CFE                PPS        MAC      CVA-L1 
+1        2         3                4        5        6 
+Day                                 12.40 PM  
+10.00 AM    11.00  AM     12.00 PM            1.40  PM      2.40  PM     3.40  PM  
+               Time                             12.00 PM  
+9.00  AM     10.00 AM     11.00  AM            12.40 PM     1.40  PM     2.40  PM  
+Section:      D                        Class Room No: E-141                                  w.e.f: 05/08/2026 
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                     Programme:   B.Tech.                     Branch:  CSE 
+CLASS  TIMET ABLE   
+DEP AR TMENT   OF  COMPUTER    SCIENCE   AND  ENGINEERING     
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+I/C Timetables:                                                                                                                                                                 HOD-CSE 
+ 
+ 
+ 
+Class Coordinator: Ms. K. Jhansi Lakshmi 
+25MN6HS101  Induction Programme (IP)        E-140   Mrs. A. Sandhya Rani                           
+(BEE LAB)  
+25ES2EE101                     B-004                                       
+Basic Electrical Engineering Lab           Ms. B. Harshini / Mr. K. Srikanth (T) / Dr. P. Nagabushanam (Th) 
+----------------Page (14) Break----------------
+F) 
+Laboratory (PPS LAB)               Lakshmi                    Placements  
+25ES2CS101                    (W)/E-103(                  MTP                 
+Programming for Problem Solving          Mrs. S. Sravanthi / Mrs. K. Jhansi         Mentoring Training & 
+E-130  
+Kiranmai (W) 
+LAB)                                             Approach-Level1 
+25BS2CH101                     B-309   Chandran (M)/Dr. M Haritha     CVA-L1                
+Engineering Chemistry Laboratory (EC                               Career Vision 
+Dr. Shuchi Tiwari / Dr.  Likha 
+Srinivasa Rao (Th) 
+25ES3ME101  Engineering Drawing (ED)       E-014/015  Dr. T. Malyadri (T) / Dr. M. S.    CCA    Co-Curricular Activities  - 
+Ms. S. Swetha / Dr. A. Syam Prasad/ 
+(PPS)                                             Activities 
+25ES1CS101                     E-037   Ms. S Sravanthi          Sports/ECA             - 
+Programming for Problem Solving                                 Sports/Extra Curricular 
+25ES1EE101  Basic Electrical Engineering (BEE)      E-037   Mr. B. Devulal           Library   Library         - 
+25BS1CH101  Chemistry for Engineers (CFE)       E-037   Dr. Shuchi Tiwari          Seminar   Seminar        - 
+25BS1MT101  Matrices and Calculus (MAC)       E-037   Dr. J. Srinivas           OTHERS: 
+Faculty 
+Course Code  Name of the Course           Room No.  Name of the Faculty        Category  Name of the Activity 
+Name of the 
+* - Tutorial Class 
+Saturday         CFE       BEE       MAC              PPS        MTP       SPORTS 
+Friday           PPS Lab / BEE Lab         CFE              MAC        BEE       ECA/  
+H 
+C 
+Thursday                 ED                        PPS           LIBRARY 
+N 
+PPS Lab / EC Lab         PPS              CFE        MAC       CCA Wednesday 
+U 
+L 
+Tuesday             ITW             CFE                        ED 
+Monday         BEE       MAC       PPS                EC Lab / BEE Lab        CVA-L1 
+1        2        3              4         5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM    12.00 PM           1.40  PM      2.40  PM     3.40  PM  
+                    Time                            12.00 PM  
+9.00  AM     10.00 AM    11.00  AM           12.40 PM      1.40  PM     2.40  PM  
+Section:      E                        Class Room No: E-107                      w.e.f: 05/08/2026     
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                            Programme:   B.Tech.                     Branch:   CSE    
+ 
+CLASS  TIMET ABLE
+DEP AR TMENT   OF  COMPUTER    SCIENCE   AND  ENGINEERING     
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+ 
+                 I/C Timetables:                                                                                                                                                                                     HOD-CSE 
+ 
+ 
+Class Coordinator: Dr. D N Vasundhara 
+25MN6HS101  Induction Programme (IP)         E-106   Mrs. M. Srijitha                         
+LAB)                        Kumar (F) 
+25ES2EE101                      P-014                                   
+Basic Electrical Engineering Lab (BEE         Mr. G. C . Prabhakar / Dr. Kasi Ramakrishna Reddy (T) / Dr. A. Ravi 
+----------------Page (15) Break----------------
+    (PPS) 
+C-201   Ms. M. Alekhya                           
+25ES1CS101  Programming for Problem Solving 
+    (IOT) 
+C-201   Mr. Ch. Venkanna         Library   Library        - 
+25ES1EI101  Introduction to IOT and Application 
+25BS1CH101  Chemistry for Engineers (CFE)       C-201   Dr. N. Mamatha          Seminar   Seminar       - 
+25BS1MT101  Matrices and Calculus (MAC)       C-201   Dr. B Naga Malleswari       OTHERS: 
+Faculty 
+Course Code  Name of the Course           Room No.  Name of the Faculty       Category  Name of the Activity 
+Name of the 
+* - Tutorial Class 
+Saturday         CFE        IOT       PPS              MAC            MTP 
+Friday          MAC       CFE       ESE                PPS Lab / EC Lab        LIBRARY 
+H 
+C 
+Thursday           ELCS Lab           CFE               PPS        IOT*      LIBRARY 
+N 
+ESE        PPS       IOT              MAC       LIBRARY      CCA Wednesday 
+U 
+L 
+Tuesday         PPS       MAC       CFE                    EW             CVA-L1 
+Monday          EC Lab / PPS Lab         IOT               ESE        ECA      SPORTS 
+1        2        3              4         5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM    12.00 PM           1.40  PM      2.40  PM     3.40  PM  
+                    Time                            12.00 PM  
+9.00  AM     10.00 AM    11.00  AM           12.40 PM      1.40  PM     2.40  PM  
+Section:      A                        Class Room No: C-201                                  w.e.f: 05/08/2026  
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                            Programme:   B.Tech.                     Branch:      EIE 
+ 
+CLASS  TIMET ABLE
+DEP AR TMENT   OF  ELECTRONICS    AND  INSTRUMENT    ATION  ENGINEERING    
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+I/C Timetables:                                                                                                                                                                   HOD-CSE(CSBS) 
+ 
+e 
+CLASS  TIMET ABLE  
+DEP AR TMENT   OF  COMPUTER    SCIENCE   AND  ENGINEERING    (CSBS)  
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+ 
+              I/C Timetables:                                                                                                                                                                            HOD-CSE 
+ 
+ 
+Class Coordinator: Ms. S. Sravanthi 
+25MN6HS101  Induction Programme (IP)         E-037   Mrs. S. Ambika                             
+LAB)  
+25ES2EE101                     B-004   Mr. B. Devulal / Dr. Y. Venu (M), Dr. J. Bhavani (F)              
+Basic Electrical Engineering Lab (BEE 
+25ES2IT101  IT Workshop (ITW)          E-030/031  Ms. P Prasanna / Ms. Ch. Sandhya Rani / Ms. K. Bhagya Rekha         
+----------------Page (16) Break----------------
+    (IOT) 
+C-202   Mr. Ch. Venkanna        Library    Library      - 
+25ES1EI101  Introduction to Internet of Things 
+25BS1CH101  Chemistry for Engineers (CFE)       C-202   Dr. M. Bramhayya        Seminar   Seminar      - 
+25BS1MT101  Matrices and Calculus (MAC)       C-202   Dr. V. Swathi          OTHERS: 
+Activity      Faculty 
+Course Code  Name of the Course           Room No     Name of the Faculty    Category 
+Name of the    Name of the 
+* - Tutorial Class   
+Saturday       MAC        CFE        PPS               IOT            MTP 
+Friday          PPS Lab / EC Lab          ESE                  ELCS Lab          SPORTS 
+H 
+C 
+Thursday       IOT        MAC        PPS                    EW             CVA-L1 
+N 
+ESE        PPS        CFE               IOT* Wednesday 
+U                    LIBRARY 
+L 
+Tuesday       MAC        PPS        CFE               IOT         ECA       CCA 
+Monday       CFE        IOT        MAC               ESE              EC Lab / PPS Lab 
+1        2         3               4         5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM     12.00 PM           1.40  PM      2.40  PM      3.40  PM  
+               Time                            12.00 PM  
+9.00  AM     10.00 AM     11.00  AM           12.40 PM      1.40  PM      2.40  PM  
+Section:      B                        Class Room No: C-202                                           w.e.f: 05/08/2026 
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                     Programme:   B.Tech.                     Branch:  EIE 
+CLASS  TIMET ABLE  
+DEP AR TMENT   OF  ELECTRONICS    AND  INSTRUMENT    ATION  ENGINEERING    
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+ 
+ 
+I/C Timetable:   Mr. C.V. Rambabu / Mr. Ch. Venkanna                                                                                                                             HOD-EIE 
+ 
+ 
+Class Coordinator: Dr. B. Rajasekhar Reddy 
+ 
+Induction Programme (IP)         C-201   Dr. A. Jyothirmai                           
+25MN6HS101 
+ 
+Engineering Workshop (EW)        A-007   Mr.M.Venkata Ramarao/Mr.T.Praveen Kumar/Dr.Ch.Sri Chaitanya      
+25ES2ME101 
+    Skills Laboratory (ELCS LAB)                                  Placements  
+A-117/118  Dr. K. Ujjwala/Ms. D. Divya    MTP                
+25HS2EN101  English Language and Communication                               Mentoring Training & 
+Laboratory (PPS LAB)           (F)    Sharma                   Approach-Level1 
+25ES2CS101                                           CVA-L1              
+Programming for Problem Solving    C-204(M)/205 Ms. M. Alekhya/Mr. Anand Kumar        Career Vision 
+LAB)                       Kumar (M) / Dr. S Rambabu (F)         Activities 
+25BS2CH101                     C-313                   CCA                
+Engineering Chemistry Laboratory (EC         Dr. N. Mamatha/ Dr. S Nagarjuna        Co-Curricular 
+                                                    Curricular Activities 
+English for Skill Enhancement (ESE)    C-201   Mr. K. Ashok           Sports/ECA            - 
+25HS1EN101                                                 Sports/Extra 
+----------------Page (17) Break----------------
+25ES1EE101  Basic Electrical Engineering (BEE)       B-414  Mrs. S. Poornima        Library    Library     - 
+25BS1CH101  Chemistry for Engineers (CFE)         B-414  Dr. Likha Chandran       Seminar   Seminar    - 
+25BS1MT101  Matrices and Calculus (MAC)         B-414  Dr. V Ganesh Kumar      OTHERS: 
+No.                         Activity 
+Course Code       Name of the Course              Name of the Faculty    Category          Name of the Faculty 
+Room                        Name of the 
+* - Tutorial Class 
+Saturday         PPS       MAC       CFE                   ITW             MTP 
+Friday                  ED                        PPS        CFE       MAC 
+H 
+C 
+Thursday        CFE        PPS        BEE                BEE Lab / EC Lab         SPORTS 
+N 
+PPS Lab / BEE Lab         PPS              MAC           LIBRARY Wednesday 
+U 
+L 
+Tuesday         MAC       BEE       CFE                EC Lab / PPS Lab        CVA-L1 
+Monday                  ED                        BEE        ECA       CCA 
+1        2        3              4         5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM     12.00 PM           1.40  PM      2.40  PM     3.40  PM  
+                    Time                            12.00 PM  
+9.00  AM     10.00 AM     11.00  AM           12.40 PM      1.40  PM     2.40  PM  
+Section:      A                                           Class Room No: B-414                                              w.e.f: 05/08/2026 
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                            Programme:   B.Tech.                     Branch:      IT 
+ 
+CLASS  TIMET ABLE
+DEP AR TMENT   OF  INFORMA  TION  TECHNOLOGY     
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+I/C Timetables: Mr. C.V. Rambabu / Mr. Ch. Venkanna                                                                                                                               HOD-EIE 
+ 
+ 
+Class Coordinator: Dr. S. Senthil Kumar 
+ 
+Induction Programme (IP)         C-202   Dr. P. Sampurna Lakshmi                      
+25MN6HS101 
+ 
+Engineering Workshop (EW)        C-007   Dr. G. Raghu Babu / Dr. H. Naresh/ Mr. S. N. S. Sai Hari         
+25ES2ME101 
+    Skills Laboratory (ELCS LAB) 
+A-117/118   Dr. Ayesha Salma/Ms. D. Divya                   
+25HS2EN101  English Language and Communication 
+Rao (F)                   Placements  
+Laboratory (PPS LAB)           (F) 
+25ES2CS101                           P.Lalitha(M)/Mr. P.Venkateswar   MTP     Training &      
+Programming for Problem Solving    C-204(M)/205
+Mr. Anand Kumar Sharma/Mrs.         Mentoring 
+(EC LAB)                     Mamatha (M) / Dr. G Nirmala (F)        Approach-Level 1 
+25BS2CH101                     C-313                   CVA-L1            - 
+Engineering Chemistry Laboratory           Dr. M. Brahmayya / Dr. N.           Career Vision 
+                                                    Activities 
+English for Skill Enhancement (ESE)    C-202   Dr. Ayesha Salma        CCA              - 
+25HS1EN101                                                 Co-Curricular 
+Activities 
+    (PPS) 
+C-202   Mr. Anand Kumar Sharma     Sports/ECA  Curricular      
+25ES1CS101  Programming for Problem Solving 
+Sports/Extra 
+----------------Page (18) Break----------------
+25ES1EE101  Basic Electrical Engineering (BEE)    B-415  Mr. N. Amarnadh Reddy        Library    Library       - 
+25BS1CH101  Chemistry for Engineers (CFE)     B-415  Dr. S. Archana Kushwaha       Seminar   Seminar       - 
+ 
+25BS1MT101  Matrices and Calculus (MAC)      B-415                    OTHERS: 
+Dr. S. Vishwas 
+Faculty  
+Course Code  Name of the Course          Room No     Name of the Faculty     Category   Name of the Activity 
+Name  of the 
+* - Tutorial Class 
+Saturday            ITW              CFE               MAC       CVA-L1       MTP 
+Friday        MAC        PPS        BEE                BEE Lab / PPS Lab         CCA 
+H 
+C 
+Thursday                 ED                         CFE        PPS        ECA 
+N 
+CFE        BEE        MAC                EC Lab / BEE Lab        SPORTS Wednesday 
+U 
+L 
+Tuesday         PPS Lab / EC Lab          PPS               CFE           LIBRARY 
+Monday       BEE        PPS        MAC                        ED 
+1        2         3               4        5        6 
+Day                                  12.40 PM  
+10.00 AM     11.00  AM      12.00 PM           1.40  PM     2.40  PM     3.40  PM  
+               Time                             12.00 PM  
+9.00  AM     10.00 AM      11.00  AM           12.40 PM     1.40  PM     2.40  PM  
+Section:      B                        Class Room No: B-415                      w.e.f: 05/08/2026 
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                     Programme:   B.Tech.                     Branch:  IT 
+CLASS  TIMET ABLE  
+DEP AR TMENT   OF  INFORMA  TION  TECHNOLOGY     
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+   I/C Timetables:     Mrs Kamala Challa / Mrs S Renu Deepti                                                                                                                                HOD-IT 
+         
+     
+Class Coordinator: Mrs Ch Rohini 
+25MN6HS101  Induction Programme (IP)          B-414   Mrs. Ch. Rohini                       
+12 
+25ES2EE101  IT Workshop (ITW)                  Mrs. K. Renuka / Mrs. M Radha                 
+A-111/1
+LAB)                        Venu (Th) 
+25ES2IT101                       B-004                                
+Basic Electrical Engineering Laboratory (BEE       Mrs. S. Poornima / Dr. Kasi Ramakrishna Reddy (W) / Dr. Y 
+Suresh Reddy (W)              Placements  
+(PPS LAB)                                                  Dr N Mangathayaru 
+25ES2CS101                       A-108  Sitamahalakshmi (T) / Dr G   MTP     Training & 
+Programming for Problem Solving Laboratory                                   Dr BV Seshu kumari / 
+Mrs. M. Susmitha / Mrs KVN         Mentoring 
+Kumar (Th)                 el1 
+25BS2CH101  Engineering Chemistry Laboratory (EC LAB)   B-309  Krishna (T) / Dr. S Nagarjuna   CVA-L1   Approach-Lev  
+Dr. Likha Chandran / Dr. N Siva        Career Vision 
+Chandra (F) 
+Prabha (M) / Dr. D. Sarath           Activities 
+25ES3ME101  Engineering Drawing (ED)          D-313                 CCA            - 
+Priyadarsini / Dr. K. Aruna          Co-Curricular 
+Dr. K. Jaya Prakash / Dr.Ch. 
+25ES1CS101  Programming for Problem Solving (PPS)     B-414  Ms. M. Susmitha        Sports/ECA  Sports/Extra Curricular Activities 
+----------------Page (19) Break----------------
+25BS1CH101  Chemistry for Engineers (CFE)     B-416   Dr. Archana Kushwaha           Seminar   Seminar      - 
+25BS1MT101  Matrices and Calculus (MAC)      B-416   Dr. R. Srilatha               OTHERS: 
+Activity      Faculty 
+Course Code  Name of the Course         Room No.  Name of the Faculty            Category 
+Name of the    Name of the 
+* - Tutorial Class 
+Saturday         PPS        MAC       BEE                    ITW             MTP 
+Friday           EC Lab / PPS Lab         CFE              MAC           LIBRARY 
+H 
+C 
+Thursday         CFE        PPS       BEE                        ED 
+N 
+BEE        PPS       CFE                PPS Lab / BEE Lab        SPORTS Wednesday 
+U 
+L 
+Tuesday                  ED                        MAC        PPS       CVA-L1 
+Monday          BEE Lab / EC Lab         MAC              CFE        ECA        CCA 
+1        2        3              4         5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM    12.00 PM           1.40  PM      2.40  PM      3.40  PM  
+                    Time                            12.00 PM  
+9.00  AM     10.00 AM    11.00  AM          12.40 PM      1.40  PM      2.40  PM  
+Section:      C                        Class Room No: B-416                                 w.e.f: 05/08/2026 
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                            Programme:   B.Tech.                     Branch:      IT 
+ 
+CLASS  TIMET ABLE
+DEP AR TMENT   OF  INFORMA  TION  TECHNOLOGY      
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+ 
+I/C Timetables: Mrs Kamala Challa  / Mrs S Renu Deepti                                                                  HOD-IT 
+ 
+ 
+ 
+Class Coordinator: Mrs Anu ragavi 
+25MN6HS101  Induction Programme (IP)        B-415  Mrs. Anu ragavi                              
+25ES2EE101  IT Workshop (ITW)         A-113/114  Mrs S Renu Deepti / Mrs Kamala Challa                   
+Laboratory (BEE LAB)             (F) 
+25ES2IT101                    B-004                                      
+Basic Electrical Engineering           Mr. N. Amarnadh Reddy / Dr. A . Anil Kumar (W) / Dr. N. Nageswara Reddy 
+Laboratory (PPS LAB)              Sitamahalakshmi (T) /Dr D Kalyani (F)        & Placements      Mrs M Susmitha  
+25ES2CS101                    A-108                    MTP 
+Programming for Problem Solving         Dr. G. Rajesh Kumar / Mrs. KVN           Mentoring Training  Dr  G Madhu  / 
+Balabardhana Rao (W) 
+(EC LAB)                                           Approach-Level1 
+25BS2CH101                    B-309  Nagarjuna Kumar (M) / Dr. A R     CVA-L1               
+Engineering Chemistry Laboratory                                 Career Vision 
+Dr. S. Archana Kushwaha / Dr. S 
+Sandeep Raj (Th) 
+Activities 
+25ES3ME101  Engineering Drawing (ED)       D-319  Kumar/ Dr. H. Naresh (M) / Dr. L.    CCA               - 
+Co-Curricular 
+Dr. V. V. Durga Sahithi / Dr. P. Prasad 
+(PPS)                                             Curricular Activities 
+25ES1CS101                    B-415  Dr. G. Rajesh Kumar         Sports/ECA            - 
+Programming for Problem Solving                                 Sports/Extra 
+----------------Page (20) Break----------------
+25BS1PH101  Applied Physics (AP)             D-415   Dr . G.  Suresh            Seminar    Seminar        - 
+25BS1MT101  Matrices and Calculus (MAC)         D-415   Dr . R. Arpitha            OTHERS:   
+Activity  
+Course  Code   Name  of the Course                Room  No.  Name  of the Faculty         Category             Name  of the Faculty  
+Name  of the 
+* - Tutorial Class 
+Saturday         MAC        PC        MT               AP            SPORTS 
+Friday             ELCS Lab           AP               PC           LIBRARY 
+H 
+C 
+Thursday         AP        PC       MAC               MT        ECA       CCA 
+N 
+EW             ESE               MT         AP       CVA-L1 Wednesday 
+U 
+L 
+Tuesday          AP Lab / PC Lab          ESE               PC        MAC      LIBRARY 
+Monday         ESE        MT       MAC                PC Lab / AP Lab         MTP 
+1        2        3               4         5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM    12.00 PM           1.40  PM      2.40  PM     3.40  PM  
+                    Time                            12.00 PM  
+9.00  AM     10.00 AM    11.00  AM           12.40 PM      1.40  PM     2.40  PM  
+Section:      A                        Class Room No: D-415                                     w.e.f: __05/08/2026 
+Regulation:    R25                      Class:      I Year                          Semester: I    
+Academic Year:  2026-27                            Programme:   B.Tech.                         Branch:      AE 
+ 
+CLASS  TIMET ABLE
+DEP AR TMENT   OF  AUT OMOBILE   ENGINEERING    
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+I/C Timetables:   Mrs Kamala Challa / Mrs S Renu Deepti                                                                                                                                          HOD-IT 
+ 
+ 
+Class Coordinator: Mrs KVN Sita Mahalakshmi 
+25MN6HS101  Induction Programme (IP)       B-416   Mrs KVNS Mahalakshmi                          
+25ES2EE101  IT Workshop (ITW)         A-113/114  Mrs. A. Soujanya / Dr. BV Seshukumari                    
+Laboratory (BEE LAB) 
+25ES2IT101                    P-014                                       
+Basic Electrical Engineering           Dr. A. Giri Prasad/Dr.J Bhavani(M) Mrs. M Naga Jyothi (W) 
+Mahalakshmi  
+Placements     Sita 
+Laboratory (PPS LAB)              Srinivasarao (F) 
+25ES2CS101                        A-108                       MTP    Training &     Mrs KVN 
+Programming for Problem Solving         Dr. K. Sravanthi / Mrs K Radhika (W) / Dr D 
+Mentoring     Krishna / 
+Dr V Radha 
+(EC LAB)                   / Dr. N Siva Krishna (F)                  Approach-Level1 
+25BS2CH101                    B-309                       CVA-L1             
+Engineering Chemistry Laboratory         Dr. Archana Kushwaha / Dr. S Appa Rao (M)        Career Vision 
+Mr. R. Ramu (T) / Dr. B. Harish Babu (Th)         Activities 
+25ES3ME101  Engineering Drawing (ED)       D-319                       CCA             - 
+Mr. Balappa H / Mr. M. Venkata Rama Rao /        Co-Curricular 
+Activities 
+(PPS) 
+25ES1CS101                    B-416   Dr. K. Sravanthi              Sports/ECA  Curricular     - 
+Programming for Problem Solving 
+Sports/Extra 
+25ES1EE101  Basic Electrical Engineering (BEE)    B-416   Dr. A. Giri Prasad             Library   Library      - 
+----------------Page (21) Break----------------
+25BS1MT101  Matrices and Calculus (MAC)        E-204  Dr. T Kusuma          OTHERS: 
+Faculty 
+Course Code  Name of the Course           Room No.  Name of the Faculty       Category  Name of the Activity 
+Name of the 
+* - Tutorial Class 
+Saturday         PPS        AEP       MAC                   ITW             MTP 
+Friday          MFCS       AEP       MAC              PPS       LIBRARY      CCA 
+H 
+C 
+Thursday             EW             MFCS              PPS        MAC       CVA-L1 
+N 
+PPS Lab / AEP Lab         PPS                        ED Wednesday 
+U 
+L 
+Tuesday         AEP       MAC      MFCS                AEP Lab / PPS Lab         ECA 
+Monday                 ED                        AEP       LIBRARY     SPORTS 
+1        2        3              4         5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM    12.00 PM           1.40  PM      2.40  PM     3.40  PM  
+                    Time                            12.00 PM  
+9.00  AM     10.00 AM    11.00  AM          12.40 PM      1.40  PM     2.40  PM  
+Section:      A                        Class Room No: E-204                      w.e.f: 05/08/2026 
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                           Programme:   B.Tech.                     Branch:      AIML 
+ 
+CLASS  TIMET ABLE
+DEP AR TMENT   OF  COMPUTER    SCIENCE   AND  ENGINEERING    (AIML,  IOT  & RAI)  
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+ 
+ 
+I/C Timetables: Mr. M. Krishna                                                                                                           HOD-AE 
+ 
+ 
+ 
+Class Coordinator: Dr. D. Suresh 
+ 
+25MN6HS101  Induction Programme (IP)           D-415    Dr . D.  Suresh                             
+25ES2ME101  Engineering  Workshop  (EW)            A-007    Dr . GVL  Prasad  / Mr . Mohamad  Aziz  Athani  / Mr . M.  Venkata  Ramarao     
+LAB)  
+25ES2DS101                       D-412    Dr . L. Indira/ Dr . D.  Suresh                       
+Problem  Solving  Through  C Laboratory  (PC 
+Ramana  
+Skills Laboratory (ELCS LAB)              Berifin                  & Placements   
+25HS2EN101                     A-117/1 18                    MTP               Prasad  / Dr . M.  Venkata  
+English Language and Communication          Ms. Aswathi Bai/Dr. Mary         Mentoring  Training 
+Dr , D.  Suresh  / Dr . GVL  
+Approach-Level1   
+25BS2PH101  Applied Physics Laboratory (AP LAB)     C-304    Dr . G Suresh/Dr . M.  Sumithra     CV A-L1              - 
+Career  Vision 
+Activities  
+25PC1AE101  Manufacturing  Technology  (MT)           D-415   Dr . M.  Venkata  Ramana       CCA                
+Co-Curricular  
+A      Curricular  Activities  
+25ES1DS101  Problem  Solving  Through  C (PC)          D-415   Dr . L. Indira                             - 
+Sports/EC   Sports/Extra  
+25HS1EN101  English for Skill Enhancement (ESE)      D-415   Dr . Lalitha Sreedevi         Library    Library        - 
+----------------Page (22) Break----------------
+25BS1MT101  Matrices and Calculus (MAC)       E-205   Dr . P Rajashekar           OTHERS:   
+Course  Code   Name  of the Course              Room  No       Name  of the Faculty      Category    Name  of the Activity    Name  of the Faculty  
+* - Tutorial Class 
+Saturday       MFCS       MAC        AEP                PPS       CVA-L1       MTP 
+Friday            EW              MFCS               AEP       MAC       CCA 
+H 
+C 
+Thursday       MAC       AEP         PPS                 PPS Lab / AEP Lab         ECA 
+N 
+ED                             ITW            SPORTS Wednesday 
+U 
+L 
+Tuesday                 ED                         AEP        PPS       MAC 
+Monday        AEP Lab / PPS Lab         MFCS               PPS           LIBRARY 
+1        2         3               4        5        6 
+Day                                  12.40 PM  
+10.00 AM     11.00  AM     12.00 PM            1.40  PM     2.40  PM     3.40  PM  
+               Time                             12.00 PM  
+9.00  AM     10.00 AM     11.00  AM           12.40 PM     1.40  PM     2.40  PM  
+Section:      B                        Class Room No: E-205                      w.e.f: 05/08/2025 
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                     Programme:   B.Tech.                     Branch:  AIML 
+CLASS  TIMET ABLE  
+DEP AR TMENT   OF  COMPUTER    SCIENCE   AND  ENGINEERING    (AIML  IOT  & RAI)  
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+                                                                                                        
+ 
+I/C Timetables:  Ms. V. Manjula & Ms. Y.V. Sahithi                                                                                                  HOD- CSE (AIML, IOT) 
+ 
+ 
+ 
+Class Coordinator: Ms. V. Manjula 
+25MN6HS101  Induction Programme (IP)         E-204  Ms. V. Manjula                             
+25ES2IT101  IT Workshop (ITW)           B-314/315  Ms. K. Akhila / Ms. K.Prathyusha / Ms. M. Swapna Kumari           
+Laboratory (PPS LAB) 
+25ES2CS101                      E-217  Dr. Sayanthi Chattarjee / Dr. U. Harshavardhan               
+Programming for Problem Solving 
+Prasad/ Dr. P. S. Prasad            Placements  
+25ES2ME101  Engineering Workshop (EW)        C-007                  MTP                  
+Dr. T. Malyadri  / Dr. S.V. Satya        Mentoring Training & 
+(AEP LAB)                                         Approach-Level1 
+25BS2PH102                     C-304  Dr. T Rajani/Dr. G V Rao     CVA-L1                
+ Advance Engineering Physics Laboratory                             Career Vision 
+(M) / Dr. T. Malyadri (W) 
+E-216 
+25ES3ME101  Engineering Drawing (ED)             Swetha/ Dr. V. V. Durga Sahithi   CCA    Co-Curricular Activities  - 
+E-215&  
+Dr. N Shiva Kumar / Ms. S. 
+Science (MFCS)                                       Activities 
+25PC1AM101                     E-204  Ms. V. Manjula         Sports/ECA              - 
+Mathematical Foundations for Computer                             Sports/Extra Curricular 
+25ES1CS101  Programming for Problem Solving (PPS)   E-204  Dr. Sayanthi Chattarjee      Library   Library         - 
+25BS1PH102   Advance Engineering Physics (AEP)     E-204  Dr. T Rajani           Seminar   Seminar         - 
+----------------Page (23) Break----------------
+Faculty 
+Course Code  Name of the Course          Room No.  Name of the Faculty        Category  Name of the Activity 
+Name of the 
+* - Tutorial Class 
+Saturday         PPS        AEP       MFCS             MAC               MTP      SPORTS 
+Friday           PPS Lab / AEP Lab         MAC                        ED 
+H 
+C 
+Thursday         MAC       PPS       MFCS                       ED 
+N 
+MFCS       PPS       AEP                AEP Lab / PPS Lab        CVA-L1 Wednesday 
+U 
+L 
+Tuesday             EW             AEP              MAC        ECA       CCA 
+Monday             ITW             PPS              AEP           LIBRARY 
+1        2        3              4         5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM    12.00 PM           1.40  PM      2.40  PM     3.40  PM  
+                    Time                            12.00 PM  
+9.00  AM     10.00 AM    11.00  AM          12.40 PM      1.40  PM     2.40  PM  
+Section:      C                        Class Room No: E-241                      w.e.f: 05/08/2026 
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                            Programme:   B.Tech.                     Branch:      AIML 
+ 
+CLASS  TIMET ABLE
+DEP AR TMENT   OF  COMPUTER    SCIENCE   AND  ENGINEERING    (AIML  IOT  & RAI)  
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+                                                                                                                                     HOD-CSE (AIML IOT & RAI) 
+I/C Timetables: Ms. V. Manjula & Ms. Y.V. Sahithi 
+ 
+ 
+Class Coordinator: Ms. M. Swapna Kumari 
+25MN6HS101  Induction Programme (IP)         E-205    Ms. M.  Swapna  Kumari                            
+25ES2IT101  IT Workshop (ITW)           B-314/315   Ms. K. Akhila / Ms. R. Sudha / Ms. K. Prathyusha              
+Laboratory (PPS LAB) 
+25ES2CS101                       E-217    Dr . Y Sagar / Ms. K.  Anusha  / Ms. M. Swapna Kumari             
+Programming for Problem Solving 
+Dr .B.Harish  Babu                  Placements   
+25ES2ME101  Engineering Workshop (EW)        C-007                      MTP                   
+Dr . T.S.Krishna  Kumar/  Mr .M.V ijay /         Mentoring  Training & 
+(AEP LAB)                     Kumar  (Th)  
+Approach-Level1   
+25BS2PH102  Laboratory                C-304    K.S.Rudramamba    (M) / Dr . N.  Suresh   CV A-L1                  
+Career  Vision 
+Dr . N V Suresh  Kumar/Dr . 
+ Advance Engineering Physics 
+(W) 
+(Tu) / Dr. M. S. Srinivasa Rao 
+25ES3ME101  Engineering Drawing (ED)       E-215/216                     CCA      Co-Curricular  Activities   - 
+Shiva Kumar/ Dr. K. Jaya Prakash 
+Dr. Ch Naveen Reddy / Dr. N. 
+Computer Science (MFCS)                                      Activities  
+25PC1AM101                       E-205    Ms. M. Swapna Kumari      Sports/ECA                - 
+Mathematical Foundations for                                 Sports/Extra  Curricular  
+(PPS) 
+25ES1CS101                       E-205   Dr . Y Sagar             Library     Library          - 
+Programming for Problem Solving 
+25BS1PH102   Advance Engineering Physics (AEP)    E-205   Dr . N V Suresh  Kumar         Seminar     Seminar          - 
+----------------Page (24) Break----------------
+Course  Code   Name  of the Course               Room  No      Name  of the Faculty     Category    Name  of the Activity    Name  of the Faculty  
+* - Tutorial Class 
+Saturday       IOT        MAC        PPS               AEP            MTP 
+Friday          PPS Lab / AEP Lab         IOT               PPS       LIBRARY     SPORTS 
+H 
+C 
+Thursday            ITW              ESE               MAC           LIBRARY 
+N 
+PPS        AEP        IOT               ESE        ECA       CCA Wednesday 
+U 
+L 
+Tuesday       ESE        AEP        MAC                AEP Lab / PPS Lab        CVA-L1 
+Monday       MAC        PPS        AEP                   ELCS Lab          SPORTS 
+1         2         3               4         5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM     12.00 PM            1.40  PM      2.40  PM     3.40  PM  
+               Time                             12.00 PM  
+9.00  AM     10.00 AM     11.00  AM           12.40 PM      1.40  PM     2.40  PM  
+Section:      A                       Class Room No: E-240                      w.e.f: 05/08/2026 
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                     Programme:   B.Tech.                     Branch:  IOT 
+CLASS  TIMET ABLE  
+DEP AR TMENT   OF  COMPUTER    SCIENCE   AND  ENGINEERING    (AIML  IOT  & RAI)  
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+                                                        HOD-CSE (          ) 
+AIML  IOT  & RAI
+I/C Timetables: Ms. V. Manjula & Ms. Y.V. Sahithi 
+ 
+ 
+ 
+Class Coordinator: Ms. K. Anusha 
+25MN6HS101  Induction Programme (IP)        E-241  Ms. K. Anusha                              
+25ES2IT101  IT Workshop (ITW)         B-314/315  Ms. K. Pratyusha/ / Ms. R. Sudha / Ms. K. Akhila                
+Laboratory (PPS LAB) 
+25ES2CS101                    E-217  Ms. K Anusha/ Dr. Sayanti Chatterjee                     
+Programming for Problem Solving 
+Ravi Kumar/ Dr. S.V. Satya Prasad         Placements  
+25ES2ME101  Engineering Workshop (EW)      A-007                   MTP                  
+Mr. S. R. Somayajulu/ Dr. B.V.R.         Mentoring Training & 
+(AEP LAB) 
+(W) / Dr. L. Srinivasa Rao (F)           Approach-Level1 
+25BS2PH102  Laboratory               C-304                   CVA-L1                
+Dr. D Venkata Sai / Dr. C. Thirmal         Career Vision 
+ Advance Engineering Physics 
+Rao / Dr. D. Suresh 
+25ES3ME101  Engineering Drawing (ED)      E-215/216                  CCA    Co-Curricular Activities  - 
+Mr. T. Raju / Mr. M. Venkata Rama 
+Computer Science (MFCS)                                   Activities 
+25PC1AM101                    E-241  Ms. M. Swapna Kumari       Sports/ECA              - 
+Mathematical Foundations for                                  Sports/Extra Curricular 
+(PPS) 
+25ES1CS101                    E-241  Ms. K Anusha           Library   Library         - 
+Programming for Problem Solving 
+25BS1PH102   Advance Engineering Physics (AEP)   E-241  Dr. D Venkata Sai          Seminar   Seminar         - 
+25BS1MT101  Matrices and Calculus (MAC)      E-241  Dr. J Srinivas            OTHERS: 
+----------------Page (25) Break----------------
+* - Tutorial Class 
+Saturday        BEEE       CFE       MAC              PPS        MTP       SPORTS 
+Friday                  EG                        BSIES Lab / BEEE Lab        CCA 
+H 
+Thursday         EC Lab / PPS Lab         BEEE      C       PPS       MAC        ECA 
+N 
+Wednesday       MAC       CFE       BEEE              PPS           LIBRARY 
+U 
+L 
+Tuesday          EC Lab / PPS Lab         CFE 
+EG 
+Monday         CFE       MAC       PPS               BEEE Lab / BSIES Lab       CVA-L1 
+1        2        3              4        5         6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM    12.00 PM          1.40  PM     2.40  PM      3.40  PM  
+                    Time                            12.00 PM  
+9.00  AM     10.00 AM    11.00  AM          12.40 PM     1.40  PM      2.40  PM  
+Section:      A                        Class Room No:   E-037                                w.e.f: 05/08/2026   
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                            Programme:   B.Tech.                     Branch:   RAI 
+ 
+CLASS  TIMET ABLE
+ 
+DEP AR TMENT   OF  COMPUTER    SCIENCE   AND  ENGINEERING    (AIML  IOT  & RAI)  
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+ 
+ 
+ 
+I/C Timetables: Ms. V. Manjula & Ms. Y.V. Sahithi                                HOD-CSE (AIML, IOT & RAI)
+ 
+ 
+ 
+ 
+Class Coordinator:  Ms. K. Pratyusha 
+25MN6HS101  Induction Programme (IP)           E-240    Ms.K.Prathyusha                               
+25ES2IT101  IT Workshop (ITW)            B-314/315    Ms. K. Pratyusha/ Ms. K. Akhila / Ms. R. Sudha             
+Laboratory (PPS LAB) 
+25ES2CS101                        E-303    Mr. K  Krishna Babu/ Ms. K. Prathyusha                
+Programming for Problem Solving 
+Laboratory  (ELCS  LAB)                   Shafia                 Placements   
+25HS2EN101                     A-117/1 18                   MTP                   
+English  Language  and Communication   Skills         Dr. S kanchana/Dr. Waheeda        Mentoring  Training & 
+(AEP LAB)                       Rudramamba                   Approach-Level1   
+25BS2PH102                        A-314                   CV A-L1                 
+ Advance Engineering Physics Laboratory         Dr . B Ashok/Dr . K S             Career  Vision 
+25ES1IN101  Introduction  to Internet  of Things  (IOT)       E-240   Dr . Manjula  Sree          CCA     Co-Curricular  Activities   - 
+Activities  
+25HS1EN101  English  for Skill Enhancement  (ESE)        E-240   Dr. S Kanchana        Sports/ECA                - 
+Sports/Extra  Curricular  
+25ES1CS101  Programming for Problem Solving (PPS)    E-240   Mr . K Kishan  Babu         Library     Library          - 
+25BS1PH102   Advance Engineering Physics (AEP)     E-240   Dr . B Ashok            Seminar    Seminar          - 
+25BS1MT101  Matrices and Calculus (MAC)         E-240   Dr . T Kusuma           OTHERS:   
+----------------Page (26) Break----------------
+* - Tutorial Class 
+Saturday       BEEE       MAC        CFE              PPS        MTP        CCA 
+Friday         BEEE Lab / PPS Lab         PPS                        ED 
+H 
+C 
+Thursday        EC Lab / BEEE Lab         MAC              CFE           LIBRARY 
+N 
+ED                        MAC       BEEE        ECA Wednesday 
+U 
+L 
+Tuesday       MAC        CFE        PPS                 PPS Lab / EC Lab        SPORTS 
+Monday        PPS        CFE        BEEE                   ITW            CVA-L1 
+1         2         3              4         5         6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM     12.00 PM           1.40  PM      2.40  PM      3.40  PM  
+               Time                             12.00 PM  
+9.00  AM     10.00 AM     11.00  AM          12.40 PM      1.40  PM      2.40  PM  
+Section:      A                        Class Room No:   E-437                                 w.e.f: 05/08/2026 
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                     Programme:   B.Tech.                     Branch:  DS 
+CLASS  TIMET ABLE   
+DEP AR TMENT   OF  COMPUTER    SCIENCE   AND  ENGINEERING    (CYS,  DS  AND  AI  & DS) 
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+I/C Timetables: Ms. V. Manjula & Ms. Y.V. Sahithi                                                                                              HOD-CSE (AIML, IOT & RAI) 
+ 
+ 
+Class Coordinator: Ms. R. Sudha 
+25MN6HS101  Induction Programme (IP)                                                 
+E-107   Mrs. R.Sudha 
+(BSIES LAB) 
+25PC2RA101  Electronics simulation Laboratory     C-205   Dr. A. Adithya Kashyap / Ms. R. Sudha                   
+Basic Signal Interfacing and 
+Engineering Laboratory (BEEE LAB)         (F) 
+25ES2EE102                     A-313                                      
+Basic Electrical and Electronics            Mrs. M. Naga Jyothi/ Mrs.G Anjali Devi (M) / Dr. Kasi Ramakrishna Reddy 
+Laboratory (PPS LAB)               Babu                    Placements  
+25ES2CS101                     E-217                   MTP                 
+Programming for Problem Solving          Dr. G Nagaraju / Mr. K. Kishan         Mentoring Training & 
+(EC LAB)                    (T) / Dr. M Brahmayya (Th)           Approach-Level1 
+25BS2CH101                     P-320                   CVA-L1                
+Engineering Chemistry Laboratory          Dr. G. Nirmala / Dr. S Appa Rao         Career Vision 
+Swetha (F) 
+25ES3ME102  Engineering Graphics (EG)       E-215/216  Dr. Jayashri Nair (Tu) / Ms. S.    CCA    Co-Curricular Activities  - 
+Dr. B Sujith / Mr. S. N. S. Sai Hari / 
+Engineering (BEEE)                                      Activities 
+25ES1EE102                          Mrs. M. Naga Jyothi        Sports/ECA             - 
+Basic Electrical and Electronics      E-107                          Sports/Extra Curricular 
+(PPS) 
+25ES1CS101                          Dr. G Nagaraju          Library   Library         - 
+Programming for Problem Solving     E-107 
+25BS1CH101  Chemistry for Engineers (CFE)            Dr. G. Nirmala          Seminar   Seminar         - 
+E-107 
+25BS1MT101  Matrices and Calculus (MAC)            Dr. M Pavan Kumar Reddy     OTHERS: 
+E-107 
+Faculty 
+Course Code  Name of the Course          Room No.  Name of the Faculty       Category  Name of the Activity 
+Name of the 
+----------------Page (27) Break----------------
+* - Tutorial Class 
+Saturday             ITW             PPS              CFE        MTP        CCA 
+Friday                  ED                       MAC       PPS       SPORTS 
+H 
+Thursday         CFE       MAC      BEEE      C        BEEE Lab / EC Lab        CVA-L1 
+N 
+Wednesday         EC Lab / PPS Lab         PPS              CFE           LIBRARY 
+U 
+L 
+Tuesday         PPS       MAC      BEEE 
+                                               ED 
+Monday         BEEE       CFE       MAC               PPS Lab / BEEE Lab         ECA 
+1        2        3              4        5         6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM    12.00 PM          1.40  PM     2.40  PM      3.40  PM  
+                    Time                            12.00 PM  
+9.00  AM     10.00 AM    11.00  AM          12.40 PM     1.40  PM      2.40  PM  
+Section:      B                        Class Room No:   E-438                                w.e.f: 05/08/2026   
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                            Programme:   B.Tech.                     Branch:      DS 
+ 
+CLASS  TIME  TABLE
+DEP AR TMENT   OF  COMPUTER    SCIENCE   AND  ENGINEERING    (CYS,  DS  AND  AI  & DS) 
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+I/C Timetables:                                                                                           HOD-CSE-(CYS, DS & AI &DS) 
+ 
+ 
+ 
+Class Coordinator: Dr. V Surya Narayana Reddy 
+25MN6HS101  Induction Programme (IP)         E-437   Mr. P. Balakesava Reddy                        
+25ES2IT101  IT Workshop (ITW)           E-330/331  Mr. P Bala Kesavan Reddy/ Mrs. K. Naga Sandhya/Mr. D. Srinivasa Rao/Mrs. N. Harika 
+Engineering Laboratory (BEEE LAB) 
+25ES2EE102                      A-313   Ms. B Naga Swetha / Dr. G. Radhika (Th) / Dr. Ch. Rami Reddy (F)      
+Basic Electrical and Electronics 
+Laboratory (PPS LAB)                Swathi                     & Placements  
+25ES2CS101                      E-417                    MTP               
+Programming for Problem Solving           Dr. V Surya Narayan Reddy/Mrs. P.         Mentoring Training 
+LAB)                       / Dr. A. Sri Charitha (Th)             Approach-Level1 
+25BS2CH101                      C-313                    CVA-L1              
+Engineering Chemistry Laboratory (EC         Dr. C Jyotsna/ Dr. A. Sri Charitha (T)        Career Vision 
+Rathinam                    Activities 
+25ES3ME101  Engineering Drawing (ED)        E-430/431                   CCA              - 
+Mr. R. Ramu/Mr. M. Krishna/Dr. V.         Co-Curricular 
+Activities 
+25ES1CS101  Programming for Problem Solving (PPS)   E-437   Dr. V Surya Narayana Reddy     Sports/ECA  Curricular      - 
+Sports/Extra 
+Engineering (BEEE) 
+25ES1EE102                      E-437   Ms. B Naga Swetha          Library    Library       - 
+Basic Electrical and Electronics 
+ 
+Chemistry for Engineers (CFE)       E-437   Dr. C. Jyotsna           Seminar   Seminar      - 
+25BS1CH101 
+25BS1MT101  Matrices and Calculus (MAC)        E-437   Dr. G Jithender Reddy        OTHERS: 
+Activity      Faculty 
+Course Code  Name of the Course           Room No     Name of the Faculty     Category 
+Name of the     Name of the 
+----------------Page (28) Break----------------
+* - Tutorial Class 
+Saturday         PPS       MAC      BEEE              CFE            MTP 
+Friday          PPS        CFE       MAC                        ED 
+H 
+Thursday             ITW             PPS       C       MAC       ECA       CCA 
+N 
+Wednesday        MAC       CFE       BEEE               PPS Lab / EC Lab        SPORTS 
+U 
+L 
+Tuesday          EC Lab / BEEE Lab        MAC 
+BEEE       PPS      LIBRARY 
+Monday          BEEE Lab / PPS Lab        CFE                        ED 
+1        2        3              4        5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM    12.00 PM           1.40  PM     2.40  PM     3.40  PM  
+                    Time                            12.00 PM  
+9.00  AM     10.00 AM    11.00  AM          12.40 PM     1.40  PM     2.40  PM  
+Section:      C                        Class Room No: E-439                      w.e.f: 05/08/2026   
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                            Programme:   B.Tech.                     Branch:      DS 
+ 
+CLASS  TIMET ABLE  
+DEP AR TMENT   OF  COMPUTER    SCIENCE   AND  ENGINEERING    (CYS,  DS  AND  AI  & DS) 
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+I/C Timetables:                                                                                                                          HOD-CSE-(CYS, DS & AI &DS) 
+ 
+Class Coordinator: Ms. D. Sree Vidya 
+25MN6HS101  Induction Programme (IP)                                                 
+E-438   Mrs. D. Sree Vidya 
+25ES2IT101  IT Workshop (ITW)                                                   
+E-430/431  Mrs. D.Sree Vidya/Mrs. N.Harika/Mrs.PVanaja Kumari/Mrs.K. Naga Sandhya 
+LAB) 
+25ES2EE102  Engineering Laboratory (BEEE    A-309/B-005  Dr. A Ravi Kumar/Dr.J Srinivasa Rao                    
+Basic Electrical and Electronics 
+Laboratory (PPS LAB)                                     Placements  
+25ES2CS101                    E-316   Dr. D Manju/Mrs. T.Sowjanya     MTP                 
+Programming for Problem Solving                                 Mentoring Training & 
+ 
+(EC LAB)                                           Approach-Level1 
+25BS2CH101                    C-313   (W) / Dr. Chander A Pawar (Th)    CVA-L1                
+Engineering Chemistry Laboratory                                 Career Vision 
+Dr. S Pratyusha / Dr. Siva Kirshna 
+(F) / Dr. T. Malyadri (F) 
+Prakash (Tu) / Dr. V. V. Durga Sahithi 
+25ES3ME101  Engineering Drawing (ED)      E-430/431                   CCA    Co-Curricular Activities  - 
+Priyadarsini (Tu) / Dr. K. Jaya 
+Dr. K Aruna Prabha / Dr.Ch. 
+(PPS)                                             Activities 
+25ES1CS101                    E-438   Dr. D Manju            Sports/ECA             - 
+Programming for Problem Solving                                 Sports/Extra Curricular 
+Engineering (BEEE) 
+25ES1EE102                    E-438   Dr. A Ravi Kumar          Library   Library         - 
+Basic Electrical and Electronics 
+ 
+Chemistry for Engineers (CFE)     E-438   Dr. S Pratyusha           Seminar   Seminar         - 
+25BS1CH101 
+25BS1MT101  Matrices and Calculus (MAC)      E-438   Dr. M Pavan Kumar Reddy      OTHERS: 
+Faculty 
+Course Code  Name of the Course          Room No.  Name of the Faculty        Category  Name of the Activity 
+Name of the 
+----------------Page (29) Break----------------
+* - Tutorial Class 
+Saturday       CFE        PPS        BEEE               PPS Lab / BEEE Lab       LIBRARY 
+Friday        BEEE        ICS        MAC              CFE       ECA       CCA 
+H 
+C 
+Thursday       PPS        MAC        CFE               ICS       CVA-L1      SPORTS 
+N 
+BEEE Lab / EC Lab         MAC               PPS           LIBRARY Wednesday 
+U 
+L 
+Tuesday        ICS        MAC       BEEE                EC Lab / PPS Lab        SPORTS 
+Monday            ITW              PPS               CFE            MTP 
+1         2         3               4        5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM     12.00 PM           1.40  PM     2.40  PM     3.40  PM  
+               Time                             12.00 PM  
+9.00  AM     10.00 AM     11.00  AM           12.40 PM     1.40  PM     2.40  PM  
+Section:      A                        Class Room No: E-522                      w.e.f: 05/08/2026 
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                     Programme:   B.Tech.                     Branch:  CYS 
+CLASS  TIMET ABLE  
+DEP AR TMENT   OF  COMPUTER    SCIENCE   AND  ENGINEERING    (CYS,  DS  AND  AI  & DS) 
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+I/C Timetables:                                                                                                                          HOD-CSE-(CYS, DS & AI &DS) 
+ 
+Class Coordinator: Ms. K. Sai Pragna 
+25MN6HS101  Induction Programme (IP)          E-439   Ms. K. Sai Pragnya                           
+Servana Kumar 
+25ES2IT101  IT Workshop (ITW)           E-313/316                                     
+Ms. K Sai Pragna/Mrs.P.Vanaja Kumari/Mr. Sk. Khaleel /Mr. Mr. PVM 
+Engineering Laboratory (BEEE LAB)          (T) 
+25ES2EE102                      B-004                                      
+Basic Electrical and Electronics            Dr. A Anil Kumar / Dr. Ch. Rami Reddy (M) / Dr. B. Neelakanteeshwar Rao 
+Alekya (W) 
+Laboratory (PPS LAB)                                       Placements  
+25ES2CS101                      E-331    Balakesava Reddy(M) / Mrs. M.   MTP                 
+Programming for Problem Solving                                  Mentoring Training & 
+Mrs. P. Swarna Ramya / Mr. P. 
+ 
+LAB)                                              Approach-Level1 
+25BS2CH101                      C-313   Pawar (T) / Dr. G Nirmala (W)    CVA-L1               
+Engineering Chemistry Laboratory (EC                                Career Vision 
+Dr. A Sri Charitha / Dr. Chander A 
+Sandeep Raj / Dr. CH. Rajeswari         Activities 
+25ES3ME101  Engineering Drawing (ED)        E-430/431                  CCA                - 
+Dr.Ch. Priyadarsini / Dr. L.            Co-Curricular 
+Activities 
+25ES1CS101  Programming for Problem Solving (PPS)   E-439   Mrs. P. Swarna Ramya       Sports/ECA             - 
+Sports/Extra Curricular 
+Engineering (BEEE) 
+25ES1EE102                      E-439   Dr. A. Anil Kumar         Library    Library        - 
+Basic Electrical and Electronics 
+                               
+Chemistry for Engineers (CFE)       E-439                   Seminar   Seminar        - 
+25BS1CH101                           Dr. A Sri Charitha 
+25BS1MT101  Matrices and Calculus (MAC)        E-439   Dr. V Swathi           OTHERS: 
+the Faculty 
+Course Code  Name of the Course            Room No.  Name of the Faculty       Category   Name of the Activity 
+Name of 
+----------------Page (30) Break----------------
+Saturday        PPS        MAC        CFE               ICS       CVA-L1      SPORTS 
+Friday          PPS Lab / EC Lab          CFE              BEEE       ECA       CCA 
+H 
+C 
+Thursday       BEEE        PPS        MAC                   ITW            LIBRARY 
+N 
+BEEE Lab / PPS Lab         ICS               CFE           LIBRARY Wednesday 
+U 
+L 
+Tuesday        CFE        MAC       BEEE              PPS            MTP 
+Monday        ICS        PPS        MAC                EC Lab / BEEE Lab        SPORTS 
+1         2         3               4        5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM     12.00 PM           1.40  PM     2.40  PM     3.40  PM  
+               Time                             12.00 PM  
+9.00  AM     10.00 AM     11.00  AM           12.40 PM     1.40  PM     2.40  PM  
+Section:      B                        Class Room No: E-523                      w.e.f: 05/08/2026 
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                     Programme:   B.Tech.                     Branch:  CYS 
+CLASS  TIMET ABLE  
+DEP AR TMENT   OF  COMPUTER    SCIENCE   AND  ENGINEERING    (CYS,  DS  AND  AI  & DS) 
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+I/C Timetables:                                                                                 HOD-CSE-(CYS, DS) and AI &DS 
+ 
+ 
+Class Coordinator: Dr. R Kranthi Kumar 
+25MN6HS101  Induction Programme (IP)          E-522    Ms. Dhanshree Mukund Pande                      
+Sowjanya 
+25ES2IT101  IT Workshop (ITW)           E-315/316                                     
+Dr. Dhanshri Mukund Pande/Mrs. P. Swathi/Mr. Sk. Khaleel/Mrs. T. 
+Engineering Laboratory (BEEE LAB)          Kumari(S) 
+25ES2EE102                      A-313                                      
+Basic Electrical and Electronics             Ms. B Madhuri/ Ms. B. Harshini,(W), Dr. Geshma 
+Laboratory (PPS LAB)                 Latha                    Placements  
+25ES2CS101                      E-317                   MTP                 
+Programming for Problem Solving            Dr. R Kranthi Kumar/Mrs. G. Asha        Mentoring Training & 
+Chandran (W) 
+LAB)                                              Approach-Level1 
+25BS2CH101                      P-320    Pratyusha (T) / Dr. Likha      CVA-L1               
+Engineering Chemistry Laboratory (EC                                Career Vision 
+Dr. A R Balavardhana Rao / Dr. S 
+Activities 
+25ES1CY101  Introduction to Cyber Security (ICS)     E-522    Mr. A. Madhu          CCA                - 
+Co-Curricular 
+(PPS)                                              Activities 
+25ES1CS101                      E-522    Dr. R Kranthi Kumar       Sports/ECA             - 
+Programming for Problem Solving                                  Sports/Extra Curricular 
+Engineering(BEEE) 
+25ES1EE102                      E-522    Ms. B Madhuri          Library    Library        - 
+Basic Electrical and Electronics 
+ 
+Chemistry for Engineers (CFE)        E-522    Dr. A R Balavardhana Rao     Seminar   Seminar        - 
+25BS1CH101 
+25BS1MT101  Matrices and Calculus (MAC)        E-522    Dr. T Siva Nageswara Rao     OTHERS: 
+Faculty 
+Course Code  Name of the Course            Room No      Name of the Faculty    Category   Name of the Activity  the 
+Name of 
+----------------Page (31) Break----------------
+Saturday          PPS/BEEE Lab          PPS               CFE            MTP 
+Friday         ICS        MAC       BEEE                   ITW            LIBRARY 
+H 
+C 
+Thursday       PPS        CFE        MAC                 EC/PPS Lab         SPORTS 
+N 
+PPS        BEEE        CFE              MAC           LIBRARY Wednesday 
+U 
+L 
+Tuesday       BEEE        CFE        MAC               ICS       CVA-L1      SPORTS 
+Monday          BEEE/EC Lab           ICS               PPS        ECA       CCA 
+1         2         3               4        5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM     12.00 PM           1.40  PM     2.40  PM     3.40  PM  
+               Time                             12.00 PM  
+9.00  AM     10.00 AM     11.00  AM           12.40 PM     1.40  PM     2.40  PM  
+Section:      C                        Class Room No: E-524                      w.e.f: 05/08/2026 
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                     Programme:   B.Tech.                     Branch:  CYS 
+CLASS  TIMET ABLE  
+DEP AR TMENT   OF  COMPUTER    SCIENCE   AND  ENGINEERING    (CYS,  DS  AND  AI  & DS) 
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+ 
+I/C Timetables:                                                   HOD-CSE-(CYS, DS) and AI &DS 
+ 
+ 
+Class Coordinator: Dr. N. Pushpa Latha   
+25MN6HS101  Induction Programme (IP)          E-523    Mr. D. Srinivasa Rao 
+25ES2IT101  IT Workshop (ITW)           E-315/316   Mr. Md. Ashfakul Hasan/Mrs. D. Naga Vardhini/Mrs. G. Shravani / Dr. V. Radhika 
+Engineering Laboratory (BEEE LAB) 
+25ES2EE102                      P-014    Mr. K. Srikanth/ Dr. J. Bhavani (M), Mrs. B. Naga Swetha (W)     
+Basic Electrical and Electronics 
+Laboratory (PPS LAB)                 K. Naga Sandhya            Placements  
+25ES2CS101                      E-401                MTP                 
+Programming for Problem Solving            Dr. N Pushpa Latha / Mrs.        Mentoring Training & 
+Chander A Pawar (F) 
+LAB)                                           Approach-Level1 
+25BS2CH101                      P-320    Dr. S Rambabu (M) / Dr.  CVA-L1               
+Engineering Chemistry Laboratory (EC                             Career Vision 
+Dr. M Haritha Kiranmai / 
+Activities 
+25ES1CY101  Introduction to Cyber Security (ICS)     E-523    Ms. G. Usha Rani     CCA                - 
+Co-Curricular 
+(PPS)                                           Activities 
+25ES1CS101                      E-523    Dr. N Pushpa Latha     Sports/ECA             - 
+Programming for Problem Solving                               Sports/Extra Curricular 
+Engineering(BEEE) 
+25ES1EE102                      E-523    Mr. K Srikanth       Library    Library        - 
+Basic Electrical and Electronics 
+ 
+Chemistry for Engineers (CFE)        E-523    Dr. M Haritha Kiranmai   Seminar   Seminar        - 
+25BS1CH101 
+25BS1MT101  Matrices and Calculus (MAC)        E-523    Dr. N Pothanna      OTHERS: 
+Faculty 
+Course Code  Name of the Course            Room No    Name of the Faculty   Category   Name of the Activity 
+Name of the 
+* - Tutorial Class 
+----------------Page (32) Break----------------
+Friday              ITW             BEEE              CFE       CVA-L1     SPORTS 
+H 
+C 
+Thursday         MAC       PPS       CFE                BEEE Lab / EC Lab        SPORTS 
+N 
+PPS       IAI&DS      BEEE              MAC           LIBRARY Wednesday 
+U 
+L 
+Tuesday          PPS Lab / BEEE Lab         MAC              PPS        ECA       CCA 
+Monday         CFE       MAC       IAI&DS               EC Lab / PPS Lab        LIBRARY 
+1        2        3              4        5        6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM    12.00 PM           1.40  PM      2.40  PM     3.40  PM  
+                    Time                            12.00 PM  
+9.00  AM     10.00 AM    11.00  AM           12.40 PM     1.40  PM     2.40  PM  
+Section:      A                        Class Room No: E-440                      w.e.f: 05/08/2026 
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                            Programme:   B.Tech.                     Branch:      AI & DS 
+ 
+CLASS  TIMET ABLE
+DEP AR TMENT   OF  COMPUTER    SCIENCE   AND  ENGINEERING    (CYS,  DS  AND  AI  & DS) 
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+ 
+I/C Timetables:                                                 HOD-CSE-(CYS, DS) and AI &DS 
+ 
+ 
+Class Coordinator: Mr. A. Madhu     
+25MN6HS101  Induction Programme (IP)          E-524    Mrs. CH. N. V. Jyothirmai 
+Jyothirmai 
+25ES2IT101  IT Workshop (ITW)           E-315/316 
+Dr. B Ganesh Babu/Mr.P.Venkateswara Rao / Mr. B. Sangameshwar / Mrs.Ch. NV. 
+Engineering Laboratory (BEEE LAB) 
+25ES2EE102                      A-313   Dr. G. Radhika / Dr. G. Lakshminarayana (M) / Dr. A Giri Prasad (S)   
+Basic Electrical and Electronics 
+Laboratory (PPS LAB)                 Reddy/Mr.D,Srinivasa Rao        Placements  
+25ES2CS101                      E-332                MTP                 
+Programming for Problem Solving            Dr. V Surya Narayan           Mentoring Training & 
+Dr. Dr. S Appa Rao (Th) 
+LAB)                                           Approach-Level1 
+25BS2CH101                      P-320    Dr. Likha Chandran (M) /  CVA-L1               
+Engineering Chemistry Laboratory (EC                             Career Vision 
+Dr. M Haritha Kiranmai / 
+Activities 
+25ES1CY101  Introduction to Cyber Security (ICS)     E-524    Mr. A Madhu       CCA                - 
+Co-Curricular 
+(PPS)                        Reddy                 Activities 
+25ES1CS101                      E-524                Sports/ECA             - 
+Programming for Problem Solving            Dr. V Surya Narayan           Sports/Extra Curricular 
+Engineering (BEEE) 
+25ES1EE102                      E-524    Dr. G. Radhika      Library    Library        - 
+Basic Electrical and Electronics 
+ 
+Chemistry for Engineers (CFE)        E-524    Dr. M Haritha Kiranmai   Seminar   Seminar        - 
+25BS1CH101 
+25BS1MT101  Matrices and Calculus (MAC)        E-524    Dr. P Rajashekar      OTHERS: 
+Faculty 
+Course Code  Name of the Course            Room No    Name of the Faculty   Category   Name of the Activity 
+Name of the 
+* - Tutorial Class 
+----------------Page (33) Break----------------
+H 
+Thursday                                                                
+C 
+Wednesday                                  N                             
+U 
+Tuesday                                                       
+L 
+Monday                                                      
+1         2         3              4         5         6 
+Day                                 12.40 PM  
+10.00 AM     11.00  AM     12.00 PM           1.40  PM      2.40  PM      3.40  PM  
+               Time                             12.00 PM  
+9.00  AM     10.00 AM     11.00  AM          12.40 PM      1.40  PM      2.40  PM  
+Section:      A                        Class Room No: D-503                       w.e.f: /08/2026 
+Regulation:    R25                      Class:      I Year                      Semester: I        
+Academic Year:  2026-27                     Programme:   B.Tech.                     Branch:  BIO 
+CLASS  TIMET ABLE   
+DEP AR TMENT   OF  BIOTECHNOLOGY      
+VNR  VIGNANA   JYOTHI   INSTITUTE   OF  ENGINEERING    & TECHNOLOGY     HYDERABAD    
+ 
+ 
+I/C Timetables:                                              HOD-CSE-(CYS, DS & AI &DS) 
+ 
+ 
+ 
+Class Coordinator: Mr. Manmath Nath Das 
+25MN6HS101  Induction Programme (IP)        E-440   Mrs. D. Naga Vardhini                          
+A. Pravalika 
+25ES2IT101  IT Workshop (ITW)          E-330/331                                     
+Mrs. D Naga Vardhini / Mr. Mohd Ashfakul Hasan / Ms. N. Vasundara / Mrs. 
+Engineering Laboratory (BEEE LAB)        (Th) 
+25ES2EE102                    A-313                                      
+Basic Electrical and Electronics           Dr. N Nageswara Reddy / Dr. G. Lakshminarayana (T) / Mr. G. C. Prabhakar 
+Laboratory (PPS LAB)              Vasundara/Mrs. D. Sree Vidya          Placements  
+25ES2CS101                    E-501                   MTP                 
+Programming for Problem Solving          Dr. P V Shiva Kumar/Ms. N.           Mentoring Training & 
+(EC LAB)                    Charitha (M) / Dr. G Nirmala (Th)         Approach-Level1 
+25BS2CH101                    B-308                   CVA-L1                
+Engineering Chemistry Laboratory          Dr. N. Siva Krishna / Dr. A Sri          Career Vision 
+(IAI&DS) 
+25ES1AD101                    E-440   Mr. Manmath Nath Das       CCA    Co-Curricular Activities  - 
+Introduction to AI and Data Science 
+(PPS)                                            Activities 
+25ES1CS101                    E-440   Dr. P V Shiva Kumar        Sports/ECA              - 
+Programming for Problem Solving                                Sports/Extra Curricular 
+Engineering (BEEE) 
+25ES1EE102                    E-440   Dr. N Nageswara Reddy      Library   Library         - 
+Basic Electrical and Electronics 
+ 
+Chemistry for Engineers (CFE)      E-440   Dr. N Siva Krishna         Seminar   Seminar         - 
+25BS1CH101 
+25BS1MT101  Matrices and Calculus (MAC)      E-440   Dr. S Viswas           OTHERS: 
+Faculty 
+Course Code  Name of the Course          Room No.  Name of the Faculty        Category  Name of the Activity 
+Name of the 
+* - Tutorial Class 
+Saturday        IAI&DS      BEEE       CFE               PPS            MTP 
+----------------Page (34) Break----------------
+I/C Timetables                                                                                                                          HOD-BIO 
+ 
+Class Coordinator:  
+ 
+Induction Programme (IP)                                                
+25MN6HS101 
+ 
+Engineering Workshop (EW)                                              
+25ES2ME101 
+     Skills Laboratory (ELCS LAB) 
+                                     
+25HS2EN101  English Language and Communication 
+     LAB                                            Placements  
+                  MTP                
+25ES2DS101  Problem Solving Through C Laboratory (PC                           Mentoring Training & 
+     LAB)                                           Approach-Level1 
+                                     
+25BS2CH101  Engineering Chemistry Laboratory (EC                             Career Vision 
+                                                  Activities 
+Engineering Graphics (EG)                             CCA               - 
+25ES3ME102                                               Co-Curricular 
+                                                  Activities 
+English for Skill Enhancement (ESE)                        Sports/ECA            - 
+25HS1EN101                      D-503                       Sports/Extra Curricular 
+ 
+Problem Solving Through C (PC)                          Library   Library        - 
+25ES1DS101                      D-503 
+ 
+Chemistry For Engineers (CFE)                          Seminar   Seminar        - 
+25BS1CH101                      D-503 
+25PC1BT101  Biology (BM/FB) 
+              OTHERS: 
+25BS1MT104/  Basic Mathematics / Fundamentals of     D-503 
+Faculty 
+Course Code  Name of the Course            Room No    Name of the Faculty   Category  Name of the Activity 
+Name of the 
+* - Tutorial Class 
+Saturday                                                                 
+Friday                                                                 
+----------------Page (35) Break----------------
