@@ -16,6 +16,7 @@ export default function TimetablesView() {
   const [facultyList, setFacultyList] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [sections, setSections] = useState([]);
+  const [blocks, setBlocks] = useState([]);
   
   const [timetables, setTimetables] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -26,6 +27,7 @@ export default function TimetablesView() {
     departmentId: '',
     section: '',
     facultyName: '',
+    blockId: '',
     date: todayStr(),
     filterType: 'Whole',
     customStart: '09:00',
@@ -45,7 +47,8 @@ export default function TimetablesView() {
       }),
       masterDataApi.faculty().then(setFacultyList),
       masterDataApi.departments().then(setDepartments),
-      masterDataApi.sections().then(setSections)
+      masterDataApi.sections().then(setSections),
+      masterDataApi.blocks().then(setBlocks)
     ]).catch(() => {});
   }, []);
 
@@ -56,7 +59,8 @@ export default function TimetablesView() {
       resourceId: '',
       departmentId: '',
       section: '',
-      facultyName: ''
+      facultyName: '',
+      blockId: ''
     }));
   }, [viewMode]);
 
@@ -109,12 +113,15 @@ export default function TimetablesView() {
     timetableApi
       .list(params)
       .then(data => {
+        let results = data;
+        if (filters.blockId) {
+          results = results.filter(t => t.resource?.blockId === Number(filters.blockId));
+        }
         if (viewMode === 'Faculty') {
           // If searching faculty, filter out slots with no faculty assigned
-          setTimetables(data.filter((t) => t.facultyName));
-        } else {
-          setTimetables(data);
+          results = results.filter((t) => t.facultyName);
         }
+        setTimetables(results);
       })
       .catch((err) => setError(err.response?.data?.error || 'Failed to load schedule.'))
       .finally(() => setLoading(false));
@@ -133,6 +140,7 @@ export default function TimetablesView() {
     if (viewMode === 'Classroom') {
       const occupiedResourceIds = new Set(timetables.map(t => t.resourceId));
       freeItems = resourceList.filter(r => !occupiedResourceIds.has(r.resourceId));
+      if (filters.blockId) freeItems = freeItems.filter(r => r.blockId === Number(filters.blockId));
       if (filters.resourceId) freeItems = freeItems.filter(r => r.resourceId === Number(filters.resourceId));
     } else if (viewMode === 'Faculty') {
       const occupiedFaculty = new Set(timetables.filter(t => t.facultyName).map(t => t.facultyName));
@@ -190,11 +198,26 @@ export default function TimetablesView() {
 
       {/* Filters */}
       <div className="mt-6 rounded-xl border border-line bg-white p-4 shadow-sm">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-5 items-end">
+        <div className="flex flex-col md:flex-row md:flex-wrap gap-4 items-end">
           
+          {/* Shared Block Filter */}
+          <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
+            <label className="mb-1 block text-xs font-semibold text-navy">Block</label>
+            <select
+              value={filters.blockId}
+              onChange={(e) => setFilters((f) => ({ ...f, blockId: e.target.value }))}
+              className="w-full rounded border border-line px-3 py-2 text-sm focus:border-navy focus:ring-1 focus:ring-navy"
+            >
+              <option value="">All Blocks</option>
+              {blocks.map(b => (
+                <option key={b.blockId} value={b.blockId}>{b.blockName}</option>
+              ))}
+            </select>
+          </div>
+
           {/* Dynamic Filters based on Mode */}
           {viewMode === 'Classroom' && (
-            <div className="col-span-1">
+            <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
               <label className="mb-1 block text-xs font-semibold text-navy">Classroom / Lab</label>
               <select
                 value={filters.resourceId}
@@ -210,7 +233,7 @@ export default function TimetablesView() {
           )}
 
           {viewMode === 'Faculty' && (
-            <div className="col-span-1">
+            <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
               <label className="mb-1 block text-xs font-semibold text-navy">Faculty Name</label>
               <select
                 value={filters.facultyName}
@@ -227,7 +250,7 @@ export default function TimetablesView() {
 
           {viewMode === 'Section' && (
             <>
-              <div>
+              <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
                 <label className="mb-1 block text-xs font-semibold text-navy">Branch / Dept</label>
                 <select
                   value={filters.departmentId}
@@ -240,7 +263,7 @@ export default function TimetablesView() {
                   ))}
                 </select>
               </div>
-              <div>
+              <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
                 <label className="mb-1 block text-xs font-semibold text-navy">Section</label>
                 <select
                   value={filters.section}
@@ -258,7 +281,7 @@ export default function TimetablesView() {
           )}
 
           {/* Shared Filters */}
-          <div>
+          <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
             <label className="mb-1 block text-xs font-semibold text-navy">Date</label>
             <input
               type="date"
@@ -268,7 +291,7 @@ export default function TimetablesView() {
             />
           </div>
 
-          <div>
+          <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
             <label className="mb-1 block text-xs font-semibold text-navy">Time Slot</label>
             <select
               value={filters.filterType}
@@ -283,7 +306,7 @@ export default function TimetablesView() {
             </select>
           </div>
 
-          <div>
+          <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
             <label className="mb-1 block text-xs font-semibold text-navy">Status</label>
             <select
               value={filters.status}
@@ -297,7 +320,7 @@ export default function TimetablesView() {
           </div>
 
           {filters.filterType === 'Custom' && (
-            <div className="flex gap-2 col-span-1 md:col-span-5 border-t border-line/50 pt-3 mt-1">
+            <div className="flex gap-2 w-full border-t border-line/50 pt-3 mt-1">
               <div className="w-48">
                 <label className="mb-1 block text-xs font-semibold text-navy">Custom Start</label>
                 <input
@@ -344,7 +367,9 @@ export default function TimetablesView() {
                       {viewMode === 'Section' && `${item.department.branchCode} - Sec ${item.section}`}
                     </div>
                     {viewMode === 'Classroom' && (
-                      <div className="text-xs text-ink/60 mt-0.5">{item.block?.blockName}</div>
+                      <div className="text-xs text-ink/60 mt-0.5">
+                        {item.block?.blockCode ? `Block ${item.block.blockCode}` : ''}
+                      </div>
                     )}
                   </div>
                   <span className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-semibold">Available</span>
@@ -385,7 +410,7 @@ export default function TimetablesView() {
                             : '-'}
                         </div>
                         <div className="text-xs text-ink/60 mt-0.5">
-                          {t.resource?.block?.blockName}
+                          {t.resource?.block?.blockCode ? `Block ${t.resource.block.blockCode}` : ''}
                         </div>
                       </td>
                       
