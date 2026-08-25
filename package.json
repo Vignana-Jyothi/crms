@@ -1,0 +1,16 @@
+{
+  "name": "crms-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "VNRVJIET Campus Resource Management System (CRMS) — Root Orchestration",
+  "scripts": {
+    "test": "npm run test:backend && npm run test:main-fe && npm run test:admin-fe",
+    "test:all": "npm run test:backend && npm run test:main-fe && npm run test:admin-fe && npm run build",
+    "test:backend": "npm --prefix crms-backend test",
+    "test:frontend": "npm --prefix crms-main-frontend test && npm --prefix crms-admin-frontend test",
+    "test:main-fe": "npm --prefix crms-main-frontend test",
+    "test:admin-fe": "npm --prefix crms-admin-frontend test",
+    "build": "npm --prefix crms-main-frontend run build && npm --prefix crms-admin-frontend run build",
+    "lint": "npm --prefix crms-main-frontend run lint && npm --prefix crms-admin-frontend run lint"
+  }
+}

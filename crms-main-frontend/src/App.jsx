@@ -13,6 +13,8 @@ import Approvals from './pages/admin/Approvals';
 import Bookings from './pages/admin/Bookings';
 import LiveStatus from './pages/admin/LiveStatus';
 import FacultySchedule from './pages/admin/FacultySchedule';
+import ClassroomSchedule from './pages/admin/ClassroomSchedule';
+import SectionSchedule from './pages/admin/SectionSchedule';
 import Resources from './pages/admin/Resources';
 import Users from './pages/admin/Users';
 import AuditLogs from './pages/admin/AuditLogs';
@@ -62,6 +64,8 @@ export default function App() {
           <Route path="/admin/bookings" element={<ProtectedRoute><RequireRole roles={[ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN]}><MainShell><Bookings /></MainShell></RequireRole></ProtectedRoute>} />
           <Route path="/admin/live" element={<ProtectedRoute><RequireRole roles={[ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN]}><MainShell><LiveStatus /></MainShell></RequireRole></ProtectedRoute>} />
           <Route path="/admin/faculty-schedule" element={<ProtectedRoute><RequireRole roles={[ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN]}><MainShell><FacultySchedule /></MainShell></RequireRole></ProtectedRoute>} />
+          <Route path="/admin/classroom-schedule" element={<ProtectedRoute><RequireRole roles={[ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN]}><MainShell><ClassroomSchedule /></MainShell></RequireRole></ProtectedRoute>} />
+          <Route path="/admin/section-schedule" element={<ProtectedRoute><RequireRole roles={[ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN]}><MainShell><SectionSchedule /></MainShell></RequireRole></ProtectedRoute>} />
           <Route path="/admin/resources" element={<ProtectedRoute><RequireRole roles={[ROLES.SUPER_ADMIN]}><MainShell><Resources /></MainShell></RequireRole></ProtectedRoute>} />
           <Route path="/admin/users" element={<ProtectedRoute><RequireRole roles={[ROLES.SUPER_ADMIN]}><MainShell><Users /></MainShell></RequireRole></ProtectedRoute>} />
           <Route path="/admin/audit-logs" element={<ProtectedRoute><RequireRole roles={[ROLES.SUPER_ADMIN]}><MainShell><AuditLogs /></MainShell></RequireRole></ProtectedRoute>} />

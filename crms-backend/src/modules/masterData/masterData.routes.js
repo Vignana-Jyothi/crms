@@ -15,5 +15,6 @@ router.get('/departments', asyncHandler(async (req, res) => res.json(await repo.
 router.get('/blocks', asyncHandler(async (req, res) => res.json(await repo.listBlocks())));
 router.get('/resource-types', asyncHandler(async (req, res) => res.json(await repo.listResourceTypes())));
 router.get('/faculty', asyncHandler(async (req, res) => res.json(await repo.listFaculty())));
+router.get('/sections', asyncHandler(async (req, res) => res.json(await repo.listSections())));
 
 module.exports = router;

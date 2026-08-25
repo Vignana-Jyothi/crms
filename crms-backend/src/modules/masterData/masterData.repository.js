@@ -15,4 +15,14 @@ const listFaculty = async () => {
   return records.map(r => r.facultyName);
 };
 
-module.exports = { listRoles, listDepartments, listBlocks, listResourceTypes, listFaculty };
+const listSections = async () => {
+  const records = await prisma.timetable.findMany({
+    where: { section: { not: null, not: '' } },
+    select: { section: true, departmentId: true },
+    distinct: ['section', 'departmentId'],
+    orderBy: [{ departmentId: 'asc' }, { section: 'asc' }]
+  });
+  return records;
+};
+
+module.exports = { listRoles, listDepartments, listBlocks, listResourceTypes, listFaculty, listSections };
