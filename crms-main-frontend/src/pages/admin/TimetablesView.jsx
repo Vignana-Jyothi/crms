@@ -29,7 +29,8 @@ export default function TimetablesView() {
     date: todayStr(),
     filterType: 'Whole',
     customStart: '09:00',
-    customEnd: '17:00'
+    customEnd: '17:00',
+    status: 'All'
   });
 
   // Load all master data on mount
@@ -125,6 +126,39 @@ export default function TimetablesView() {
     ? sections.filter(s => s.departmentId === Number(filters.departmentId))
     : sections;
   const uniqueSectionNames = [...new Set(availableSections.map(s => s.section))];
+
+  // Calculate Free items
+  let freeItems = [];
+  if (filters.status === 'Free' && !loading) {
+    if (viewMode === 'Classroom') {
+      const occupiedResourceIds = new Set(timetables.map(t => t.resourceId));
+      freeItems = resourceList.filter(r => !occupiedResourceIds.has(r.resourceId));
+      if (filters.resourceId) freeItems = freeItems.filter(r => r.resourceId === Number(filters.resourceId));
+    } else if (viewMode === 'Faculty') {
+      const occupiedFaculty = new Set(timetables.filter(t => t.facultyName).map(t => t.facultyName));
+      freeItems = facultyList.filter(f => !occupiedFaculty.has(f));
+      if (filters.facultyName) freeItems = freeItems.filter(f => f === filters.facultyName);
+    } else if (viewMode === 'Section') {
+      const occupiedSections = new Set(timetables.map(t => `${t.departmentId}-${t.section}`));
+      const allCombinations = [];
+      const deptsToUse = filters.departmentId 
+        ? departments.filter(d => d.departmentId === Number(filters.departmentId)) 
+        : departments;
+        
+      for (const dept of deptsToUse) {
+        const deptSections = sections.filter(s => s.departmentId === dept.departmentId);
+        const uniqueSecs = [...new Set(deptSections.map(s => s.section))];
+        for (const sec of uniqueSecs) {
+          if (!occupiedSections.has(`${dept.departmentId}-${sec}`)) {
+            if (!filters.section || filters.section === sec) {
+              allCombinations.push({ department: dept, section: sec });
+            }
+          }
+        }
+      }
+      freeItems = allCombinations;
+    }
+  }
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -249,6 +283,19 @@ export default function TimetablesView() {
             </select>
           </div>
 
+          <div>
+            <label className="mb-1 block text-xs font-semibold text-navy">Status</label>
+            <select
+              value={filters.status}
+              onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))}
+              className="w-full rounded border border-line px-3 py-2 text-sm font-medium focus:border-navy focus:ring-1 focus:ring-navy"
+            >
+              <option value="All">All Schedules</option>
+              <option value="Free">Available / Free</option>
+              <option value="Busy">In Use / Busy</option>
+            </select>
+          </div>
+
           {filters.filterType === 'Custom' && (
             <div className="flex gap-2 col-span-1 md:col-span-5 border-t border-line/50 pt-3 mt-1">
               <div className="w-48">
@@ -281,6 +328,30 @@ export default function TimetablesView() {
       <div className="mt-8">
         {loading ? (
           <div className="text-sm text-ink/60">Loading schedule...</div>
+        ) : filters.status === 'Free' ? (
+          freeItems.length === 0 ? (
+            <div className="rounded-xl border border-line border-dashed p-10 text-center text-ink/50 bg-white/50">
+              No available {viewMode.toLowerCase()}s found for this time.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {freeItems.map((item, idx) => (
+                <div key={idx} className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-50/50 flex items-center justify-between">
+                  <div>
+                    <div className="font-medium text-navy">
+                      {viewMode === 'Classroom' && item.resourceName}
+                      {viewMode === 'Faculty' && item}
+                      {viewMode === 'Section' && `${item.department.branchCode} - Sec ${item.section}`}
+                    </div>
+                    {viewMode === 'Classroom' && (
+                      <div className="text-xs text-ink/60 mt-0.5">{item.block?.blockName}</div>
+                    )}
+                  </div>
+                  <span className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-semibold">Available</span>
+                </div>
+              ))}
+            </div>
+          )
         ) : timetables.length === 0 ? (
           <div className="rounded-xl border border-line border-dashed p-10 text-center text-ink/50 bg-white/50">
             No classes found for the selected filters.
@@ -303,7 +374,12 @@ export default function TimetablesView() {
                 <tbody className="divide-y divide-line">
                   {timetables.map((t) => (
                     <tr key={t.timetableId} className="hover:bg-paper/50">
-                      <td className="px-4 py-3 whitespace-nowrap">{fmtTimeSlot(t.startTime, t.endTime)}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <div className="font-medium">{fmtTimeSlot(t.startTime, t.endTime)}</div>
+                        {(filters.status === 'Busy' || filters.status === 'All') && (
+                          <span className="inline-block mt-1 px-1.5 py-0.5 bg-brick/10 text-brick rounded text-[10px] font-bold uppercase tracking-wider">In Use</span>
+                        )}
+                      </td>
                       
                       {viewMode !== 'Classroom' && (
                         <td className="px-4 py-3">
