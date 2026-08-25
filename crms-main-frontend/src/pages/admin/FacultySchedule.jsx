@@ -72,7 +72,7 @@ export default function FacultySchedule() {
 
     timetableApi
       .list(params)
-      .then(setTimetables)
+      .then((data) => setTimetables(data.filter((t) => t.facultyName)))
       .catch((err) => setError(err.response?.data?.error || 'Failed to load schedule.'))
       .finally(() => setLoading(false));
   }
