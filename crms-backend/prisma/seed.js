@@ -52,10 +52,10 @@ async function main() {
 
   // 3. Blocks
   const blocksData = [
-    { blockCode: 'A', blockName: 'APJ Abdul Kalam Block' },
-    { blockCode: 'B', blockName: 'Babbage Block' },
-    { blockCode: 'C', blockName: 'C.V. Raman Block' },
-    { blockCode: 'D', blockName: 'Dr. B.R. Ambedkar Block' },
+    { blockCode: 'A', blockName: 'Block A' },
+    { blockCode: 'B', blockName: 'Block B' },
+    { blockCode: 'C', blockName: 'Block C' },
+    { blockCode: 'D', blockName: 'Block D' },
   ];
   const blockMap = {};
   for (const b of blocksData) {
