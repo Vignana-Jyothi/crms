@@ -114,7 +114,7 @@ export default function WeeklyGrid({ timetables, onAssignFaculty, facultyList })
                                 <span className="truncate">{t.courseCode}</span>
                                 {t.department && t.section && (
                                   <span className="text-[10px] text-ink/70 bg-line/50 px-1.5 py-0.5 rounded ml-1 shrink-0">
-                                    {t.department.branchCode}-{t.section}
+                                    {t.studentYear ? `${t.studentYear} ` : ''}{t.department.branchCode}-{t.section}
                                   </span>
                                 )}
                               </div>

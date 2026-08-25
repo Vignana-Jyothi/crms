@@ -536,7 +536,7 @@ export default function TimetablesView() {
                       <td className="px-4 py-3">
                         <div className="font-medium text-navy">{t.courseCode}</div>
                         <div className="text-xs text-ink/60 mt-0.5">
-                          {t.department?.branchCode} - Sec {t.section}
+                          {t.studentYear ? `${t.studentYear} ` : ''}{t.department?.branchCode} - Sec {t.section}
                         </div>
                       </td>
                       

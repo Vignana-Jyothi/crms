@@ -137,6 +137,7 @@ model Timetable {
   courseCode String? @map("course_code") @db.VarChar(20)
   section String? @db.VarChar(20)
   academicYear String? @map("academic_year") @db.VarChar(20)
+  studentYear String? @map("student_year") @db.VarChar(20)
   facultyName String? @map("faculty_name") @db.VarChar(100)
   uploadedByUserId Int? @map("uploaded_by_user_id")
 
