@@ -5,7 +5,7 @@ const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
-const TRANSCRIPT_PATH = 'C:\\Users\\pavan\\.gemini\\antigravity\\brain\\910be632-037c-429e-b9f4-9c891eb08244\\.system_generated\\logs\\transcript_full.jsonl';
+const TRANSCRIPT_PATH = path.join(__dirname, 'ocr_data.txt');
 
 // Time slots mapping based on the PDF header
 const TIME_SLOTS = [
