@@ -200,23 +200,6 @@ export default function TimetablesView() {
       <div className="mt-6 rounded-xl border border-line bg-white p-4 shadow-sm">
         <div className="flex flex-col md:flex-row md:flex-wrap gap-4 items-end">
           
-          {/* Shared Block Filter */}
-          <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
-            <label className="mb-1 block text-xs font-semibold text-navy">Block</label>
-            <select
-              value={filters.blockId}
-              onChange={(e) => setFilters((f) => ({ ...f, blockId: e.target.value }))}
-              className="w-full rounded border border-line px-3 py-2 text-sm focus:border-navy focus:ring-1 focus:ring-navy"
-            >
-              <option value="">All Blocks</option>
-              {blocks.map(b => (
-                <option key={b.blockId} value={b.blockId}>
-                  {b.blockCode && b.blockCode.length <= 2 ? `Block ${b.blockCode}` : b.blockName}
-                </option>
-              ))}
-            </select>
-          </div>
-
           {/* Dynamic Filters based on Mode */}
           {viewMode === 'Classroom' && (
             <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
@@ -318,6 +301,23 @@ export default function TimetablesView() {
               <option value="All">All Schedules</option>
               <option value="Free">Available / Free</option>
               <option value="Busy">In Use / Busy</option>
+            </select>
+          </div>
+
+          {/* Shared Block Filter */}
+          <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
+            <label className="mb-1 block text-xs font-semibold text-navy">Block</label>
+            <select
+              value={filters.blockId}
+              onChange={(e) => setFilters((f) => ({ ...f, blockId: e.target.value }))}
+              className="w-full rounded border border-line px-3 py-2 text-sm focus:border-navy focus:ring-1 focus:ring-navy"
+            >
+              <option value="">All Blocks</option>
+              {blocks.map(b => (
+                <option key={b.blockId} value={b.blockId}>
+                  {b.blockCode && b.blockCode.length <= 2 ? `Block ${b.blockCode}` : b.blockName}
+                </option>
+              ))}
             </select>
           </div>
 
