@@ -102,7 +102,7 @@ export default function ClassroomSchedule() {
             >
               <option value="">All Rooms</option>
               {resourceList.map(r => (
-                <option key={r.resourceId} value={r.resourceId}>{r.resourceName} ({r.resourceId})</option>
+                <option key={r.resourceId} value={r.resourceId}>{r.resourceName}</option>
               ))}
             </select>
           </div>
@@ -185,7 +185,7 @@ export default function ClassroomSchedule() {
                     <tr key={t.timetableId} className="hover:bg-paper/50">
                       <td className="px-4 py-3 whitespace-nowrap">{fmtTimeSlot(t.startTime, t.endTime)}</td>
                       <td className="px-4 py-3">
-                        <div className="font-medium">{t.resource?.resourceName || t.resourceId}</div>
+                        <div className="font-medium">{t.resource?.resourceName || '-'}</div>
                         <div className="text-xs text-ink/60 mt-0.5">
                           {t.resource?.block?.blockName}
                         </div>
@@ -196,7 +196,7 @@ export default function ClassroomSchedule() {
                           {t.department?.branchCode} - {t.section}
                         </div>
                       </td>
-                      <td className="px-4 py-3 font-medium">{t.facultyName || 'Unknown Faculty'}</td>
+                      <td className="px-4 py-3 font-medium">{t.facultyName || '-'}</td>
                     </tr>
                   ))}
                 </tbody>
