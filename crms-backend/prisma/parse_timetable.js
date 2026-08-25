@@ -9,12 +9,12 @@ const TRANSCRIPT_PATH = 'C:\\Users\\pavan\\.gemini\\antigravity\\brain\\910be632
 
 // Time slots mapping based on the PDF header
 const TIME_SLOTS = [
-  { startTime: '1970-01-01T09:00:00Z', endTime: '1970-01-01T10:00:00Z' }, // 1
-  { startTime: '1970-01-01T10:00:00Z', endTime: '1970-01-01T11:00:00Z' }, // 2
-  { startTime: '1970-01-01T11:00:00Z', endTime: '1970-01-01T12:00:00Z' }, // 3
-  { startTime: '1970-01-01T12:40:00Z', endTime: '1970-01-01T13:40:00Z' }, // 4
-  { startTime: '1970-01-01T13:40:00Z', endTime: '1970-01-01T14:40:00Z' }, // 5
-  { startTime: '1970-01-01T14:40:00Z', endTime: '1970-01-01T15:40:00Z' }, // 6
+  { startTime: '1970-01-01T09:00:00Z', endTime: '1970-01-01T09:59:00Z' }, // 1
+  { startTime: '1970-01-01T10:00:00Z', endTime: '1970-01-01T10:59:00Z' }, // 2
+  { startTime: '1970-01-01T11:00:00Z', endTime: '1970-01-01T11:59:00Z' }, // 3
+  { startTime: '1970-01-01T12:40:00Z', endTime: '1970-01-01T13:39:00Z' }, // 4
+  { startTime: '1970-01-01T13:40:00Z', endTime: '1970-01-01T14:39:00Z' }, // 5
+  { startTime: '1970-01-01T14:40:00Z', endTime: '1970-01-01T15:39:00Z' }, // 6
 ];
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -25,16 +25,16 @@ async function main() {
   
   let ocrContent = '';
   for (const line of lines) {
-    if (line.includes('==Start of OCR for page 1==')) {
-      // Just extract the raw content string if it matches
+    if (line.includes('==Start of OCR for page')) {
       try {
         const obj = JSON.parse(line);
-        if (obj.content) {
-          ocrContent = obj.content;
+        if (obj.content && !ocrContent.includes(obj.content.substring(0, 100))) {
+          ocrContent += '\n' + obj.content;
         }
       } catch (e) {
-        // Fallback if not JSON but contains the string
-        ocrContent = line;
+        if (!ocrContent.includes(line.substring(0, 100))) {
+          ocrContent += '\n' + line;
+        }
       }
     }
   }
