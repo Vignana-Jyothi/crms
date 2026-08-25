@@ -189,7 +189,11 @@ export default function FacultySchedule() {
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="font-medium">{t.resource?.resourceName || '-'}</div>
+                        <div className="font-medium">
+                          {t.resource?.resourceName && !/^\d(?:st|nd|rd|th)\s+Year/i.test(t.resource.resourceName) 
+                            ? t.resource.resourceName 
+                            : '-'}
+                        </div>
                         <div className="text-xs text-ink/60 mt-0.5">
                           {t.resource?.block?.blockName}
                         </div>
