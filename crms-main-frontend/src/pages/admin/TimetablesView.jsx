@@ -11,7 +11,6 @@ function todayStr() {
 }
 
 export default function TimetablesView() {
-  const [viewMode, setViewMode] = useState('Classroom'); // Classroom, Section, Faculty
   const [displayLayout, setDisplayLayout] = useState('List'); // List, Grid
 
   const [resourceList, setResourceList] = useState([]);
@@ -54,18 +53,6 @@ export default function TimetablesView() {
     ]).catch(() => {});
   }, []);
 
-  // Clear specific filters when mode changes to prevent confusing queries
-  useEffect(() => {
-    setFilters(prev => ({
-      ...prev,
-      resourceId: '',
-      departmentId: '',
-      section: '',
-      facultyName: '',
-      blockId: ''
-    }));
-  }, [viewMode]);
-
   const getFilterTimes = () => {
     let startTimeParam = '';
     let endTimeParam = '';
@@ -105,12 +92,10 @@ export default function TimetablesView() {
     if (startTimeParam) params.startTime = startTimeParam;
     if (endTimeParam) params.endTime = endTimeParam;
 
-    if (viewMode === 'Classroom' && filters.resourceId) params.resourceId = filters.resourceId;
-    if (viewMode === 'Section') {
-      if (filters.departmentId) params.departmentId = filters.departmentId;
-      if (filters.section) params.section = filters.section;
-    }
-    if (viewMode === 'Faculty' && filters.facultyName) params.facultyName = filters.facultyName;
+    if (filters.resourceId) params.resourceId = filters.resourceId;
+    if (filters.departmentId) params.departmentId = filters.departmentId;
+    if (filters.section) params.section = filters.section;
+    if (filters.facultyName) params.facultyName = filters.facultyName;
 
     timetableApi
       .list(params)
@@ -129,7 +114,7 @@ export default function TimetablesView() {
       .finally(() => setLoading(false));
   }
 
-  useEffect(refresh, [filters, viewMode]);
+  useEffect(refresh, [filters]);
 
   const availableSections = filters.departmentId 
     ? sections.filter(s => s.departmentId === Number(filters.departmentId))
@@ -138,17 +123,17 @@ export default function TimetablesView() {
 
   // Calculate Free items
   let freeItems = [];
-  if (filters.status === 'Free' && !loading) {
-    if (viewMode === 'Classroom') {
+  if (!loading && filters.status.startsWith('Free')) {
+    if (filters.status === 'Free_Room') {
       const occupiedResourceIds = new Set(timetables.map(t => t.resourceId));
       freeItems = resourceList.filter(r => !occupiedResourceIds.has(r.resourceId));
       if (filters.blockId) freeItems = freeItems.filter(r => r.blockId === Number(filters.blockId));
       if (filters.resourceId) freeItems = freeItems.filter(r => r.resourceId === Number(filters.resourceId));
-    } else if (viewMode === 'Faculty') {
+    } else if (filters.status === 'Free_Faculty') {
       const occupiedFaculty = new Set(timetables.filter(t => t.facultyName).map(t => t.facultyName));
       freeItems = facultyList.filter(f => !occupiedFaculty.has(f));
       if (filters.facultyName) freeItems = freeItems.filter(f => f === filters.facultyName);
-    } else if (viewMode === 'Section') {
+    } else if (filters.status === 'Free_Section') {
       const occupiedSections = new Set(timetables.map(t => `${t.departmentId}-${t.section}`));
       const allCombinations = [];
       const deptsToUse = filters.departmentId 
@@ -248,22 +233,6 @@ export default function TimetablesView() {
         
         {/* Mode & Layout Toggles */}
         <div className="flex flex-col gap-3">
-          <div className="flex bg-line/30 p-1 rounded-lg self-start">
-            {['Classroom', 'Section', 'Faculty'].map(mode => (
-              <button
-                key={mode}
-                onClick={() => setViewMode(mode)}
-                className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                  viewMode === mode 
-                    ? 'bg-white text-navy shadow-sm' 
-                    : 'text-ink/60 hover:text-navy hover:bg-white/50'
-                }`}
-              >
-                {mode}
-              </button>
-            ))}
-          </div>
-
           <div className="flex items-center justify-between gap-4">
             <div className="flex bg-line/30 p-1 rounded-lg self-start">
               {['List', 'Grid'].map(layout => (
@@ -297,70 +266,63 @@ export default function TimetablesView() {
       <div className="mt-6 rounded-xl border border-line bg-white p-4 shadow-sm print:hidden">
         <div className="flex flex-col md:flex-row md:flex-wrap gap-4 items-end">
           
-          {/* Dynamic Filters based on Mode */}
-          {viewMode === 'Classroom' && (
-            <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
-              <label className="mb-1 block text-xs font-semibold text-navy">Classroom / Lab</label>
-              <select
-                value={filters.resourceId}
-                onChange={(e) => setFilters((f) => ({ ...f, resourceId: e.target.value }))}
-                className="w-full rounded border border-line px-3 py-2 text-sm focus:border-navy focus:ring-1 focus:ring-navy"
-              >
-                <option value="">All Rooms</option>
-                {resourceList.map(r => (
-                  <option key={r.resourceId} value={r.resourceId}>{r.resourceName}</option>
-                ))}
-              </select>
-            </div>
-          )}
+          {/* Unified Filters */}
+          <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
+            <label className="mb-1 block text-xs font-semibold text-navy">Classroom / Lab</label>
+            <select
+              value={filters.resourceId}
+              onChange={(e) => setFilters((f) => ({ ...f, resourceId: e.target.value }))}
+              className="w-full rounded border border-line px-3 py-2 text-sm focus:border-navy focus:ring-1 focus:ring-navy"
+            >
+              <option value="">All Rooms</option>
+              {resourceList.map(r => (
+                <option key={r.resourceId} value={r.resourceId}>{r.resourceName}</option>
+              ))}
+            </select>
+          </div>
 
-          {viewMode === 'Faculty' && (
-            <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
-              <label className="mb-1 block text-xs font-semibold text-navy">Faculty Name</label>
-              <select
-                value={filters.facultyName}
-                onChange={(e) => setFilters((f) => ({ ...f, facultyName: e.target.value }))}
-                className="w-full rounded border border-line px-3 py-2 text-sm focus:border-navy focus:ring-1 focus:ring-navy"
-              >
-                <option value="">All Faculty</option>
-                {facultyList.map(name => (
-                  <option key={name} value={name}>{name}</option>
-                ))}
-              </select>
-            </div>
-          )}
+          <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
+            <label className="mb-1 block text-xs font-semibold text-navy">Faculty Name</label>
+            <select
+              value={filters.facultyName}
+              onChange={(e) => setFilters((f) => ({ ...f, facultyName: e.target.value }))}
+              className="w-full rounded border border-line px-3 py-2 text-sm focus:border-navy focus:ring-1 focus:ring-navy"
+            >
+              <option value="">All Faculty</option>
+              {facultyList.map(name => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+            </select>
+          </div>
 
-          {viewMode === 'Section' && (
-            <>
-              <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
-                <label className="mb-1 block text-xs font-semibold text-navy">Branch / Dept</label>
-                <select
-                  value={filters.departmentId}
-                  onChange={(e) => setFilters((f) => ({ ...f, departmentId: e.target.value, section: '' }))}
-                  className="w-full rounded border border-line px-3 py-2 text-sm focus:border-navy focus:ring-1 focus:ring-navy"
-                >
-                  <option value="">All Branches</option>
-                  {departments.map(d => (
-                    <option key={d.departmentId} value={d.departmentId}>{d.branchCode}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
-                <label className="mb-1 block text-xs font-semibold text-navy">Section</label>
-                <select
-                  value={filters.section}
-                  onChange={(e) => setFilters((f) => ({ ...f, section: e.target.value }))}
-                  className="w-full rounded border border-line px-3 py-2 text-sm focus:border-navy focus:ring-1 focus:ring-navy"
-                  disabled={!filters.departmentId && uniqueSectionNames.length === 0}
-                >
-                  <option value="">All Sections</option>
-                  {uniqueSectionNames.map(s => (
-                    <option key={s} value={s}>Section {s}</option>
-                  ))}
-                </select>
-              </div>
-            </>
-          )}
+          <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
+            <label className="mb-1 block text-xs font-semibold text-navy">Branch / Dept</label>
+            <select
+              value={filters.departmentId}
+              onChange={(e) => setFilters((f) => ({ ...f, departmentId: e.target.value, section: '' }))}
+              className="w-full rounded border border-line px-3 py-2 text-sm focus:border-navy focus:ring-1 focus:ring-navy"
+            >
+              <option value="">All Branches</option>
+              {departments.map(d => (
+                <option key={d.departmentId} value={d.departmentId}>{d.branchCode}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
+            <label className="mb-1 block text-xs font-semibold text-navy">Section</label>
+            <select
+              value={filters.section}
+              onChange={(e) => setFilters((f) => ({ ...f, section: e.target.value }))}
+              className="w-full rounded border border-line px-3 py-2 text-sm focus:border-navy focus:ring-1 focus:ring-navy"
+              disabled={!filters.departmentId && uniqueSectionNames.length === 0}
+            >
+              <option value="">All Sections</option>
+              {uniqueSectionNames.map(s => (
+                <option key={s} value={s}>Section {s}</option>
+              ))}
+            </select>
+          </div>
 
           {/* Shared Filters */}
           <div className="w-full md:w-auto md:flex-1 min-w-[150px]">
@@ -396,8 +358,11 @@ export default function TimetablesView() {
               className="w-full rounded border border-line px-3 py-2 text-sm font-medium focus:border-navy focus:ring-1 focus:ring-navy"
             >
               <option value="All">All Schedules</option>
-              <option value="Free">Available / Free</option>
+              <option value="Free_Room">Available Rooms</option>
+              <option value="Free_Section">Available Sections</option>
+              <option value="Free_Faculty">Available Faculty</option>
               <option value="Busy">In Use / Busy</option>
+              <option value="Conflict">Conflicts Only</option>
             </select>
           </div>
 
@@ -450,10 +415,10 @@ export default function TimetablesView() {
       <div className="mt-8">
         {loading ? (
           <div className="text-sm text-ink/60">Loading schedule...</div>
-        ) : filters.status === 'Free' ? (
+        ) : filters.status.startsWith('Free') ? (
           freeItems.length === 0 ? (
             <div className="rounded-xl border border-line border-dashed p-10 text-center text-ink/50 bg-white/50">
-              No available {viewMode.toLowerCase()}s found for this time.
+              No available items found for this time.
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -461,11 +426,11 @@ export default function TimetablesView() {
                 <div key={idx} className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-50/50 flex items-center justify-between">
                   <div>
                     <div className="font-medium text-navy">
-                      {viewMode === 'Classroom' && item.resourceName}
-                      {viewMode === 'Faculty' && item}
-                      {viewMode === 'Section' && `${item.department.branchCode} - Sec ${item.section}`}
+                      {filters.status === 'Free_Room' && item.resourceName}
+                      {filters.status === 'Free_Faculty' && item}
+                      {filters.status === 'Free_Section' && `${item.department.branchCode} - Sec ${item.section}`}
                     </div>
-                    {viewMode === 'Classroom' && (
+                    {filters.status === 'Free_Room' && (
                       <div className="text-xs text-ink/60 mt-0.5">
                         {item.block?.blockCode ? `Block ${item.block.blockCode}` : ''}
                       </div>
@@ -476,7 +441,7 @@ export default function TimetablesView() {
               ))}
             </div>
           )
-        ) : displayLayout === 'Grid' && filters.status !== 'Free' ? (
+        ) : displayLayout === 'Grid' && !filters.status.startsWith('Free') ? (
           <WeeklyGrid 
             timetables={timetables} 
             onAssignFaculty={handleAssignFaculty} 
