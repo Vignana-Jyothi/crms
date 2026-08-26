@@ -13,6 +13,7 @@ import Approvals from './pages/admin/Approvals';
 import Bookings from './pages/admin/Bookings';
 import LiveStatus from './pages/admin/LiveStatus';
 import TimetablesView from './pages/admin/TimetablesView';
+import FacultyCalendarView from './pages/admin/FacultyCalendarView';
 import Resources from './pages/admin/Resources';
 import Users from './pages/admin/Users';
 import AuditLogs from './pages/admin/AuditLogs';

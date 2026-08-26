@@ -46,6 +46,14 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [selectedRoom, setSelectedRoom] = useState(null);
 
+  const handleDateChange = (e) => {
+    const newDate = e.target.value;
+    setSelectedDate(newDate);
+    if (newDate !== todayStr() && filterType === 'Now') {
+      setFilterType('Whole');
+    }
+  };
+
   const getFilterTimes = () => {
     let startTimeParam = '';
     let endTimeParam = '';
@@ -170,7 +178,7 @@ export default function Dashboard() {
           <input
             type="date"
             value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
+            onChange={handleDateChange}
             className="rounded border border-line px-2 py-2 text-sm bg-white w-full"
           />
         </div>
@@ -254,7 +262,7 @@ export default function Dashboard() {
           <option value="">All blocks</option>
           {blocks.map((b) => (
             <option key={b.blockId} value={b.blockId}>
-              {b.blockCode ? `Block ${b.blockCode} - ${b.blockName}` : b.blockName}
+              {b.blockName}
             </option>
           ))}
         </select>
@@ -431,7 +439,7 @@ function ResourceCardContent({ r, isFree, occupant, since, until }) {
       <div className="mt-2">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink/60">
           {r.department && <span>{r.department.departmentName}</span>}
-          {r.block && <span>Block {r.block.blockCode}{r.floor ? `, Floor ${r.floor}` : ''}</span>}
+          {r.block && <span>{r.block.blockName}{r.floor ? `, Floor ${r.floor}` : ''}</span>}
           {r.capacityOrAreaSqm && <span>Capacity {r.capacityOrAreaSqm}</span>}
         </div>
       </div>

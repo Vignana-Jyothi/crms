@@ -56,6 +56,9 @@ async function main() {
     { blockCode: 'B', blockName: 'Block B' },
     { blockCode: 'C', blockName: 'Block C' },
     { blockCode: 'D', blockName: 'Block D' },
+    { blockCode: 'E', blockName: 'Block E' },
+    { blockCode: 'P', blockName: 'Block P' },
+    { blockCode: 'SC', blockName: 'Block SC' },
   ];
   const blockMap = {};
   for (const b of blocksData) {

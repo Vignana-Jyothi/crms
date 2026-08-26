@@ -27,13 +27,11 @@ export default function TimetablesView() {
     resourceId: '',
     departmentId: '',
     section: '',
-    facultyName: '',
     blockId: '',
     date: todayStr(),
     filterType: 'Whole',
     customStart: '09:00',
-    customEnd: '17:00',
-    status: 'All'
+    customEnd: '17:00'
   });
 
   // Load all master data on mount
@@ -95,7 +93,6 @@ export default function TimetablesView() {
     if (filters.resourceId) params.resourceId = filters.resourceId;
     if (filters.departmentId) params.departmentId = filters.departmentId;
     if (filters.section) params.section = filters.section;
-    if (filters.facultyName) params.facultyName = filters.facultyName;
 
     timetableApi
       .list(params)
@@ -125,10 +122,6 @@ export default function TimetablesView() {
       freeItems = resourceList.filter(r => !occupiedResourceIds.has(r.resourceId));
       if (filters.blockId) freeItems = freeItems.filter(r => r.blockId === Number(filters.blockId));
       if (filters.resourceId) freeItems = freeItems.filter(r => r.resourceId === Number(filters.resourceId));
-    } else if (filters.status === 'Free_Faculty') {
-      const occupiedFaculty = new Set(timetables.filter(t => t.facultyName).map(t => t.facultyName));
-      freeItems = facultyList.filter(f => !occupiedFaculty.has(f));
-      if (filters.facultyName) freeItems = freeItems.filter(f => f === filters.facultyName);
     } else if (filters.status === 'Free_Section') {
       const occupiedSections = new Set(timetables.map(t => `${t.departmentId}-${t.section}`));
       const allCombinations = [];
@@ -277,19 +270,6 @@ export default function TimetablesView() {
             </select>
           </div>
 
-          <div className="w-full md:w-48">
-            <label className="mb-1 block text-xs font-semibold text-navy">Faculty Name</label>
-            <select
-              value={filters.facultyName}
-              onChange={(e) => setFilters((f) => ({ ...f, facultyName: e.target.value }))}
-              className="w-full rounded border border-line px-3 py-2 text-sm focus:border-navy focus:ring-1 focus:ring-navy"
-            >
-              <option value="">All Faculty</option>
-              {facultyList.map(name => (
-                <option key={name} value={name}>{name}</option>
-              ))}
-            </select>
-          </div>
 
           <div className="w-full md:w-48">
             <label className="mb-1 block text-xs font-semibold text-navy">Branch / Dept</label>
@@ -356,7 +336,6 @@ export default function TimetablesView() {
               <option value="All">All Schedules</option>
               <option value="Free_Room">Available Rooms</option>
               <option value="Free_Section">Available Sections</option>
-              <option value="Free_Faculty">Available Faculty</option>
               <option value="Busy">In Use / Busy</option>
               <option value="Conflict">Conflicts Only</option>
             </select>

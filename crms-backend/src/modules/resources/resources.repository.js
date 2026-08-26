@@ -4,11 +4,11 @@ function list({ resourceTypeId, departmentId, blockId, status, search, minCapaci
   const cap = minCapacity || capacity;
   return prisma.resource.findMany({
     where: {
-      ...(resourceTypeId && { resourceTypeId }),
-      ...(departmentId && { departmentId }),
-      ...(blockId && { blockId }),
+      ...(resourceTypeId && { resourceTypeId: Number(resourceTypeId) }),
+      ...(departmentId && { departmentId: Number(departmentId) }),
+      ...(blockId && { blockId: Number(blockId) }),
       ...(status && { status }),
-      ...(cap && { capacityOrAreaSqm: { gte: cap } }),
+      ...(cap && { capacityOrAreaSqm: { gte: Number(cap) } }),
       ...(search && { resourceName: { contains: search, mode: 'insensitive' } }),
     },
     include: { resourceType: true, department: true, block: true },
