@@ -309,18 +309,18 @@ export default function Dashboard() {
                         : 'bg-white border-line'
                     }`}
                   >
-                    <ResourceCardContent r={r} isFree={true} />
+                    <ResourceCardContent r={r} isFree={true} filterType={filterType} />
                   </Link>
                 ) : isAdmin ? (
                   <button 
                     onClick={() => setSelectedRoom(liveData)}
                     className="w-full h-full flex flex-col text-left block rounded-lg border border-brick/30 bg-brick-light/30 p-3 opacity-75 hover:opacity-100 transition-opacity cursor-pointer"
                   >
-                    <ResourceCardContent r={r} isFree={false} occupant={liveData?.occupant} since={liveData?.since} until={liveData?.until} />
+                    <ResourceCardContent r={r} isFree={false} occupant={liveData?.occupant} since={liveData?.since} until={liveData?.until} filterType={filterType} />
                   </button>
                 ) : (
                   <div className="block h-full flex flex-col rounded-lg border border-brick/30 bg-brick-light/30 p-3 opacity-75 cursor-default">
-                    <ResourceCardContent r={r} isFree={false} occupant={liveData?.occupant} since={liveData?.since} until={liveData?.until} />
+                    <ResourceCardContent r={r} isFree={false} occupant={liveData?.occupant} since={liveData?.since} until={liveData?.until} filterType={filterType} />
                   </div>
                 )}
               </li>
@@ -397,7 +397,7 @@ export default function Dashboard() {
   );
 }
 
-function ResourceCardContent({ r, isFree, occupant, since, until }) {
+function ResourceCardContent({ r, isFree, occupant, since, until, filterType }) {
   // Format the time strings (e.g., '1970-01-01T09:00:00.000Z' -> '09:00')
   const formatTime = (timeStr) => {
     if (!timeStr) return '';
@@ -440,13 +440,23 @@ function ResourceCardContent({ r, isFree, occupant, since, until }) {
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink/60">
           {r.department && <span>{r.department.departmentName}</span>}
           {r.block && <span>{r.block.blockName}{r.floor ? `, Floor ${r.floor}` : ''}</span>}
-          {r.capacityOrAreaSqm && <span>Capacity {r.capacityOrAreaSqm}</span>}
+          {r.capacityOrAreaSqm && (
+            <span>
+              {r.resourceType?.typeName === 'Laboratory' || r.resourceType?.typeName === 'Lab' 
+                ? `Area ${r.capacityOrAreaSqm} sqm` 
+                : `Capacity ${Math.floor(r.capacityOrAreaSqm)}`}
+            </span>
+          )}
         </div>
       </div>
       <div className="mt-auto pt-3">
         {isFree ? (
           <div className="flex h-10 flex-col items-center justify-center rounded border border-forest/20 bg-forest-light/30 px-3 py-1 text-xs font-semibold text-forest-dark">
-            Available Now
+            {filterType === 'Whole' ? 'Available Whole Day' :
+             filterType === 'Morning' ? 'Available Morning' :
+             filterType === 'Afternoon' ? 'Available Afternoon' :
+             filterType === 'Custom' ? 'Available Custom Slot' :
+             'Available Now'}
           </div>
         ) : occupant ? (
           <div className="flex h-10 flex-col justify-center rounded border border-brick/10 bg-brick/5 px-3 py-1 text-xs font-medium text-brick-dark">
