@@ -23,7 +23,7 @@ services:
     restart: unless-stopped
     network_mode: bridge
     ports:
-      - "4000:4000"
+      - "3131:4000"
     env_file:
       - ./crms-backend/.env
     links:
@@ -37,7 +37,7 @@ services:
     restart: unless-stopped
     network_mode: bridge
     ports:
-      - "18432:80"
+      - "9999:80"
     links:
       - crms-backend:crms-backend
     depends_on:
