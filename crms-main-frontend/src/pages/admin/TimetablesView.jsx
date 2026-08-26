@@ -31,7 +31,8 @@ export default function TimetablesView() {
     date: todayStr(),
     filterType: 'Whole',
     customStart: '09:00',
-    customEnd: '17:00'
+    customEnd: '17:00',
+    status: 'All'
   });
 
   // Load all master data on mount
