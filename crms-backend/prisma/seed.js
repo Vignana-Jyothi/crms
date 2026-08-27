@@ -338,6 +338,25 @@ async function main() {
     });
   }
 
+  // Map some real classrooms to EduPrime sections for testing the sync!
+  const epMaps = [
+    { id: 'D 113', sec: 'A' },
+    { id: 'D 114', sec: 'B' },
+    { id: 'D 102', sec: 'C' }
+  ];
+  
+  for (const map of epMaps) {
+    await prisma.resource.updateMany({
+      where: { resourceId: map.id },
+      data: {
+        allocatedSemester: 'B.Tech I Year I Semester',
+        allocatedBranch: 'CSE',
+        allocatedSection: map.sec,
+        allocationNote: 'EduPrime Sync Enabled Classroom'
+      }
+    });
+  }
+
   let upsertCount = 0;
   for (const res of resourcesToUpsert) {
     // Upsert avoids duplicating rooms that were already created by OCR
