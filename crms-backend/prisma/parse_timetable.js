@@ -115,9 +115,14 @@ async function main() {
         let cleanToken = token.replace(/[\*\/]/g, '').replace('LAB', '').trim();
         let map = mappings[cleanToken] || {};
 
+        let resId = map.roomNo || defaultRoom || 'UNKNOWN';
+        if (resId !== 'UNKNOWN') {
+          resId = resId.replace('-', ' ');
+        }
+
         finalRecords.push({
           departmentId,
-          resourceId: map.roomNo || defaultRoom || 'UNKNOWN',
+          resourceId: resId,
           dayOfWeek: day,
           startTime: new Date(TIME_SLOTS[slotIdx].startTime),
           endTime: new Date(TIME_SLOTS[slotIdx].endTime),
