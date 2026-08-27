@@ -350,8 +350,10 @@ export default function FacultyCalendarView() {
                         )}
                         <div className="font-medium">{fmtTimeSlot(t.startTime, t.endTime)}</div>
                         <div className="flex flex-col gap-1 mt-1 items-start">
-                          {(filters.status === 'Busy' || filters.status === 'All') && (
+                          {live ? (
                             <span className="inline-block px-1.5 py-0.5 bg-brick/10 text-brick rounded text-[10px] font-bold uppercase tracking-wider">In Use</span>
+                          ) : (
+                            <span className="inline-block px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded text-[10px] font-bold uppercase tracking-wider">Scheduled</span>
                           )}
                           {isConflict && (
                             <span className="inline-block px-1.5 py-0.5 bg-red-100 text-red-700 rounded text-[10px] font-bold uppercase tracking-wider border border-red-200 shadow-sm">Conflict</span>
