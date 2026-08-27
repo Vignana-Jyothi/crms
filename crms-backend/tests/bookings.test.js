@@ -231,7 +231,7 @@ describe('Booking Engine & Conflict Resolution Tests', () => {
       };
 
       bookingsRepo.findById = async () => mockBooking;
-      bookingsRepo.updateStatus = async (tx, id, status) => ({
+      bookingsRepo.updateStatusIfCurrent = async (tx, id, status) => ({
         ...mockBooking,
         status,
       });
@@ -272,7 +272,7 @@ describe('Booking Engine & Conflict Resolution Tests', () => {
       };
 
       bookingsRepo.findById = async () => mockBooking;
-      bookingsRepo.updateStatus = async (tx, id, status) => ({
+      bookingsRepo.updateStatusIfCurrent = async (tx, id, status) => ({
         ...mockBooking,
         status,
       });
@@ -297,7 +297,7 @@ describe('Booking Engine & Conflict Resolution Tests', () => {
       };
 
       bookingsRepo.findById = async () => mockBooking;
-      bookingsRepo.updateStatus = async (tx, id, status) => ({
+      bookingsRepo.updateStatusIfCurrent = async (tx, id, status) => ({
         ...mockBooking,
         status,
       });
@@ -347,6 +347,56 @@ describe('Booking Engine & Conflict Resolution Tests', () => {
         },
         (err) => err.statusCode === 409 && /already Cancelled, cannot cancel/.test(err.message)
       );
+    });
+
+    it('rejects cancellation if another request already changed the booking status', async () => {
+      const mockBooking = {
+        bookingId: 304,
+        requesterUserId: 4,
+        status: 'Pending',
+      };
+
+      bookingsRepo.findById = async () => mockBooking;
+      bookingsRepo.updateStatusIfCurrent = async () => null;
+
+      await assert.rejects(
+        async () => {
+          await bookingsService.cancel(304, 4);
+        },
+        (err) => err.statusCode === 409 && /already cancelled or decided/.test(err.message)
+      );
+    });
+
+    it('records cancellation reason and audit in the same transaction', async () => {
+      const mockBooking = {
+        bookingId: 305,
+        requesterUserId: 4,
+        status: 'Approved',
+      };
+      let createdApprovalData = null;
+      let loggedAudit = null;
+
+      mockTx.approval.create = async ({ data }) => {
+        createdApprovalData = data;
+        return { approvalId: 77, ...data };
+      };
+      bookingsRepo.findById = async () => mockBooking;
+      bookingsRepo.updateStatusIfCurrent = async (tx, id, status) => ({
+        ...mockBooking,
+        status,
+      });
+      auditService.log = async (audit) => {
+        loggedAudit = audit;
+      };
+
+      const cancelled = await bookingsService.cancel(305, 4, { userId: 4, roleId: 4 }, 'Duplicate request');
+
+      assert.equal(cancelled.status, 'Cancelled');
+      assert.equal(createdApprovalData.bookingId, 305);
+      assert.equal(createdApprovalData.decision, 'Cancelled');
+      assert.equal(createdApprovalData.remarks, 'Duplicate request');
+      assert.equal(loggedAudit.details, 'Duplicate request');
+      assert.equal(loggedAudit.tx, mockTx);
     });
   });
 

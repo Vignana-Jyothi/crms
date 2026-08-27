@@ -471,7 +471,7 @@ describe('CRMS Backend Adversarial Stress & Verification Suite', () => {
           status: 'Pending',
         };
         bookingsRepo.findById = async () => mockBooking;
-        bookingsRepo.updateStatus = async (tx, id, status) => ({ ...mockBooking, status });
+        bookingsRepo.updateStatusIfCurrent = async (tx, id, status) => ({ ...mockBooking, status });
 
         const result = await bookingsService.cancel(601, 15);
         assert.equal(result.status, 'Cancelled');
@@ -484,7 +484,7 @@ describe('CRMS Backend Adversarial Stress & Verification Suite', () => {
           status: 'Approved',
         };
         bookingsRepo.findById = async () => mockBooking;
-        bookingsRepo.updateStatus = async (tx, id, status) => ({ ...mockBooking, status });
+        bookingsRepo.updateStatusIfCurrent = async (tx, id, status) => ({ ...mockBooking, status });
 
         const result = await bookingsService.cancel(602, 15);
         assert.equal(result.status, 'Cancelled');

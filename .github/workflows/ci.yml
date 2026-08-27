@@ -24,9 +24,9 @@ jobs:
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
         run: |
           # Write environment variables to .env files so docker-compose can use them
-          echo "DATABASE_URL=$DATABASE_URL" > crms-backend/.env
-          echo "JWT_ACCESS_SECRET=$JWT_SECRET" >> crms-backend/.env
-          echo "JWT_REFRESH_SECRET=$JWT_SECRET" >> crms-backend/.env
+          echo "DATABASE_URL=$DATABASE_URL" > crms-backend/.env.docker
+          echo "JWT_ACCESS_SECRET=$JWT_SECRET" >> crms-backend/.env.docker
+          echo "JWT_REFRESH_SECRET=$JWT_SECRET" >> crms-backend/.env.docker
           # Clean up unused Docker networks to prevent "all predefined address pools have been fully subnetted" error
           docker network prune -f
           
