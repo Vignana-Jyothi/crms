@@ -35,9 +35,15 @@ const debugEduPrime = asyncHandler(async (req, res) => {
     resource.allocatedSection
   );
 
+  const rawDbTimetables = await prisma.timetable.findMany({
+    take: 3,
+    orderBy: { timetableId: 'asc' }
+  });
+
   res.json({
     resource,
-    sampleEntries: entries.slice(0, 3)
+    sampleEntries: entries.slice(0, 3),
+    rawDbTimetables
   });
 });
 
