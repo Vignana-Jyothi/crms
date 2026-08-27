@@ -1,14 +1,22 @@
 const axios = require('axios');
+require('dotenv').config();
+
+const EDUPRIME_BASE_URL = process.env.EDUPRIME_BASE_URL;
+const EDUPRIME_RELIC_TOKEN = process.env.EDUPRIME_RELIC_TOKEN;
+
+if (!EDUPRIME_BASE_URL || !EDUPRIME_RELIC_TOKEN) {
+  throw new Error('Set EDUPRIME_BASE_URL and EDUPRIME_RELIC_TOKEN before running this helper.');
+}
 
 async function testHostelApp() {
   try {
     const response = await axios.post(
-      'https://automation.vnrvjiet.ac.in/api/HostelApp/StudentInfo',
+      `${EDUPRIME_BASE_URL}/api/HostelApp/StudentInfo`,
       {}, // Empty body for testing
       {
         headers: { 
           'Content-Type': 'application/json',
-          'Relic': '7F5B9C7D-0C2D-4B36-8E8A-6F7151B2C9A4' // The dummy token we have
+          'Relic': EDUPRIME_RELIC_TOKEN,
         }
       }
     );

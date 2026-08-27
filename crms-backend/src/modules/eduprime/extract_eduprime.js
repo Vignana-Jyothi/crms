@@ -1,10 +1,15 @@
-require('dotenv').config({ path: '../../../.env' }); // Load .env from root
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 
-const EDUPRIME_BASE_URL = process.env.EDUPRIME_BASE_URL || 'https://automation.vnrvjiet.ac.in';
-const EDUPRIME_RELIC_TOKEN = process.env.EDUPRIME_RELIC_TOKEN || '7F5B9C7D-0C2D-4B36-8E8A-6F7151B2C9A4';
+require('dotenv').config({ path: path.join(__dirname, '../../../.env') });
+
+const EDUPRIME_BASE_URL = process.env.EDUPRIME_BASE_URL;
+const EDUPRIME_RELIC_TOKEN = process.env.EDUPRIME_RELIC_TOKEN;
+
+if (!EDUPRIME_BASE_URL || !EDUPRIME_RELIC_TOKEN) {
+  throw new Error('Set EDUPRIME_BASE_URL and EDUPRIME_RELIC_TOKEN before running this extractor.');
+}
 
 async function extract() {
   const semester = 'B.Tech I Year I Semester'; 

@@ -12,6 +12,7 @@ const router = Router();
 router.use(authenticate);
 
 const PHONE_REGEX = /^[6-9]\d{9}$/;
+const VALID_ROLE_IDS = new Set(Object.values(ROLES));
 
 function canReadUser(user, auth) {
   if ([ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN].includes(auth.roleId)) return true;
@@ -31,7 +32,15 @@ router.post(
   asyncHandler(async (req, res) => {
     const { name, email, phone, roleId, departmentId, notes, roomNo } = req.body;
 
-    if (!name || !phone) throw ApiError.badRequest('name and phone are required');
+    if (!name || !email || !phone || !roleId) {
+      throw ApiError.badRequest('name, email, phone, and roleId are required');
+    }
+    if (!VALID_ROLE_IDS.has(Number(roleId))) {
+      throw ApiError.badRequest('roleId must be a valid role');
+    }
+    if (Number(roleId) === ROLES.DEPARTMENT_ADMIN && !departmentId) {
+      throw ApiError.badRequest('departmentId is required for Department Admin users');
+    }
     if (!PHONE_REGEX.test(phone)) {
       throw ApiError.badRequest('phone must be a valid 10-digit Indian mobile number');
     }
@@ -41,9 +50,9 @@ router.post(
 
     const user = await repo.create({
       name,
-      email: email || null,
+      email,
       phone,
-      roleId: roleId ?? ROLES.REQUESTER,
+      roleId,
       departmentId: departmentId ?? null,
       notes: notes || null,
       roomNo: roomNo || null,
@@ -124,6 +133,12 @@ router.patch(
   authorizeRole(ROLES.SUPER_ADMIN),
   asyncHandler(async (req, res) => {
     const { roleId, departmentId } = req.body;
+    if (!VALID_ROLE_IDS.has(Number(roleId))) {
+      throw ApiError.badRequest('roleId must be a valid role');
+    }
+    if (Number(roleId) === ROLES.DEPARTMENT_ADMIN && !departmentId) {
+      throw ApiError.badRequest('departmentId is required for Department Admin users');
+    }
     const updated = await repo.updateRole(Number(req.params.userId), roleId, departmentId ?? null);
     await auditService.log({
       userId: req.auth.userId,
