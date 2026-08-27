@@ -2,8 +2,26 @@ const app = require('./app');
 const env = require('./config/env');
 const prisma = require('./config/prisma');
 
-const server = app.listen(env.port, () => {
+const server = app.listen(env.port, async () => {
   console.log(`CRMS backend listening on port ${env.port} [${env.nodeEnv}]`);
+  
+  // Temporary script to simplify block names and update C001
+  try {
+    await prisma.block.updateMany({ where: { blockCode: 'A' }, data: { blockName: 'Block A' } });
+    await prisma.block.updateMany({ where: { blockCode: 'B' }, data: { blockName: 'Block B' } });
+    await prisma.block.updateMany({ where: { blockCode: 'C' }, data: { blockName: 'Block C' } });
+    await prisma.block.updateMany({ where: { blockCode: 'D' }, data: { blockName: 'Block D' } });
+    await prisma.block.updateMany({ where: { blockCode: 'E' }, data: { blockName: 'Block E' } });
+    await prisma.block.updateMany({ where: { blockCode: 'P' }, data: { blockName: 'PG Block' } });
+
+    let aud = await prisma.resourceType.findFirst({ where: { typeName: 'Auditorium' } });
+    if (!aud) aud = await prisma.resourceType.create({ data: { typeName: 'Auditorium' } });
+    
+    await prisma.resource.updateMany({ where: { resourceId: 'C 001' }, data: { resourceTypeId: aud.resourceTypeId } });
+    console.log('Block names and C001 successfully updated!');
+  } catch (err) {
+    console.error('Failed to update DB on startup:', err);
+  }
 });
 
 // Graceful shutdown — important under PM2/systemd/Docker restarts,
