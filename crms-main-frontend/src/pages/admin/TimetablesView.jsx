@@ -172,10 +172,13 @@ export default function TimetablesView() {
     const s = new Date(t.startTime);
     const e = new Date(t.endTime);
     
-    const startObj = new Date(today.getFullYear(), today.getMonth(), today.getDate(), s.getUTCHours(), s.getUTCMinutes());
-    const endObj = new Date(today.getFullYear(), today.getMonth(), today.getDate(), e.getUTCHours(), e.getUTCMinutes());
+    // DB times are stored as 1970-01-01Thh:mm:00Z (UTC)
+    // We compare against current UTC time to avoid IST offset mismatch
+    const nowUTCMinutes = today.getUTCHours() * 60 + today.getUTCMinutes();
+    const startUTCMinutes = s.getUTCHours() * 60 + s.getUTCMinutes();
+    const endUTCMinutes = e.getUTCHours() * 60 + e.getUTCMinutes();
     
-    return today >= startObj && today <= endObj;
+    return nowUTCMinutes >= startUTCMinutes && nowUTCMinutes < endUTCMinutes;
   };
 
   const detectConflicts = (timetablesList) => {

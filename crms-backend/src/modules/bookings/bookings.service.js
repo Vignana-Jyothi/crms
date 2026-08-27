@@ -270,13 +270,27 @@ async function getLiveStatus(dateInput, startTimeInput, endTimeInput) {
   let startVal, endVal;
   
   if (startTimeInput && endTimeInput) {
-    startVal = toTimeValue(startTimeInput);
-    endVal = toTimeValue(endTimeInput);
+    // Frontend sends IST times (e.g. "09:00") but DB stores UTC (09:00 IST = 03:30 UTC)
+    // Convert IST -> UTC by subtracting 5h30m = 330 minutes
+    const IST_OFFSET_MINUTES = 330;
+    const toUTCTimeValue = (hhmm) => {
+      const [h, m] = hhmm.split(':').map(Number);
+      let totalMins = h * 60 + m - IST_OFFSET_MINUTES;
+      // Handle underflow (e.g. times before 05:30 IST)
+      totalMins = ((totalMins % 1440) + 1440) % 1440;
+      const utcH = String(Math.floor(totalMins / 60)).padStart(2, '0');
+      const utcM = String(totalMins % 60).padStart(2, '0');
+      return new Date(`1970-01-01T${utcH}:${utcM}:00Z`);
+    };
+    startVal = toUTCTimeValue(startTimeInput);
+    endVal = toUTCTimeValue(endTimeInput);
   } else {
     // Default to current time point check
+    // Times in the DB are stored as UTC (1970-01-01Thh:mm:00Z)
+    // So we must compare using UTC hours/minutes from 'now'
     const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const mins = String(now.getMinutes()).padStart(2, '0');
+    const hours = String(now.getUTCHours()).padStart(2, '0');
+    const mins = String(now.getUTCMinutes()).padStart(2, '0');
     startVal = toTimeValue(`${hours}:${mins}`);
     endVal = startVal; // Point in time
   }
