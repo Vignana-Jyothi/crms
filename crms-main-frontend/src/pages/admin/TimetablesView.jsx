@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { masterDataApi, resourcesApi, timetableApi } from '../../api/endpoints';
 import { fmtTimeSlot } from '../../utils/formatters';
 import WeeklyGrid from '../../components/admin/WeeklyGrid';
@@ -52,7 +52,7 @@ export default function TimetablesView() {
     ]).catch(() => {});
   }, []);
 
-  const getFilterTimes = () => {
+  const getFilterTimes = useCallback(() => {
     let startTimeParam = '';
     let endTimeParam = '';
 
@@ -77,9 +77,9 @@ export default function TimetablesView() {
     }
 
     return { startTimeParam, endTimeParam };
-  };
+  }, [filters]);
 
-  function refresh() {
+  const refresh = useCallback(() => {
     setLoading(true);
     setError('');
 
@@ -106,9 +106,11 @@ export default function TimetablesView() {
       })
       .catch((err) => setError(err.response?.data?.error || 'Failed to load schedule.'))
       .finally(() => setLoading(false));
-  }
+  }, [filters, getFilterTimes]);
 
-  useEffect(refresh, [filters]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   const availableSections = filters.departmentId 
     ? sections.filter(s => s.departmentId === Number(filters.departmentId))

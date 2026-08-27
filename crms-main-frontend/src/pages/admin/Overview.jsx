@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { approvalsApi, bookingsApi, resourcesApi } from '../../api/endpoints';
-import { useAuth, ROLES } from '../../context/AuthContext';
+import { useAuth } from '../../context/authStore';
+import { ROLES } from '../../constants/roles';
 import { fmtDate, fmtTimeSlot } from '../../utils/formatters';
 
 function StatCard({ label, value, to, color = 'navy' }) {

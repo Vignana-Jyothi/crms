@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { resourcesApi } from '../api/endpoints';
-import { fmtTimeSlot } from '../utils/formatters';
 
 function todayStr() {
   const d = new Date();
@@ -27,28 +26,25 @@ export default function LiveStatus() {
   const [selectedDate, setSelectedDate] = useState(todayStr());
   const [selectedTime, setSelectedTime] = useState(''); // Empty means "Now"
 
-  function refresh() {
+  const refresh = useCallback(() => {
     setLoading(true);
     setError('');
     
-    // If a time is selected, pass the full ISO string, otherwise let backend use current time
-    const timeParam = selectedTime ? `${selectedDate}T${selectedTime}:00` : null;
-    
     resourcesApi
-      .liveStatus(timeParam)
+      .liveStatus(selectedDate, selectedTime || null, selectedTime || null)
       .then((data) => {
         setRooms(data);
         setLastUpdated(new Date());
       })
       .catch(() => setError('Failed to fetch live status. Please try again.'))
       .finally(() => setLoading(false));
-  }
+  }, [selectedDate, selectedTime]);
 
   useEffect(() => {
     refresh();
     const interval = setInterval(refresh, 60000);
     return () => clearInterval(interval);
-  }, [selectedDate, selectedTime]);
+  }, [refresh]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRoom, setSelectedRoom] = useState(null);

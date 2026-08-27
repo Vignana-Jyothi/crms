@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/authStore';
 
 // Section 15/16 of the doc: some screens (Users, Resources, Audit
 // Logs) are Super Admin only, even though Institute/Department

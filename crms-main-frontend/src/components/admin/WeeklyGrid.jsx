@@ -3,7 +3,7 @@ import { fmtTimeSlot } from '../../utils/formatters';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-export default function WeeklyGrid({ timetables, onAssignFaculty, facultyList }) {
+export default function WeeklyGrid({ timetables, onAssignFaculty: _onAssignFaculty, facultyList: _facultyList }) {
   // Group by Day -> Time Slot -> Item
   const grid = {};
   DAYS.forEach(d => {

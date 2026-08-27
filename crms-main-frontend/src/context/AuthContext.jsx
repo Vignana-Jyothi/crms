@@ -1,14 +1,6 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { authApi, usersApi } from '../api/endpoints';
-
-const AuthContext = createContext(null);
-
-export const ROLES = {
-  SUPER_ADMIN: 1,
-  INSTITUTE_ADMIN: 2,
-  DEPARTMENT_ADMIN: 3,
-  REQUESTER: 4,
-};
+import { AuthContext } from './authStore';
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -45,10 +37,4 @@ export function AuthProvider({ children }) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
-  return ctx;
 }

@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { resourcesApi } from '../../api/endpoints';
-import { fmtTimeSlot } from '../../utils/formatters';
 
 function todayStr() {
   const d = new Date();
@@ -9,11 +8,6 @@ function todayStr() {
   const day = String(d.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
-
-const TIME_OPTIONS = [
-  '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', 
-  '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'
-];
 
 export default function LiveStatus() {
   const [rooms, setRooms] = useState([]);
@@ -29,7 +23,7 @@ export default function LiveStatus() {
   const [customStart, setCustomStart] = useState('09:00');
   const [customEnd, setCustomEnd] = useState('10:00');
 
-  function refresh() {
+  const refresh = useCallback(() => {
     setLoading(true);
     setError('');
     
@@ -60,13 +54,13 @@ export default function LiveStatus() {
       })
       .catch(() => setError('Failed to fetch live status. Please try again.'))
       .finally(() => setLoading(false));
-  }
+  }, [selectedDate, filterType, customStart, customEnd]);
 
   useEffect(() => {
     refresh();
     const interval = setInterval(refresh, 60000);
     return () => clearInterval(interval);
-  }, [selectedDate, filterType, customStart, customEnd]);
+  }, [refresh]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRoom, setSelectedRoom] = useState(null);

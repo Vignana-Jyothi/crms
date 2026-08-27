@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { masterDataApi, resourcesApi, timetableApi } from '../../api/endpoints';
+import { useCallback, useEffect, useState } from 'react';
+import { timetableApi } from '../../api/endpoints';
 import { fmtTimeSlot } from '../../utils/formatters';
 import WeeklyGrid from '../../components/admin/WeeklyGrid';
 
@@ -35,7 +35,7 @@ export default function FacultyCalendarView() {
     }).catch(() => {});
   }, []);
 
-  const getFilterTimes = () => {
+  const getFilterTimes = useCallback(() => {
     let startTimeParam = '';
     let endTimeParam = '';
 
@@ -60,9 +60,9 @@ export default function FacultyCalendarView() {
     }
 
     return { startTimeParam, endTimeParam };
-  };
+  }, [filters]);
 
-  function refresh() {
+  const refresh = useCallback(() => {
     setLoading(true);
     setError('');
 
@@ -82,9 +82,11 @@ export default function FacultyCalendarView() {
       })
       .catch((err) => setError(err.response?.data?.error || 'Failed to load schedule.'))
       .finally(() => setLoading(false));
-  }
+  }, [filters, getFilterTimes]);
 
-  useEffect(refresh, [filters]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   // Calculate Free items
   let freeItems = [];

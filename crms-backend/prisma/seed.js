@@ -1,11 +1,16 @@
 const { PrismaClient } = require('@prisma/client');
+require('dotenv').config();
 const bcrypt = require('bcrypt');
 const rawData = require('./seed-data-raw');
 
 const prisma = new PrismaClient();
 
 const SALT_ROUNDS = 12;
-const DEFAULT_PASSWORD = 'Password@123';
+const DEFAULT_PASSWORD = process.env.SEED_DEFAULT_PASSWORD;
+
+if (!DEFAULT_PASSWORD || DEFAULT_PASSWORD.length < 12) {
+  throw new Error('Set SEED_DEFAULT_PASSWORD to a strong temporary password before running the seed script.');
+}
 
 function parseClassrooms(text, rtMap, deptMap, blockMap, resources) {
   const lines = text.trim().split('\n');

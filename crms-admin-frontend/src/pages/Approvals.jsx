@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { approvalsApi } from '../api/endpoints';
 import { fmtDate, fmtTimeSlot } from '../utils/formatters';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/authStore';
 
 export default function Approvals() {
   const [pending, setPending] = useState([]);

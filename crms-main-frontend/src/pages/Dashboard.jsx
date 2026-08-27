@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { masterDataApi, resourcesApi } from '../api/endpoints';
-import { useAuth, ROLES } from '../context/AuthContext';
+import { useAuth } from '../context/authStore';
+import { ROLES } from '../constants/roles';
 
 function todayStr() {
   const d = new Date();
@@ -54,7 +55,7 @@ export default function Dashboard() {
     }
   };
 
-  const getFilterTimes = () => {
+  const getFilterTimes = useCallback(() => {
     let startTimeParam = '';
     let endTimeParam = '';
 
@@ -79,7 +80,7 @@ export default function Dashboard() {
     }
 
     return { startTimeParam, endTimeParam };
-  };
+  }, [filterType, customStart, customEnd]);
 
   useEffect(() => {
     Promise.all([
@@ -142,7 +143,7 @@ export default function Dashboard() {
       isCancelled = true;
       clearTimeout(handle);
     };
-  }, [filters.resourceTypeId, filters.departmentId, filters.blockId, filters.search, selectedDate, filterType, customStart, customEnd]);
+  }, [filters.resourceTypeId, filters.departmentId, filters.blockId, filters.search, selectedDate, getFilterTimes]);
 
   const filteredResources = resources.filter((r) => {
     if (filters.minCapacity && Number(r.capacityOrAreaSqm || 0) < Number(filters.minCapacity)) return false;

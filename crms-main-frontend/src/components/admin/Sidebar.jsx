@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useAuth, ROLES } from '../../context/AuthContext';
+import { useAuth } from '../../context/authStore';
+import { ROLES } from '../../constants/roles';
 import { approvalsApi } from '../../api/endpoints';
 
 const NAV = [

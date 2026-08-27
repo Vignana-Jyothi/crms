@@ -27,9 +27,11 @@ jobs:
           echo "DATABASE_URL=$DATABASE_URL" > crms-backend/.env.docker
           echo "JWT_ACCESS_SECRET=$JWT_SECRET" >> crms-backend/.env.docker
           echo "JWT_REFRESH_SECRET=$JWT_SECRET" >> crms-backend/.env.docker
-          # Clean up unused Docker networks to prevent "all predefined address pools have been fully subnetted" error
-          docker network prune -f
-          
           # Bring down any old containers, rebuild the images, and start the new ones
           docker compose down
+          
+          # Clean up stopped containers and unused networks to prevent "all predefined address pools have been fully subnetted" error
+          # Note: We do NOT use --volumes here to avoid wiping out the database data
+          docker system prune -f
+          
           docker compose up -d --build
