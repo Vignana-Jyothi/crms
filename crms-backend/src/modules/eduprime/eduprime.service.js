@@ -18,7 +18,7 @@ async function getClassTimeTable(semester, branch, section) {
 
   try {
     const response = await axios.post(
-      `${EDUPRIME_BASE_URL}/api/Academics/ClassTimeTable`,
+      `${EDUPRIME_BASE_URL}/api/HostelApp/Timetable`,
       {
         Semester: semester,
         Branch: branch,
