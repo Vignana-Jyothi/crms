@@ -299,7 +299,7 @@ export default function FacultyCalendarView() {
                   <div>
                     <div className="font-medium text-navy">
                       {filters.status === 'Free_Room' && item.resourceName}
-                      {filters.status === 'Free_Faculty' && item}
+                      {filters.status === 'Free_Faculty' && item.name}
                       {filters.status === 'Free_Section' && `${item.department.branchCode} - Sec ${item.section}`}
                     </div>
                     {filters.status === 'Free_Room' && (
