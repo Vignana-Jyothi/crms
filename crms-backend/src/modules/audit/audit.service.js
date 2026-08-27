@@ -5,9 +5,9 @@ const prisma = require('../../config/prisma');
 // Every module that mutates state should call this. Deliberately
 // fire-and-forget-ish (awaited, but never throws) so a logging
 // failure never blocks the actual business operation.
-async function log({ userId, action, entityType, entityId, details }) {
+async function log({ userId, action, entityType, entityId, details, tx }) {
   try {
-    await prisma.auditLog.create({
+    await (tx || prisma).auditLog.create({
       data: { userId, action, entityType, entityId: String(entityId), details },
     });
   } catch (err) {

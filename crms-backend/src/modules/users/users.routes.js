@@ -13,6 +13,12 @@ router.use(authenticate);
 
 const PHONE_REGEX = /^[6-9]\d{9}$/;
 
+function canReadUser(user, auth) {
+  if ([ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN].includes(auth.roleId)) return true;
+  if (auth.roleId === ROLES.DEPARTMENT_ADMIN) return user.departmentId === auth.departmentId;
+  return user.userId === auth.userId;
+}
+
 // Only Super Admin creates accounts (Section 15: "Create users").
 // A random temporary password is generated and returned ONCE in the
 // response — the admin is expected to relay it to the person out of
@@ -83,6 +89,9 @@ router.patch(
 router.get(
   '/',
   asyncHandler(async (req, res) => {
+    if (req.auth.roleId === ROLES.REQUESTER) {
+      throw ApiError.forbidden('Requesters can only view their own profile');
+    }
     const departmentId =
       req.auth.roleId === ROLES.DEPARTMENT_ADMIN ? req.auth.departmentId : req.query.departmentId;
     res.json(await repo.list(departmentId ? Number(departmentId) : undefined));
@@ -101,6 +110,9 @@ router.get(
   asyncHandler(async (req, res) => {
     const user = await repo.findById(Number(req.params.userId));
     if (!user) throw ApiError.notFound('User not found');
+    if (!canReadUser(user, req.auth)) {
+      throw ApiError.forbidden('You do not have permission to view this user');
+    }
     res.json(user);
   })
 );

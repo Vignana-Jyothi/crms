@@ -91,6 +91,19 @@ function updateStatus(tx, bookingId, status) {
   return (tx || prisma).booking.update({ where: { bookingId }, data: { status } });
 }
 
+async function updateStatusIfCurrent(tx, bookingId, status, currentStatuses) {
+  const client = tx || prisma;
+  const result = await client.booking.updateMany({
+    where: {
+      bookingId: Number(bookingId),
+      status: { in: currentStatuses },
+    },
+    data: { status },
+  });
+  if (result.count !== 1) return null;
+  return client.booking.findUnique({ where: { bookingId: Number(bookingId) } });
+}
+
 module.exports = {
   ACTIVE_STATUSES,
   findOverlappingBookings,
@@ -99,4 +112,5 @@ module.exports = {
   findById,
   list,
   updateStatus,
+  updateStatusIfCurrent,
 };

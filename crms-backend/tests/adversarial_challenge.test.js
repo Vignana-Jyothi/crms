@@ -1,4 +1,4 @@
-const { describe, it, beforeEach } = require('node:test');
+const { describe, it, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
 const jwt = require('jsonwebtoken');
 
@@ -16,6 +16,8 @@ const authenticate = require('../src/middleware/authenticate');
 const { authorizeRole, ROLES } = require('../src/middleware/authorizeRole');
 const { signAccessToken, signRefreshToken, verifyAccessToken, verifyRefreshToken } = require('../src/utils/jwt');
 
+const originalResolveApprover = resourcesService.resolveApprover;
+
 // Helper to simulate interval overlap mathematically:
 // existing.start < new.end AND existing.end > new.start
 function checkIntervalOverlap(existingStartStr, existingEndStr, newStartStr, newEndStr) {
@@ -28,6 +30,9 @@ function checkIntervalOverlap(existingStartStr, existingEndStr, newStartStr, new
 }
 
 describe('CRMS Backend Adversarial Stress & Verification Suite', () => {
+  afterEach(() => {
+    resourcesService.resolveApprover = originalResolveApprover;
+  });
 
   // =========================================================================
   // 1. CONCURRENCY, TRANSACTION ISOLATION & INTERVAL-OVERLAP QUERY LOGIC

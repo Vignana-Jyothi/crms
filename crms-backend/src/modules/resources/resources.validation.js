@@ -39,9 +39,30 @@ const createResourceSchema = z.object({
   }),
 });
 
+const updateResourceSchema = z.object({
+  params: z.object({ resourceId: z.string().min(1).max(20) }),
+  body: z
+    .object({
+      resourceName: z.string().trim().min(1).max(100).optional(),
+      resourceTypeId: z.number().int().positive().optional(),
+      departmentId: z.number().int().positive().nullable().optional(),
+      blockId: z.number().int().positive().nullable().optional(),
+      floor: z.string().trim().max(10).nullable().optional(),
+      capacityOrAreaSqm: z.number().positive().nullable().optional(),
+      allocationNote: z.string().trim().max(60).nullable().optional(),
+      allocatedSemester: z.string().trim().max(50).nullable().optional(),
+      allocatedBranch: z.string().trim().max(50).nullable().optional(),
+      allocatedSection: z.string().trim().max(50).nullable().optional(),
+      status: z.enum(['Active', 'Inactive', 'Maintenance']).optional(),
+    })
+    .strict()
+    .refine((data) => Object.keys(data).length > 0, 'At least one field is required'),
+});
+
 module.exports = {
   listResourcesSchema,
   resourceIdParamSchema,
   availabilitySchema,
   createResourceSchema,
+  updateResourceSchema,
 };

@@ -51,6 +51,9 @@ async function decide(approvalId, decision, remarks, auth) {
       decision, // 'Approved' | 'Rejected'
       remarks,
     });
+    if (!updated) {
+      throw ApiError.conflict('This request was already decided');
+    }
 
     if (decision === 'Rejected') {
       await bookingsRepo.updateStatus(tx, approval.bookingId, 'Rejected');
@@ -64,6 +67,7 @@ async function decide(approvalId, decision, remarks, auth) {
       entityType: 'booking',
       entityId: approval.bookingId,
       details: remarks || undefined,
+      tx,
     });
 
     // Fetch details for email

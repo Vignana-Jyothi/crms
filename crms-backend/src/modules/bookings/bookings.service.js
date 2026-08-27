@@ -133,6 +133,7 @@ async function createBooking({ resourceId, bookingDate, startTime, endTime, purp
         entityType: 'booking',
         entityId: booking.bookingId,
         details: `Requested ${resourceId} on ${bookingDate} ${startTime}-${endTime}`,
+        tx,
       });
 
       // Fetch users for notifications (tx.user check is for tests)
@@ -229,29 +230,39 @@ async function cancel(bookingId, actingUserId, auth, reason = null) {
     throw ApiError.conflict(`Booking is already ${booking.status}, cannot cancel`);
   }
 
-  const updated = await repo.updateStatus(null, bookingId, 'Cancelled');
-  
-  if (reason) {
-    const { PrismaClient } = require('@prisma/client');
-    const prisma = new PrismaClient();
-    await prisma.approval.create({
-      data: {
-        bookingId,
-        approverUserId: userId,
-        approverRoleId: userAuth?.roleId,
-        decision: 'Cancelled',
-        decisionAt: new Date(),
-        remarks: reason
+  return prisma.$transaction(
+    async (tx) => {
+      const updated = await repo.updateStatusIfCurrent(tx, bookingId, 'Cancelled', ['Pending', 'Approved']);
+      if (!updated) {
+        throw ApiError.conflict('Booking was already cancelled or decided');
       }
-    });
-  }
-  await auditService.log({
-    userId,
-    action: 'CANCEL_BOOKING',
-    entityType: 'booking',
-    entityId: bookingId,
-  });
-  return updated;
+
+      if (reason) {
+        await tx.approval.create({
+          data: {
+            bookingId: Number(bookingId),
+            approverUserId: userId,
+            approverRoleId: userAuth?.roleId,
+            decision: 'Cancelled',
+            decisionAt: new Date(),
+            remarks: reason,
+          },
+        });
+      }
+
+      await auditService.log({
+        userId,
+        action: 'CANCEL_BOOKING',
+        entityType: 'booking',
+        entityId: bookingId,
+        details: reason || undefined,
+        tx,
+      });
+
+      return updated;
+    },
+    { isolationLevel: 'Serializable' }
+  );
 }
 
 async function getLiveStatus(dateInput, startTimeInput, endTimeInput) {

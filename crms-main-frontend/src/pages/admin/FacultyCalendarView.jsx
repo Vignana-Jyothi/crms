@@ -165,6 +165,12 @@ export default function FacultyCalendarView() {
   
   const conflictsSet = detectConflicts(timetables);
 
+  const displayTimetables = timetables.filter(t => {
+    if (filters.status === 'Busy') return isLive(t);
+    if (filters.status === 'Conflict') return conflictsSet.has(t.timetableId);
+    return true;
+  });
+
   return (
     <div className="mx-auto max-w-6xl">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 print:hidden">
@@ -318,11 +324,11 @@ export default function FacultyCalendarView() {
           )
         ) : displayLayout === 'Grid' && !filters.status.startsWith('Free') ? (
           <WeeklyGrid 
-            timetables={timetables} 
+            timetables={displayTimetables} 
             onAssignFaculty={handleAssignFaculty} 
             facultyList={facultyList} 
           />
-        ) : timetables.length === 0 ? (
+        ) : displayTimetables.length === 0 ? (
           <div className="rounded-xl border border-line border-dashed p-10 text-center text-ink/50 bg-white/50">
             No classes found for the selected filters.
           </div>
@@ -339,7 +345,7 @@ export default function FacultyCalendarView() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-line">
-                  {timetables.map((t) => {
+                  {displayTimetables.map((t) => {
                     const isConflict = conflictsSet.has(t.timetableId);
                     const live = isLive(t);
                     return (

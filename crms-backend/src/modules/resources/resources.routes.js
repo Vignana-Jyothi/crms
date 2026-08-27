@@ -8,6 +8,7 @@ const {
   resourceIdParamSchema,
   availabilitySchema,
   createResourceSchema,
+  updateResourceSchema,
 } = require('./resources.validation');
 
 const router = Router();
@@ -28,6 +29,11 @@ router.post(
   validateRequest(createResourceSchema),
   controller.create
 );
-router.patch('/:resourceId', authorizeRole(ROLES.SUPER_ADMIN), controller.update);
+router.patch(
+  '/:resourceId',
+  authorizeRole(ROLES.SUPER_ADMIN),
+  validateRequest(updateResourceSchema),
+  controller.update
+);
 
 module.exports = router;

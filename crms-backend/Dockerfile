@@ -1,18 +1,24 @@
-FROM node:20-slim
+FROM node:20-bookworm-slim AS prisma-build
 
-# Install OpenSSL for Prisma
-RUN apt-get update -y && apt-get install -y openssl
-
+RUN apt-get update -y && apt-get install -y --no-install-recommends openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install --omit=dev
-
+RUN npm ci
 COPY prisma ./prisma
 RUN npx prisma generate
 
+FROM node:20-bookworm-slim
+
+RUN apt-get update -y && apt-get install -y --no-install-recommends openssl ca-certificates && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --omit=dev
+COPY --from=prisma-build /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=prisma-build /app/node_modules/@prisma/client ./node_modules/@prisma/client
+COPY prisma ./prisma
 COPY src ./src
-COPY scripts ./scripts
 
 EXPOSE 4000
 

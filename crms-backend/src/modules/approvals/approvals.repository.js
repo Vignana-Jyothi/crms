@@ -45,11 +45,14 @@ function listPendingFor({ approverUserId, roleId, departmentId }) {
   });
 }
 
-function recordDecision(tx, approvalId, { approverUserId, decision, remarks }) {
-  return (tx || prisma).approval.update({
-    where: { approvalId },
+async function recordDecision(tx, approvalId, { approverUserId, decision, remarks }) {
+  const client = tx || prisma;
+  const result = await client.approval.updateMany({
+    where: { approvalId, decision: null },
     data: { approverUserId, decision, remarks, decisionAt: new Date() },
   });
+  if (result.count !== 1) return null;
+  return client.approval.findUnique({ where: { approvalId } });
 }
 
 module.exports = { findById, listPendingFor, recordDecision };

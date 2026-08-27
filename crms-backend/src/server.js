@@ -2,20 +2,8 @@ const app = require('./app');
 const env = require('./config/env');
 const prisma = require('./config/prisma');
 
-const { execSync } = require('child_process');
-
-const server = app.listen(env.port, async () => {
+const server = app.listen(env.port, () => {
   console.log(`CRMS backend listening on port ${env.port} [${env.nodeEnv}]`);
-  
-  try {
-    console.log('Running database seed script to sync official data...');
-    const result = execSync('npm run seed', { encoding: 'utf-8' });
-    console.log(result);
-  } catch (err) {
-    console.error('Failed to run seed script on startup:', err.message);
-    if (err.stdout) console.log(err.stdout);
-    if (err.stderr) console.error(err.stderr);
-  }
 });
 
 // Graceful shutdown — important under PM2/systemd/Docker restarts,
