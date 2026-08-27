@@ -1,17 +1,148 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
+const rawData = require('./seed-data-raw');
 
 const prisma = new PrismaClient();
 
 const SALT_ROUNDS = 12;
 const DEFAULT_PASSWORD = 'Password@123';
 
-function toTimeValue(hhmm) {
-  return new Date(`1970-01-01T${hhmm}:00Z`);
+function parseClassrooms(text, rtMap, deptMap, blockMap, resources) {
+  const lines = text.trim().split('\n');
+  for (let line of lines) {
+    line = line.trim();
+    if (!line) continue;
+    
+    // Find the department branch code at the beginning
+    const branchMatch = line.match(/^([A-Z&\(\)\/]+)\s+(.*)$/);
+    if (!branchMatch) continue;
+    
+    let branch = branchMatch[1];
+    // Normalize branch names
+    if (branch === 'CE') branch = 'CIVIL';
+    if (branch === 'ME') branch = 'MECH';
+    if (branch === 'EVL') branch = 'ECE'; // Assuming EVL is part of ECE
+    if (branch === 'CSBS') branch = 'CSE'; // Group under CSE
+    
+    const rest = branchMatch[2];
+    
+    // Match room IDs and optional capacities like "D 113(73)" or "E 012 (152)"
+    const roomRegex = /([A-Z]\s*[\d\/A-Z\-]+)(?:\s*\(\s*(\d+)\s*\))?/g;
+    let match;
+    while ((match = roomRegex.exec(rest)) !== null) {
+      let roomId = match[1].trim();
+      let capacity = match[2] ? parseInt(match[2], 10) : 60;
+      
+      // Fix spacing for IDs like "D113" -> "D 113" if needed, but let's keep it exactly as is, except normalizing single spaces
+      roomId = roomId.replace(/\s+/g, ' ');
+
+      const blockChar = roomId.charAt(0);
+      const blockId = blockMap[blockChar] || null;
+
+      resources.push({
+        resourceId: roomId,
+        resourceName: roomId,
+        resourceTypeId: rtMap['Classroom'],
+        departmentId: deptMap[branch] || null,
+        blockId: blockId,
+        floor: roomId.length > 2 ? roomId.charAt(2) : 'Ground',
+        capacityOrAreaSqm: capacity,
+        allocationNote: 'Official Classroom',
+        status: 'Active'
+      });
+    }
+  }
+}
+
+function parseLabs(text, rtMap, deptMap, blockMap, resources) {
+  const lines = text.trim().split('\n');
+  for (let line of lines) {
+    line = line.trim();
+    if (!line) continue;
+    
+    const branchMatch = line.match(/^([A-Z&\(\)\/a-z]+)\s+(.*)$/);
+    if (!branchMatch) continue;
+    
+    let branch = branchMatch[1];
+    if (branch === 'CE') branch = 'CIVIL';
+    if (branch === 'ME') branch = 'MECH';
+    if (branch === 'Physics' || branch === 'Chemistry' || branch === 'English') branch = null; // Basic Sciences
+    
+    const rest = branchMatch[2];
+    
+    // Labs format: "D 002 (AWS) 231.08" or "D 008/1 134.53"
+    const labRegex = /([A-Z]\s*[\d\/A-Z\-]+(?:\s*\([^\)]+\))?)\s+(\d+(?:\.\d+)?)/g;
+    let match;
+    while ((match = labRegex.exec(rest)) !== null) {
+      let rawId = match[1].trim();
+      let area = parseFloat(match[2]);
+      
+      // Extract the actual room ID, e.g. "D 002" from "D 002 (AWS)"
+      let roomIdMatch = rawId.match(/^([A-Z]\s*[\d\/A-Z\-]+)/);
+      let roomId = roomIdMatch ? roomIdMatch[1].trim() : rawId;
+      
+      // Some special cases
+      if (roomId === 'SC 007' || roomId === 'SC 006') roomId = roomId.replace('SC ', 'SC-');
+
+      const blockChar = roomId.charAt(0);
+      const blockId = blockMap[blockChar] || null;
+
+      resources.push({
+        resourceId: roomId,
+        resourceName: rawId !== roomId ? rawId : roomId,
+        resourceTypeId: rtMap['Lab'],
+        departmentId: deptMap[branch] || null,
+        blockId: blockId,
+        floor: roomId.length > 2 ? roomId.charAt(2) : 'Ground',
+        capacityOrAreaSqm: area,
+        allocationNote: 'Official Lab',
+        status: 'Active'
+      });
+    }
+  }
+}
+
+function parseTutorialRooms(text, rtMap, deptMap, blockMap, resources) {
+  const lines = text.trim().split('\n');
+  for (let line of lines) {
+    line = line.trim();
+    if (!line) continue;
+    
+    const branchMatch = line.match(/^([A-Z&\(\)\/a-z]+)\s+(.*)$/);
+    if (!branchMatch) continue;
+    
+    let branch = branchMatch[1];
+    if (branch === 'CE') branch = 'CIVIL';
+    if (branch === 'ME') branch = 'MECH';
+    
+    const rest = branchMatch[2];
+    
+    const roomRegex = /([A-Z]\s*\d+)/g;
+    let match;
+    while ((match = roomRegex.exec(rest)) !== null) {
+      let roomId = match[1].trim();
+
+      const blockChar = roomId.charAt(0);
+      const blockId = blockMap[blockChar] || null;
+
+      // These might already exist as Classrooms. We will upsert them as Classrooms/Tutorial rooms.
+      resources.push({
+        resourceId: roomId,
+        resourceName: roomId,
+        resourceTypeId: rtMap['Classroom'], // Let's keep them as classrooms for general use
+        departmentId: deptMap[branch] || null,
+        blockId: blockId,
+        floor: roomId.length > 2 ? roomId.charAt(2) : 'Ground',
+        capacityOrAreaSqm: 60,
+        allocationNote: 'Tutorial Room',
+        status: 'Active'
+      });
+    }
+  }
 }
 
 async function main() {
-  console.log('🌱 Starting CRMS database seeding...');
+  console.log('🌱 Starting CRMS database seeding with real data...');
 
   const rolesData = [
     { roleName: 'Super Admin', description: 'System-wide administrative access' },
@@ -30,7 +161,6 @@ async function main() {
   }
   console.log(`✅ Seeded ${rolesData.length} roles.`);
 
-  // 2. Departments
   const departmentsData = [
     { branchCode: 'CSE', departmentName: 'Computer Science and Engineering', groupType: 'Engineering' },
     { branchCode: 'ECE', departmentName: 'Electronics and Communication Engineering', groupType: 'Engineering' },
@@ -38,6 +168,8 @@ async function main() {
     { branchCode: 'MECH', departmentName: 'Mechanical Engineering', groupType: 'Engineering' },
     { branchCode: 'CIVIL', departmentName: 'Civil Engineering', groupType: 'Engineering' },
     { branchCode: 'IT', departmentName: 'Information Technology', groupType: 'Engineering' },
+    { branchCode: 'AE', departmentName: 'Automobile Engineering', groupType: 'Engineering' },
+    { branchCode: 'EIE', departmentName: 'Electronics and Instrumentation Engg', groupType: 'Engineering' },
   ];
   const deptMap = {};
   for (const d of departmentsData) {
@@ -50,15 +182,14 @@ async function main() {
   }
   console.log(`✅ Seeded ${departmentsData.length} departments.`);
 
-  // 3. Blocks
   const blocksData = [
     { blockCode: 'A', blockName: 'Block A' },
     { blockCode: 'B', blockName: 'Block B' },
     { blockCode: 'C', blockName: 'Block C' },
     { blockCode: 'D', blockName: 'Block D' },
     { blockCode: 'E', blockName: 'Block E' },
-    { blockCode: 'P', blockName: 'Block P' },
-    { blockCode: 'SC', blockName: 'Block SC' },
+    { blockCode: 'P', blockName: 'PG Block' },
+    { blockCode: 'SC', blockName: 'Sports Complex / SC Block' },
   ];
   const blockMap = {};
   for (const b of blocksData) {
@@ -71,7 +202,6 @@ async function main() {
   }
   console.log(`✅ Seeded ${blocksData.length} blocks.`);
 
-  // 4. Resource Types
   const resourceTypesData = [
     { typeName: 'Classroom', description: 'Standard lecture hall / classroom' },
     { typeName: 'Lab', description: 'Computing, electronics, or engineering laboratory' },
@@ -89,245 +219,128 @@ async function main() {
   }
   console.log(`✅ Seeded ${resourceTypesData.length} resource types.`);
 
-  // 5. Users
-  const passwordHash = await bcrypt.hash(DEFAULT_PASSWORD, SALT_ROUNDS);
+  // ---------------------------------------------------------
+  // DELETE DUMMY DATA
+  // ---------------------------------------------------------
+  console.log('🗑️ Purging dummy data...');
+  const dummyIds = ['CSE-LAB-101', 'CSE-CR-201', 'CSE-CR-202', 'ECE-LAB-101', 'ECE-CR-301'];
+  
+  // Delete timetables for dummy rooms to prevent foreign key errors
+  await prisma.timetable.deleteMany({
+    where: { resourceId: { in: dummyIds } }
+  });
+  
+  await prisma.resource.deleteMany({
+    where: { resourceId: { in: dummyIds } }
+  });
 
-  const usersData = [
-    {
-      name: 'System Super Admin',
-      email: 'admin@vnrvjiet.in',
-      phone: '9876543210',
-      roleId: roleMap['Super Admin'],
-      departmentId: null,
-      employeeId: 'EMP001',
-      status: 'Active',
-      passwordHash,
-    },
-    {
-      name: 'Dean Administration',
-      email: 'dean@vnrvjiet.in',
-      phone: '9876543211',
-      roleId: roleMap['Institute Admin'],
-      departmentId: null,
-      employeeId: 'EMP002',
-      status: 'Active',
-      passwordHash,
-    },
-    {
-      name: 'CSE Dept Admin & HOD',
-      email: 'deptadmin_cse@vnrvjiet.in',
-      phone: '9876543212',
-      roleId: roleMap['Department Admin'],
-      departmentId: deptMap['CSE'],
-      employeeId: 'EMP003',
-      status: 'Active',
-      passwordHash,
-    },
-    {
-      name: 'CSE Faculty Member',
-      email: 'faculty_cse@vnrvjiet.in',
-      phone: '9876543213',
-      roleId: roleMap['Requester'],
-      departmentId: deptMap['CSE'],
-      employeeId: 'EMP004',
-      status: 'Active',
-      passwordHash,
-    },
-    {
-      name: 'ECE Dept Admin',
-      email: 'deptadmin_ece@vnrvjiet.in',
-      phone: '9876543214',
-      roleId: roleMap['Department Admin'],
-      departmentId: deptMap['ECE'],
-      employeeId: 'EMP005',
-      status: 'Active',
-      passwordHash,
-    },
-    {
-      name: 'ECE Faculty Member',
-      email: 'faculty_ece@vnrvjiet.in',
-      phone: '9876543215',
-      roleId: roleMap['Requester'],
-      departmentId: deptMap['ECE'],
-      employeeId: 'EMP006',
-      status: 'Active',
-      passwordHash,
-    },
-    {
-      name: 'Student Council President',
-      email: 'student@vnrvjiet.in',
-      phone: '9876543216',
-      roleId: roleMap['Requester'],
-      departmentId: deptMap['CSE'],
-      employeeId: 'STU001',
-      status: 'Active',
-      passwordHash,
-    },
-  ];
+  await prisma.timetable.deleteMany({
+    where: { resource: { allocationNote: 'EduPrime Sync Enabled Classroom' } }
+  });
 
-  for (const user of usersData) {
-    await prisma.user.upsert({
-      where: { email: user.email },
-      update: {
-        name: user.name,
-        phone: user.phone,
-        roleId: user.roleId,
-        departmentId: user.departmentId,
-        employeeId: user.employeeId,
-        status: user.status,
-        passwordHash: user.passwordHash,
-      },
-      create: user,
-    });
-  }
-  console.log(`✅ Seeded ${usersData.length} users (Default password: ${DEFAULT_PASSWORD}).`);
-
-  // 6. Resources (both Department-owned and Institute-wide)
-  const resources = [
-    {
-      resourceId: 'CSE-LAB-101',
-      resourceName: 'CSE Advanced Computing Lab 1',
-      resourceTypeId: rtMap['Lab'],
-      departmentId: deptMap['CSE'],
-      blockId: blockMap['B'],
-      floor: '1',
-      capacityOrAreaSqm: 60,
-      allocationNote: 'High Performance GPUs & Linux Workstations',
-      status: 'Active',
-    },
-    {
-      resourceId: 'CSE-CR-201',
-      resourceName: 'CSE Smart Classroom 201',
-      resourceTypeId: rtMap['Classroom'],
-      departmentId: deptMap['CSE'],
-      blockId: blockMap['B'],
-      floor: '2',
-      capacityOrAreaSqm: 70,
-      allocationNote: 'Projector & Smart Interactive Board',
-      status: 'Active',
-    },
-    {
-      resourceId: 'CSE-CR-202',
-      resourceName: 'CSE Smart Classroom 202',
-      resourceTypeId: rtMap['Classroom'],
-      departmentId: deptMap['CSE'],
-      blockId: blockMap['B'],
-      floor: '2',
-      capacityOrAreaSqm: 70,
-      allocationNote: 'Projector & Audio System',
-      status: 'Active',
-    },
-    {
-      resourceId: 'ECE-LAB-101',
-      resourceName: 'ECE Embedded Systems Lab',
-      resourceTypeId: rtMap['Lab'],
-      departmentId: deptMap['ECE'],
-      blockId: blockMap['C'],
-      floor: '1',
-      capacityOrAreaSqm: 50,
-      allocationNote: 'FPGA & Microcontroller Kits',
-      status: 'Active',
-    },
-    {
-      resourceId: 'ECE-CR-301',
-      resourceName: 'ECE Lecture Hall 301',
-      resourceTypeId: rtMap['Classroom'],
-      departmentId: deptMap['ECE'],
-      blockId: blockMap['C'],
-      floor: '3',
-      capacityOrAreaSqm: 65,
-      allocationNote: 'Smart Classroom Setup',
-      status: 'Active',
-    },
-    {
-      resourceId: 'KS-AUDITORIUM',
-      resourceName: 'K.S. Auditorium',
-      resourceTypeId: rtMap['Auditorium'],
-      departmentId: null,
-      blockId: blockMap['A'],
-      floor: 'Ground',
-      capacityOrAreaSqm: 1200,
-      allocationNote: 'Central Institute Auditorium with Stage & Lighting',
-      status: 'Active',
-    },
-    {
-      resourceId: 'SEMINAR-HALL-A',
-      resourceName: 'PG Seminar Hall Block A',
-      resourceTypeId: rtMap['Seminar Hall'],
-      departmentId: null,
-      blockId: blockMap['A'],
-      floor: '3',
-      capacityOrAreaSqm: 250,
-      allocationNote: 'Central AC Seminar Hall',
-      status: 'Active',
-    },
-    {
-      resourceId: 'SEMINAR-HALL-D',
-      resourceName: 'Ambedkar Memorial Seminar Hall',
-      resourceTypeId: rtMap['Seminar Hall'],
-      departmentId: null,
-      blockId: blockMap['D'],
-      floor: '2',
-      capacityOrAreaSqm: 300,
-      allocationNote: 'Equipped with Video Conferencing Setup',
-      status: 'Active',
-    },
-  ];
-
-  // Dynamically generate EduPrime mapped Classrooms for all 4 years
-  const branchList = ['CSE', 'ECE', 'EEE', 'MECH', 'CIVIL', 'IT'];
-  const years = [
-    { label: '1st', semName: 'B.Tech I Year I Semester' },
-    { label: '2nd', semName: 'B.Tech II Year I Semester' },
-    { label: '3rd', semName: 'B.Tech III Year I Semester' },
-    { label: '4th', semName: 'B.Tech IV Year I Semester' }
-  ];
-  const sections = ['A', 'B', 'C'];
-
-  let resourceCounter = 1;
-
-  const blockCounters = { A: 101, B: 101, C: 101, D: 101 };
-
-  for (const branch of branchList) {
-    const deptId = deptMap[branch];
-    if (!deptId) continue;
-    
-    // Assign blocks logically based on department
-    const blockCode = (branch === 'CSE' || branch === 'CIVIL' || branch === 'IT') ? 'A' :
-                      (branch === 'ECE') ? 'B' :
-                      (branch === 'EEE') ? 'C' : 'D';
-    const blockId = blockMap[blockCode];
-
-    for (const year of years) {
-      for (const section of sections) {
-        // Generate UNIQUE realistic room number, e.g., "A-101", "A-102"
-        const roomNumber = `${blockCode}-${blockCounters[blockCode]++}`;
-
-        resources.push({
-          resourceId: roomNumber,
-          resourceName: `${year.label} Year ${branch} - Sec ${section}`, // Keep section as Name for the subtitle
-          resourceTypeId: rtMap['Classroom'],
-          departmentId: deptId,
-          blockId: blockId,
-          floor: Math.floor(blockCounters[blockCode] / 100).toString(),
-          capacityOrAreaSqm: 65,
-          allocationNote: 'EduPrime Sync Enabled Classroom',
-          status: 'Active',
-          allocatedSemester: year.semName,
-          allocatedBranch: branch,
-          allocatedSection: section
-        });
-        resourceCounter++;
-      }
-    }
-  }
-
-  // Clean up any previously generated EduPrime rooms to avoid duplicates
   await prisma.resource.deleteMany({
     where: { allocationNote: 'EduPrime Sync Enabled Classroom' }
   });
 
-  for (const res of resources) {
+  console.log('✅ Purged dummy data.');
+
+  // ---------------------------------------------------------
+  // SEED USERS FROM DEANS PDF
+  // ---------------------------------------------------------
+  const passwordHash = await bcrypt.hash(DEFAULT_PASSWORD, SALT_ROUNDS);
+  
+  // Create super admin if not exists (so user doesn't lose login)
+  await prisma.user.upsert({
+    where: { email: 'admin@vnrvjiet.in' },
+    update: {},
+    create: {
+      name: 'System Super Admin',
+      email: 'admin@vnrvjiet.in',
+      phone: '9876543210',
+      roleId: roleMap['Super Admin'],
+      employeeId: 'EMP001',
+      status: 'Active',
+      passwordHash,
+    }
+  });
+
+  const lines = rawData.deansText.trim().split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    // Format is "Designation Name Phone"
+    // E.g. "Dean - Academics Dr. Y. Shivraj Narayan 7981818985"
+    // Email is usually just name based or generic for now, we'll auto-generate emails
+    const parts = line.split('Dr. ');
+    if (parts.length < 2) continue; // Skip lines without Dr.
+    
+    let desig = parts[0].trim();
+    let rest = 'Dr. ' + parts[1].trim();
+    
+    let phoneMatch = rest.match(/(\d{10})/);
+    let phone = phoneMatch ? phoneMatch[1] : null;
+    let name = phone ? rest.replace(phone, '').trim() : rest;
+    
+    let email = name.toLowerCase().replace(/[^a-z]/g, '') + '@vnrvjiet.in';
+    let role = roleMap['Requester'];
+    if (desig.toLowerCase().includes('dean') || desig.toLowerCase().includes('principal')) {
+      role = roleMap['Institute Admin'];
+    } else if (desig.toUpperCase() === desig && desig.length > 2) {
+      // Looks like a branch name, so HOD
+      role = roleMap['Department Admin'];
+    }
+
+    await prisma.user.upsert({
+      where: { email: email },
+      update: {
+        name: name,
+        phone: phone || null,
+        roleId: role,
+        status: 'Active',
+      },
+      create: {
+        name: name,
+        email: email,
+        phone: phone || null,
+        roleId: role,
+        status: 'Active',
+        passwordHash,
+      }
+    });
+  }
+  console.log(`✅ Seeded official Users (Deans & HODs).`);
+
+  // ---------------------------------------------------------
+  // SEED RESOURCES
+  // ---------------------------------------------------------
+  const resourcesToUpsert = [];
+
+  parseClassrooms(rawData.classroomsText, rtMap, deptMap, blockMap, resourcesToUpsert);
+  parseLabs(rawData.labsText, rtMap, deptMap, blockMap, resourcesToUpsert);
+  parseTutorialRooms(rawData.tutorialRoomsText, rtMap, deptMap, blockMap, resourcesToUpsert);
+
+  // Add Seminar Halls
+  for (const sh of rawData.seminarHalls) {
+    let blockId = null;
+    if (sh.block) blockId = blockMap[sh.block];
+    else if (sh.id.charAt(0) && blockMap[sh.id.charAt(0)]) blockId = blockMap[sh.id.charAt(0)];
+    
+    resourcesToUpsert.push({
+      resourceId: sh.id,
+      resourceName: sh.name || `Seminar Hall ${sh.id.replace('SEMINAR-HALL-', '')}`,
+      resourceTypeId: rtMap[sh.type || 'Seminar Hall'],
+      departmentId: null,
+      blockId: blockId,
+      floor: sh.floor || '0',
+      capacityOrAreaSqm: sh.capacity,
+      allocationNote: 'Official Seminar Hall',
+      status: 'Active'
+    });
+  }
+
+  let upsertCount = 0;
+  for (const res of resourcesToUpsert) {
+    // Upsert avoids duplicating rooms that were already created by OCR
     await prisma.resource.upsert({
       where: { resourceId: res.resourceId },
       update: {
@@ -335,51 +348,14 @@ async function main() {
         resourceTypeId: res.resourceTypeId,
         departmentId: res.departmentId,
         blockId: res.blockId,
-        floor: res.floor,
         capacityOrAreaSqm: res.capacityOrAreaSqm,
-        allocationNote: res.allocationNote,
-        status: res.status,
-        allocatedSemester: res.allocatedSemester,
-        allocatedBranch: res.allocatedBranch,
-        allocatedSection: res.allocatedSection
       },
       create: res,
     });
+    upsertCount++;
   }
-  console.log(`✅ Seeded ${resources.length} resources.`);
-
-  // 7. Timetable Records
-  const timetableEntries = [
-    {
-      resourceId: 'CSE-CR-201',
-      departmentId: deptMap['CSE'],
-      dayOfWeek: 'Monday',
-      startTime: toTimeValue('09:00'),
-      endTime: toTimeValue('10:00'),
-      courseCode: 'CS301',
-      section: 'A',
-      academicYear: '2025-2026',
-      // We skip uploadedByUserId here for robustness, or we would need to map user IDs dynamically too.
-    }
-  ];
-
-  for (const tt of timetableEntries) {
-    // We create them without forcing Timetable IDs to avoid constraint issues
-    await prisma.timetable.create({
-      data: {
-        resourceId: tt.resourceId,
-        departmentId: tt.departmentId,
-        dayOfWeek: tt.dayOfWeek,
-        startTime: tt.startTime,
-        endTime: tt.endTime,
-        courseCode: tt.courseCode,
-        section: tt.section,
-        academicYear: tt.academicYear,
-      }
-    });
-  }
-  console.log(`✅ Seeded ${timetableEntries.length} timetable records.`);
-
+  
+  console.log(`✅ Seeded and verified ${upsertCount} official resources.`);
   console.log('🎉 Seeding completed successfully!');
 }
 
