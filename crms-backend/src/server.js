@@ -17,7 +17,27 @@ const server = app.listen(env.port, async () => {
     let aud = await prisma.resourceType.findFirst({ where: { typeName: 'Auditorium' } });
     if (!aud) aud = await prisma.resourceType.create({ data: { typeName: 'Auditorium' } });
     
-    await prisma.resource.updateMany({ where: { resourceId: 'C 001' }, data: { resourceTypeId: aud.resourceTypeId } });
+    // Update C 001 to be the true KS Auditorium
+    await prisma.resource.updateMany({ 
+      where: { resourceId: 'C 001' }, 
+      data: { 
+        resourceTypeId: aud.resourceTypeId,
+        resourceName: 'K.S. Auditorium',
+        capacityOrAreaSqm: 1200
+      } 
+    });
+
+    // Handle the duplicate KS-AUDITORIUM
+    try {
+      await prisma.resource.deleteMany({ where: { resourceId: 'KS-AUDITORIUM' } });
+    } catch (e) {
+      // If there are foreign key constraints, just mark it inactive
+      await prisma.resource.updateMany({
+        where: { resourceId: 'KS-AUDITORIUM' },
+        data: { status: 'Inactive' }
+      });
+    }
+
     console.log('Block names and C001 successfully updated!');
   } catch (err) {
     console.error('Failed to update DB on startup:', err);
