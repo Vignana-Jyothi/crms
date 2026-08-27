@@ -440,11 +440,9 @@ function ResourceCardContent({ r, isFree, occupant, since, until, filterType }) 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink/60">
           {r.department && <span>{r.department.departmentName}</span>}
           {r.block && <span>{r.block.blockName}{r.floor ? `, Floor ${r.floor}` : ''}</span>}
-          {r.capacityOrAreaSqm && (
+              {r.capacityOrAreaSqm && (
             <span>
-              {r.resourceType?.typeName === 'Laboratory' || r.resourceType?.typeName === 'Lab' 
-                ? `Area ${r.capacityOrAreaSqm} sqm` 
-                : `Capacity ${Math.floor(r.capacityOrAreaSqm)}`}
+              Capacity {Math.floor(r.capacityOrAreaSqm)}
             </span>
           )}
         </div>
