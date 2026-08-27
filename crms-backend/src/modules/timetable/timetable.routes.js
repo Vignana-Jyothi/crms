@@ -3,6 +3,10 @@ const controller = require('./timetable.controller');
 const authenticate = require('../../middleware/authenticate');
 
 const router = Router();
+
+// Debug endpoint to fetch raw EduPrime entries to check keys
+router.get('/debug-eduprime', controller.debugEduPrime);
+
 router.use(authenticate);
 
 // GET /api/v1/timetable?departmentId=&resourceId=&dayOfWeek=&academicYear=
