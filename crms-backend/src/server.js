@@ -38,6 +38,17 @@ const server = app.listen(env.port, async () => {
       });
     }
 
+    // Reset Seminar Hall names to just their room names as requested
+    await prisma.resource.updateMany({
+      where: { resourceId: 'SEMINAR-HALL-D' },
+      data: { resourceName: 'Seminar Hall D' }
+    });
+    
+    await prisma.resource.updateMany({
+      where: { resourceId: 'SEMINAR-HALL-A' },
+      data: { resourceName: 'Seminar Hall A' }
+    });
+
     console.log('Block names and C001 successfully updated!');
   } catch (err) {
     console.error('Failed to update DB on startup:', err);
