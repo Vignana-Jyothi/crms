@@ -88,7 +88,8 @@ async function syncEduPrime() {
           endTime: endT,
           courseCode: entry.CourseCode,
           section: resource.allocatedSection,
-          academicYear: '2026-27'
+          academicYear: '2026-27',
+          facultyName: entry.PrimaryFacultyName
         };
       }).filter(Boolean);
 
