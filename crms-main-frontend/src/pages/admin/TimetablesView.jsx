@@ -33,11 +33,10 @@ export default function TimetablesView() {
       }),
       masterDataApi.faculty().then(setFacultyList),
       masterDataApi.sections().then(data => {
-        // We only want a list of unique section strings to populate dropdown, 
-        // assuming sections from master data are objects { section: 'A' } or similar.
-        // Actually, let's extract them from unique timetables or master data.
-        // Usually, sections master data returns unique section strings directly.
-        setSections(data);
+        // The backend returns an array of objects: { section, departmentId }
+        // We need an array of unique section strings to populate the dropdown.
+        const uniqueSections = Array.from(new Set(data.map(item => item.section)));
+        setSections(uniqueSections);
       })
     ]).catch(err => {
       console.error('Failed to load master data', err);
