@@ -16,10 +16,15 @@ export default function TimetablesView() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Selections for the respective tabs
   const [selectedResource, setSelectedResource] = useState('');
   const [selectedSection, setSelectedSection] = useState('');
   const [selectedFaculty, setSelectedFaculty] = useState('');
+  const [selectedDepartment, setSelectedDepartment] = useState('');
+  const [selectedBlock, setSelectedBlock] = useState('');
+  const [selectedDay, setSelectedDay] = useState('');
+  
+  const [departments, setDepartments] = useState([]);
+  const [blocks, setBlocks] = useState([]);
 
   // Load all master data on mount
   useEffect(() => {
@@ -37,7 +42,9 @@ export default function TimetablesView() {
         // We need an array of unique section strings to populate the dropdown.
         const uniqueSections = Array.from(new Set(data.map(item => item.section)));
         setSections(uniqueSections);
-      })
+      }),
+      masterDataApi.departments().then(setDepartments),
+      masterDataApi.blocks().then(setBlocks)
     ]).catch(err => {
       console.error('Failed to load master data', err);
     });
@@ -71,6 +78,12 @@ export default function TimetablesView() {
         }
         params.facultyName = selectedFaculty;
       }
+    } else {
+      if (selectedDepartment) params.departmentId = selectedDepartment;
+      if (selectedSection) params.section = selectedSection;
+      if (selectedFaculty) params.facultyName = selectedFaculty;
+      if (selectedResource) params.resourceId = selectedResource;
+      if (selectedDay) params.dayOfWeek = selectedDay;
     }
 
     timetableApi
@@ -86,7 +99,7 @@ export default function TimetablesView() {
       .finally(() => {
         setLoading(false);
       });
-  }, [activeTab, isEditMode, selectedResource, selectedSection, selectedFaculty]);
+  }, [activeTab, isEditMode, selectedResource, selectedSection, selectedFaculty, selectedDepartment, selectedBlock, selectedDay]);
 
   // Fetch when selection changes
   useEffect(() => {
@@ -120,7 +133,7 @@ export default function TimetablesView() {
                 onClick={() => handleTabChange(tab)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   activeTab === tab && !isEditMode
-                    ? 'bg-primary text-white shadow-sm'
+                    ? 'bg-indigo-600 text-white shadow-sm'
                     : 'text-slate-600 hover:bg-slate-100 hover:text-navy'
                 }`}
               >
@@ -144,51 +157,108 @@ export default function TimetablesView() {
           </div>
         </div>
 
-        {/* Filters Area (Only when NOT in edit mode) */}
-        {!isEditMode && (
-          <div className="bg-white p-4 rounded-xl border border-line shadow-sm flex items-center gap-4">
-            <Search size={20} className="text-slate-400" />
-            
-            {activeTab === 'Classrooms' && (
+        {/* Filters Area */}
+        <div className="bg-white p-4 rounded-xl border border-line shadow-sm flex flex-wrap items-center gap-4">
+          <Search size={20} className="text-slate-400 shrink-0" />
+          
+          {(!isEditMode && activeTab === 'Classrooms') && (
+            <>
+              <select
+                value={selectedBlock}
+                onChange={e => setSelectedBlock(e.target.value)}
+                className="flex-1 min-w-[150px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
+              >
+                <option value="">All Blocks</option>
+                {blocks.map(b => (
+                  <option key={b.blockId} value={b.blockId}>{b.blockName}</option>
+                ))}
+              </select>
               <select
                 value={selectedResource}
                 onChange={e => setSelectedResource(e.target.value)}
-                className="w-full max-w-md p-2 border-none bg-slate-50 rounded-lg text-navy font-medium focus:ring-0 outline-none"
+                className="flex-1 min-w-[200px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
               >
                 <option value="">Select a Classroom / Lab...</option>
-                {resourceList.map(r => (
+                {resourceList
+                  .filter(r => !selectedBlock || r.blockId === parseInt(selectedBlock))
+                  .map(r => (
                   <option key={r.resourceId} value={r.resourceId}>{r.resourceName}</option>
                 ))}
               </select>
-            )}
+            </>
+          )}
 
-            {activeTab === 'Sections' && (
+          {(!isEditMode && activeTab === 'Sections') && (
+            <select
+              value={selectedSection}
+              onChange={e => setSelectedSection(e.target.value)}
+              className="flex-1 min-w-[200px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
+            >
+              <option value="">Select a Section...</option>
+              {sections.map(s => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          )}
+
+          {(!isEditMode && activeTab === 'Faculty') && (
+            <select
+              value={selectedFaculty}
+              onChange={e => setSelectedFaculty(e.target.value)}
+              className="flex-1 min-w-[200px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
+            >
+              <option value="">Select a Faculty Member...</option>
+              {facultyList.map(f => (
+                <option key={f} value={f}>{f}</option>
+              ))}
+            </select>
+          )}
+
+          {isEditMode && (
+            <>
+              <select
+                value={selectedDepartment}
+                onChange={e => setSelectedDepartment(e.target.value)}
+                className="flex-1 min-w-[150px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
+              >
+                <option value="">All Departments</option>
+                {departments.map(d => (
+                  <option key={d.departmentId} value={d.departmentId}>{d.departmentName}</option>
+                ))}
+              </select>
               <select
                 value={selectedSection}
                 onChange={e => setSelectedSection(e.target.value)}
-                className="w-full max-w-md p-2 border-none bg-slate-50 rounded-lg text-navy font-medium focus:ring-0 outline-none"
+                className="flex-1 min-w-[120px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
               >
-                <option value="">Select a Section...</option>
+                <option value="">All Sections</option>
                 {sections.map(s => (
                   <option key={s} value={s}>{s}</option>
                 ))}
               </select>
-            )}
-
-            {activeTab === 'Faculty' && (
               <select
                 value={selectedFaculty}
                 onChange={e => setSelectedFaculty(e.target.value)}
-                className="w-full max-w-md p-2 border-none bg-slate-50 rounded-lg text-navy font-medium focus:ring-0 outline-none"
+                className="flex-1 min-w-[180px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
               >
-                <option value="">Select a Faculty Member...</option>
+                <option value="">All Faculty</option>
                 {facultyList.map(f => (
                   <option key={f} value={f}>{f}</option>
                 ))}
               </select>
-            )}
-          </div>
-        )}
+              <select
+                value={selectedDay}
+                onChange={e => setSelectedDay(e.target.value)}
+                className="flex-1 min-w-[120px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
+              >
+                <option value="">All Days</option>
+                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(d => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+            </>
+          )}
+        </div>
 
         {/* Content Area */}
         <div className="relative">
