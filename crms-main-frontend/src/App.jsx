@@ -16,7 +16,7 @@ import Bookings from './pages/admin/Bookings';
 import LiveStatus from './pages/admin/LiveStatus';
 import TimetablesView from './pages/admin/TimetablesView';
 // Force docker cache invalidation
-import FacultyCalendarView from './pages/admin/FacultyCalendarView';
+
 import Resources from './pages/admin/Resources';
 import Users from './pages/admin/Users';
 import AuditLogs from './pages/admin/AuditLogs';
@@ -66,7 +66,7 @@ export default function App() {
           <Route path="/admin/bookings" element={<ProtectedRoute><RequireRole roles={[ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN]}><MainShell><Bookings /></MainShell></RequireRole></ProtectedRoute>} />
           <Route path="/admin/live" element={<ProtectedRoute><RequireRole roles={[ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN]}><MainShell><LiveStatus /></MainShell></RequireRole></ProtectedRoute>} />
           <Route path="/admin/timetables" element={<ProtectedRoute><RequireRole roles={[ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN]}><MainShell><TimetablesView /></MainShell></RequireRole></ProtectedRoute>} />
-          <Route path="/admin/faculty-calendar" element={<ProtectedRoute><RequireRole roles={[ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN]}><MainShell><FacultyCalendarView /></MainShell></RequireRole></ProtectedRoute>} />
+
           <Route path="/admin/resources" element={<ProtectedRoute><RequireRole roles={[ROLES.SUPER_ADMIN]}><MainShell><Resources /></MainShell></RequireRole></ProtectedRoute>} />
           <Route path="/admin/users" element={<ProtectedRoute><RequireRole roles={[ROLES.SUPER_ADMIN]}><MainShell><Users /></MainShell></RequireRole></ProtectedRoute>} />
           <Route path="/admin/audit-logs" element={<ProtectedRoute><RequireRole roles={[ROLES.SUPER_ADMIN]}><MainShell><AuditLogs /></MainShell></RequireRole></ProtectedRoute>} />

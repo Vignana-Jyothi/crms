@@ -106,6 +106,9 @@ async function syncEduPrime() {
 async function update(timetableId, data) {
   const allowedData = {};
   if (data.facultyName !== undefined) allowedData.facultyName = data.facultyName;
+  if (data.courseCode !== undefined) allowedData.courseCode = data.courseCode;
+  if (data.resourceId !== undefined) allowedData.resourceId = data.resourceId;
+  if (data.section !== undefined) allowedData.section = data.section;
   
   return prisma.timetable.update({
     where: { timetableId: parseInt(timetableId, 10) },
