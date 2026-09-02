@@ -12,13 +12,10 @@ function todayStr() {
   return `${year}-${month}-${day}`;
 }
 
-const TYPE_COLORS = {
-  Classroom: 'bg-navy/10 text-navy',
-  Laboratory: 'bg-forest/10 text-forest',
-  Lab: 'bg-forest/10 text-forest',
-  'Seminar Hall': 'bg-amber/15 text-amber',
-  Auditorium: 'bg-amber/15 text-amber',
-  'Meeting Room': 'bg-ink/10 text-ink/70',
+const SEMINAR_HALL_NAMES = {
+  'C001': 'K S Auditorium',
+  'B011': 'B-Block Seminar Hall',
+  'D204': 'APJ Abdul Kalam Auditorium'
 };
 
 export default function Dashboard() {
@@ -360,14 +357,34 @@ export default function Dashboard() {
               </div>
             </div>
             
-            <div className="p-6">
+            <div className="p-6 max-h-[70vh] overflow-y-auto">
               <div className="space-y-6">
                 <div>
                   <h4 className="text-xs font-bold uppercase tracking-wider text-ink/40 mb-2">Current Activity</h4>
-                  {selectedRoom.occupantList && selectedRoom.occupantList.length > 0 ? (
-                    <div className="space-y-3">
-                      {selectedRoom.occupantList.map((occ, idx) => (
-                        <div key={idx} className="bg-paper/50 p-4 rounded-lg border border-line">
+                  {(() => {
+                     if (!selectedRoom.occupantList || selectedRoom.occupantList.length === 0) return null;
+                     const merged = [];
+                     selectedRoom.occupantList.forEach(occ => {
+                        if (merged.length > 0) {
+                           let last = merged[merged.length - 1];
+                           if (
+                              last.type === occ.type &&
+                              last.courseCode === occ.courseCode &&
+                              last.branchStr === occ.branchStr &&
+                              last.purpose === occ.purpose &&
+                              last.endTime === occ.startTime
+                           ) {
+                              last.endTime = occ.endTime;
+                              return;
+                           }
+                        }
+                        merged.push({ ...occ });
+                     });
+                     
+                     return (
+                        <div className="space-y-3">
+                          {merged.map((occ, idx) => (
+                            <div key={idx} className="bg-paper/50 p-4 rounded-lg border border-line">
                           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
                              <div className="font-semibold text-navy">
                                {occ.type === 'class' ? (
@@ -396,7 +413,9 @@ export default function Dashboard() {
                         </div>
                       ))}
                     </div>
-                  ) : (
+                  );
+                  })()}
+                  {(!selectedRoom.occupantList || selectedRoom.occupantList.length === 0) && (
                     <>
                       <p className="text-base font-medium text-ink bg-paper/50 p-3 rounded-lg border border-line">
                         {selectedRoom.occupant}
@@ -454,24 +473,33 @@ function ResourceCardContent({ r, isFree, occupant, since, until, filterType }) 
       <div className="flex items-start justify-between">
         <div>
           <p className="font-display text-base font-semibold text-ink">
-            {r.resourceId?.startsWith('RM-') ? (
-              r.resourceName
-            ) : (
-              <>
-                {r.resourceId}
-                {r.resourceName && r.resourceName !== r.resourceId && (
-                  <span className="block text-sm font-normal text-ink/70 mt-0.5">{r.resourceName}</span>
-                )}
-              </>
-            )}
+            {(() => {
+               const rawId = r.resourceId || '';
+               const cleanId = rawId.replace(/[-_#\s]/g, '');
+               const mappedName = SEMINAR_HALL_NAMES[cleanId];
+               
+               if (mappedName) return `${rawId} - ${mappedName}`;
+               
+               if (rawId.startsWith('RM-')) return r.resourceName;
+               
+               return (
+                  <>
+                    {rawId}
+                    {r.resourceName && r.resourceName !== rawId && (
+                      <span className="block text-sm font-normal text-ink/70 mt-0.5">{r.resourceName}</span>
+                    )}
+                  </>
+               );
+            })()}
           </p>
         </div>
         <div className="flex flex-col items-end gap-2">
           <span
-            className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-              TYPE_COLORS[r.resourceType?.typeName] || 'bg-ink/10 text-ink/70'
-            }`}
+            className="rounded-full px-2.5 py-1 text-xs font-medium bg-navy/10 text-navy flex items-center gap-1.5"
           >
+            <svg className="w-3.5 h-3.5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
             {r.resourceType?.typeName}
           </span>
           {!isFree && (

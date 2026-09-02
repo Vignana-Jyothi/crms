@@ -2,6 +2,26 @@ const prisma = require('../../config/prisma');
 
 function list({ resourceTypeId, departmentId, blockId, status, search, minCapacity, capacity }) {
   const cap = minCapacity || capacity;
+  let searchConditions = undefined;
+  if (search) {
+    const normalized = search.replace(/[- ]/g, '');
+    const match = normalized.match(/^([a-zA-Z]+)(\d+)$/);
+    if (match) {
+      const letters = match[1];
+      const numbers = match[2];
+      searchConditions = {
+        OR: [
+          { resourceName: { contains: search, mode: 'insensitive' } },
+          { resourceName: { contains: `${letters}${numbers}`, mode: 'insensitive' } },
+          { resourceName: { contains: `${letters} ${numbers}`, mode: 'insensitive' } },
+          { resourceName: { contains: `${letters}-${numbers}`, mode: 'insensitive' } }
+        ]
+      };
+    } else {
+      searchConditions = { resourceName: { contains: search, mode: 'insensitive' } };
+    }
+  }
+
   return prisma.resource.findMany({
     where: {
       ...(resourceTypeId && { resourceTypeId: Number(resourceTypeId) }),
@@ -9,7 +29,7 @@ function list({ resourceTypeId, departmentId, blockId, status, search, minCapaci
       ...(blockId && { blockId: Number(blockId) }),
       ...(status && { status }),
       ...(cap && { capacityOrAreaSqm: { gte: Number(cap) } }),
-      ...(search && { resourceName: { contains: search, mode: 'insensitive' } }),
+      ...searchConditions,
     },
     include: { resourceType: true, department: true, block: true },
     orderBy: { resourceName: 'asc' },
