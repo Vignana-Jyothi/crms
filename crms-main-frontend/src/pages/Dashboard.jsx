@@ -364,13 +364,49 @@ export default function Dashboard() {
               <div className="space-y-6">
                 <div>
                   <h4 className="text-xs font-bold uppercase tracking-wider text-ink/40 mb-2">Current Activity</h4>
-                  <p className="text-base font-medium text-ink bg-paper/50 p-3 rounded-lg border border-line">
-                    {selectedRoom.occupant}
-                  </p>
-                  {selectedRoom.until && (
-                    <p className="text-sm font-semibold text-brick mt-2">
-                      {selectedRoom.since && selectedRoom.until ? `${selectedRoom.since.substring(11, 16)} to ${selectedRoom.until.substring(11, 16)}` : ''}
-                    </p>
+                  {selectedRoom.occupantList && selectedRoom.occupantList.length > 0 ? (
+                    <div className="space-y-3">
+                      {selectedRoom.occupantList.map((occ, idx) => (
+                        <div key={idx} className="bg-paper/50 p-4 rounded-lg border border-line">
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                             <div className="font-semibold text-navy">
+                               {occ.type === 'class' ? (
+                                  <>
+                                     {occ.courseName || occ.courseCode} 
+                                     {occ.courseName && occ.courseName !== occ.courseCode && <span className="text-sm font-normal text-ink/70 ml-1">({occ.courseCode})</span>}
+                                  </>
+                               ) : (
+                                  occ.purpose
+                               )}
+                             </div>
+                             <span className="text-xs font-mono font-semibold bg-brick-light/50 text-brick-dark px-2 py-1 rounded shrink-0">
+                                {occ.startTime} - {occ.endTime}
+                             </span>
+                          </div>
+                          {occ.type === 'class' ? (
+                             <div className="mt-3 text-sm text-ink/80 flex flex-col gap-1.5">
+                                <div><span className="font-medium text-ink mr-1">Class:</span> {occ.branchStr}</div>
+                                {occ.facultyName && <div><span className="font-medium text-ink mr-1">Faculty:</span> {occ.facultyName}</div>}
+                             </div>
+                          ) : (
+                             <div className="mt-3 text-sm text-ink/80">
+                                <div><span className="font-medium text-ink mr-1">Booked by:</span> {occ.requesterName}</div>
+                             </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-base font-medium text-ink bg-paper/50 p-3 rounded-lg border border-line">
+                        {selectedRoom.occupant}
+                      </p>
+                      {selectedRoom.until && (
+                        <p className="text-sm font-semibold text-brick mt-2">
+                          {selectedRoom.since && selectedRoom.until ? `${selectedRoom.since.substring(11, 16)} to ${selectedRoom.until.substring(11, 16)}` : ''}
+                        </p>
+                      )}
+                    </>
                   )}
                 </div>
                 

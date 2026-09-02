@@ -365,6 +365,7 @@ async function getLiveStatus(dateInput, startTimeInput, endTimeInput) {
     let isFree = true;
     let occupant = null;
     let occupantContact = null;
+    let occupantList = [];
     let since = null;
     let until = null;
 
@@ -372,7 +373,7 @@ async function getLiveStatus(dateInput, startTimeInput, endTimeInput) {
       isFree = false;
       const overlaps = timetableMap[r.resourceId].sort((a,b) => new Date(a.startTime) - new Date(b.startTime));
       
-      occupant = overlaps.map(t => {
+      occupantList = overlaps.map(t => {
         const branch = t.department?.branchCode || r.allocatedBranch || r.department?.branchCode || 'Unknown Branch';
         const section = t.section || r.allocatedSection || '';
         const sectionStr = section ? ` - Sec ${section}` : '';
@@ -388,12 +389,18 @@ async function getLiveStatus(dateInput, startTimeInput, endTimeInput) {
         const startTimeStr = new Date(t.startTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' });
         const endTimeStr = new Date(t.endTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' });
         
-        let occupantStr = `[${startTimeStr} - ${endTimeStr}] Class: ${t.courseCode} (${yearPrefix}${branch}${sectionStr})`;
-        if (t.facultyName) {
-          occupantStr += ` • Faculty: ${t.facultyName}`;
-        }
-        return occupantStr;
-      }).join(' | ');
+        return {
+           type: 'class',
+           startTime: startTimeStr,
+           endTime: endTimeStr,
+           courseCode: t.courseCode,
+           courseName: t.courseName || '',
+           branchStr: `${yearPrefix}${branch}${sectionStr}`,
+           facultyName: t.facultyName || ''
+        };
+      });
+      
+      occupant = occupantList.map(item => `[${item.startTime} - ${item.endTime}] Class: ${item.courseCode} (${item.branchStr})${item.facultyName ? ` • Faculty: ${item.facultyName}` : ''}`).join(' | ');
       
       since = overlaps[0].startTime;
       until = overlaps[overlaps.length - 1].endTime;
@@ -405,6 +412,13 @@ async function getLiveStatus(dateInput, startTimeInput, endTimeInput) {
       occupantContact = { name: req?.name, email: req?.email, phone: req?.phone };
       since = b.startTime;
       until = b.endTime;
+      occupantList = [{
+         type: 'event',
+         purpose: b.purpose,
+         requesterName: req?.name,
+         startTime: new Date(b.startTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' }),
+         endTime: new Date(b.endTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' })
+      }];
     }
 
     return {
@@ -416,6 +430,7 @@ async function getLiveStatus(dateInput, startTimeInput, endTimeInput) {
       capacity: r.capacityOrAreaSqm ? Number(r.capacityOrAreaSqm) : null,
       isFree,
       occupant,
+      occupantList,
       occupantContact,
       since,
       until
