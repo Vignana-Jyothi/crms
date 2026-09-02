@@ -475,10 +475,17 @@ function ResourceCardContent({ r, isFree, occupant, since, until, filterType }) 
           <p className="font-display text-base font-semibold text-ink">
             {(() => {
                const rawId = r.resourceId || '';
-               const cleanId = rawId.replace(/[-_#\s]/g, '');
-               const mappedName = SEMINAR_HALL_NAMES[cleanId];
+               const rawName = r.resourceName || '';
                
-               if (mappedName) return `${rawId} - ${mappedName}`;
+               const checkStr1 = rawId.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+               const checkStr2 = rawName.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+               
+               const mappedName = SEMINAR_HALL_NAMES[checkStr1] || SEMINAR_HALL_NAMES[checkStr2];
+               
+               if (mappedName) {
+                  const base = rawId.startsWith('RM-') ? rawName : rawId;
+                  return `${base} - ${mappedName}`;
+               }
                
                if (rawId.startsWith('RM-')) return r.resourceName;
                
