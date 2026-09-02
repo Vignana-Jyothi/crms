@@ -10,6 +10,7 @@ const updateTimetableSchema = z.object({
     .object({
       facultyName: z.string().trim().min(1).max(100).optional(),
       courseCode: z.string().trim().min(1).max(20).optional(),
+      courseName: z.string().trim().min(1).max(100).optional(),
       resourceId: z.string().trim().min(1).max(20).optional(),
       section: z.string().trim().min(1).max(20).optional(),
     })
