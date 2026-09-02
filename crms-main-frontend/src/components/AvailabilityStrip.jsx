@@ -157,8 +157,13 @@ export default function AvailabilityStrip({ availability, date }) {
                     <span className="text-sm text-ink/80">{selectedBlock.data.facultyName || 'N/A'}</span>
                   </div>
                   <div>
-                    <span className="block text-[10px] font-bold uppercase tracking-wider text-ink/40">Section</span>
-                    <span className="text-sm text-ink/80">{selectedBlock.data.section || 'N/A'}</span>
+                    <span className="block text-[10px] font-bold uppercase tracking-wider text-ink/40">Class Details</span>
+                    <span className="text-sm text-ink/80">
+                       {selectedBlock.data.studentYear ? `${selectedBlock.data.studentYear}${['st','nd','rd'][((selectedBlock.data.studentYear+90)%100-10)%10-1]||'th'} Year ` : ''}
+                       {selectedBlock.data.branchCode ? `${selectedBlock.data.branchCode} ` : ''}
+                       {selectedBlock.data.section ? `- Sec ${selectedBlock.data.section}` : ''}
+                       {(!selectedBlock.data.studentYear && !selectedBlock.data.branchCode && !selectedBlock.data.section) ? 'N/A' : ''}
+                    </span>
                   </div>
                 </>
               ) : (

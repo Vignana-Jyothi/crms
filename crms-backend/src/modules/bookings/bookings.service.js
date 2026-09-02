@@ -168,7 +168,10 @@ async function getAvailability(resourceId, date) {
 
   const dayOfWeek = dayOfWeekFor(date);
   const [timetableBlocks, bookings] = await Promise.all([
-    prisma.timetable.findMany({ where: { resourceId, dayOfWeek } }),
+    prisma.timetable.findMany({ 
+      where: { resourceId, dayOfWeek },
+      include: { department: true } 
+    }),
     prisma.booking.findMany({
       where: { resourceId, bookingDate: new Date(date), status: { in: repo.ACTIVE_STATUSES } },
       include: { requester: { select: { name: true, email: true, phone: true } } }
@@ -179,7 +182,16 @@ async function getAvailability(resourceId, date) {
     resourceId,
     date,
     dayOfWeek,
-    blockedByTimetable: timetableBlocks.map((t) => ({ startTime: t.startTime, endTime: t.endTime, courseCode: t.courseCode, courseName: t.courseName, facultyName: t.facultyName, section: t.section })),
+    blockedByTimetable: timetableBlocks.map((t) => ({ 
+      startTime: t.startTime, 
+      endTime: t.endTime, 
+      courseCode: t.courseCode, 
+      courseName: t.courseName, 
+      facultyName: t.facultyName, 
+      section: t.section,
+      studentYear: t.studentYear,
+      branchCode: t.department?.branchCode || null
+    })),
     blockedByBookings: bookings.map((b) => ({ 
       startTime: b.startTime, 
       endTime: b.endTime, 
