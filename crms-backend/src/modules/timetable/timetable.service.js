@@ -87,6 +87,7 @@ async function syncEduPrime() {
           startTime: startT,
           endTime: endT,
           courseCode: entry.CourseCode,
+          courseName: entry.CourseName || entry.SubjectName || entry.CourseTitle || null,
           section: resource.allocatedSection,
           academicYear: '2026-27',
           facultyName: entry.PrimaryFacultyName

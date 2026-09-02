@@ -179,7 +179,7 @@ async function getAvailability(resourceId, date) {
     resourceId,
     date,
     dayOfWeek,
-    blockedByTimetable: timetableBlocks.map((t) => ({ startTime: t.startTime, endTime: t.endTime, courseCode: t.courseCode, facultyName: t.facultyName, section: t.section })),
+    blockedByTimetable: timetableBlocks.map((t) => ({ startTime: t.startTime, endTime: t.endTime, courseCode: t.courseCode, courseName: t.courseName, facultyName: t.facultyName, section: t.section })),
     blockedByBookings: bookings.map((b) => ({ 
       startTime: b.startTime, 
       endTime: b.endTime, 
