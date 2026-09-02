@@ -34,7 +34,7 @@ export default function Dashboard() {
     blockId: '',
     minCapacity: '',
     search: '',
-    availability: 'All'
+    availability: 'Free'
   });
   
   const [selectedDate, setSelectedDate] = useState(todayStr());
@@ -161,7 +161,7 @@ export default function Dashboard() {
 
   return (
     <div className="p-6 md:p-10 max-w-7xl mx-auto">
-      <h1 className="font-display text-2xl font-semibold text-navy">Find a resource</h1>
+      <h1 className="font-display text-2xl font-semibold text-navy">Book a Room</h1>
       <p className="mt-1 text-sm text-ink/60">
         Search classrooms, labs, seminar halls, and auditoriums across campus.
       </p>
