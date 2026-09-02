@@ -28,10 +28,18 @@ function formatTimeDisplay(timeVal) {
   if (!timeVal) return '';
   if (typeof timeVal === 'string' && !timeVal.includes('T')) return timeVal.substring(0, 5);
   const d = new Date(timeVal);
-  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' });
 }
 
-function Block({ startMin, endMin, color, label, onClick }) {
+function todayStr() {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function Block({ startMin, endMin, color, label, onClick, isCurrent }) {
   const totalMin = DAY_END_MIN - DAY_START_MIN;
   const left = ((Math.max(startMin, DAY_START_MIN) - DAY_START_MIN) / totalMin) * 100;
   const width = ((Math.min(endMin, DAY_END_MIN) - Math.max(startMin, DAY_START_MIN)) / totalMin) * 100;
@@ -40,13 +48,13 @@ function Block({ startMin, endMin, color, label, onClick }) {
     <button
       title={label}
       onClick={onClick}
-      className={`absolute top-0 h-full rounded-sm transition-opacity hover:opacity-80 ${color} ${onClick ? 'cursor-pointer ring-1 ring-white/30' : 'cursor-default'}`}
+      className={`absolute top-0 h-full rounded-sm transition-opacity hover:opacity-80 ${color} ${onClick ? 'cursor-pointer ring-1 ring-white/30' : 'cursor-default'} ${isCurrent ? 'animate-pulse shadow-[0_0_10px_currentColor] z-10' : ''}`}
       style={{ left: `${left}%`, width: `${Math.max(width, 1.5)}%` }}
     />
   );
 }
 
-export default function AvailabilityStrip({ availability }) {
+export default function AvailabilityStrip({ availability, date }) {
   const [selectedBlock, setSelectedBlock] = useState(null);
 
   if (!availability) return null;
@@ -57,29 +65,45 @@ export default function AvailabilityStrip({ availability }) {
     hourMarks.push(h);
   }
 
+  const isToday = date === todayStr();
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
   return (
     <div>
       <div className="relative h-8 w-full overflow-hidden rounded-md bg-forest-light">
-        {blockedByTimetable.map((t, i) => (
-          <Block
-            key={`tt-${i}`}
-            startMin={toMinutes(t.startTime)}
-            endMin={toMinutes(t.endTime)}
-            color="bg-ink/25"
-            label={`Class: ${t.courseCode || 'Scheduled'}`}
-            onClick={() => setSelectedBlock({ type: 'class', data: t })}
-          />
-        ))}
-        {blockedByBookings.map((b, i) => (
-          <Block
-            key={`bk-${i}`}
-            startMin={toMinutes(b.startTime)}
-            endMin={toMinutes(b.endTime)}
-            color={b.status === 'Approved' ? 'bg-brick' : 'bg-amber'}
-            label={`Booking (${b.status})`}
-            onClick={() => setSelectedBlock({ type: 'booking', data: b })}
-          />
-        ))}
+        {blockedByTimetable.map((t, i) => {
+          const s = toMinutes(t.startTime);
+          const e = toMinutes(t.endTime);
+          const isCurrent = isToday && currentMinutes >= s && currentMinutes <= e;
+          return (
+            <Block
+              key={`tt-${i}`}
+              startMin={s}
+              endMin={e}
+              color="bg-navy"
+              label={`Class: ${t.courseCode || 'Scheduled'}`}
+              onClick={() => setSelectedBlock({ type: 'class', data: t })}
+              isCurrent={isCurrent}
+            />
+          );
+        })}
+        {blockedByBookings.map((b, i) => {
+          const s = toMinutes(b.startTime);
+          const e = toMinutes(b.endTime);
+          const isCurrent = isToday && currentMinutes >= s && currentMinutes <= e;
+          return (
+            <Block
+              key={`bk-${i}`}
+              startMin={s}
+              endMin={e}
+              color={b.status === 'Approved' ? 'bg-brick' : 'bg-amber'}
+              label={`Booking (${b.status})`}
+              onClick={() => setSelectedBlock({ type: 'booking', data: b })}
+              isCurrent={isCurrent}
+            />
+          );
+        })}
       </div>
       <div className="mt-1 flex justify-between text-[10px] text-ink/40">
         {hourMarks.map((m) => {
@@ -94,7 +118,7 @@ export default function AvailabilityStrip({ availability }) {
       </div>
       <div className="mt-2 flex flex-wrap gap-3 text-xs text-ink/60">
         <Legend swatch="bg-forest-light border border-forest/30" label="Open" />
-        <Legend swatch="bg-ink/25" label="Class" />
+        <Legend swatch="bg-navy" label="Class" />
         <Legend swatch="bg-amber" label="Pending booking" />
         <Legend swatch="bg-brick" label="Approved booking" />
       </div>

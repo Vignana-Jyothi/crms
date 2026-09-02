@@ -112,7 +112,7 @@ export default function ResourceDetail() {
             className="rounded border border-line px-2 py-1 text-sm"
           />
         </div>
-        <AvailabilityStrip availability={availability} />
+        <AvailabilityStrip availability={availability} date={date} />
       </div>
 
       <form onSubmit={handleSubmit} className="mt-6 rounded-lg border border-line bg-white p-5">

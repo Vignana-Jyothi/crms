@@ -7,8 +7,8 @@ import { approvalsApi } from '../api/endpoints';
 const NAV = [
   { to: '/', label: 'Overview', roles: null },
   { to: '/approvals', label: 'Approvals', roles: null, badge: true },
-  { to: '/bookings', label: 'Bookings', roles: null },
-  { to: '/live', label: 'Live Status', roles: null },
+  { to: '/bookings', label: 'All Bookings', roles: null },
+  { to: '/timetables', label: 'All Timetables', roles: null },
   { to: '/resources', label: 'Resources', roles: [ROLES.SUPER_ADMIN] },
   { to: '/users', label: 'Users', roles: [ROLES.SUPER_ADMIN] },
   { to: '/audit-logs', label: 'Audit logs', roles: [ROLES.SUPER_ADMIN] },

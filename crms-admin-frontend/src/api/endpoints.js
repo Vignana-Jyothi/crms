@@ -31,8 +31,6 @@ export const masterDataApi = {
 
 export const resourcesApi = {
   list: (params) => client.get('/resources', { params }).then((r) => r.data),
-  liveStatus: (date, startTime, endTime) =>
-    client.get('/resources/live-status', { params: { date, startTime, endTime } }).then((r) => r.data),
   get: (resourceId) => client.get(`/resources/${resourceId}`).then((r) => r.data),
   create: (payload) => client.post('/resources', payload).then((r) => r.data),
   update: (id, data) => client.patch(`/resources/${id}`, data).then((r) => r.data),

@@ -2,26 +2,31 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { masterDataApi, resourcesApi, timetableApi } from '../../api/endpoints';
 import FullWeekTimetableGrid from '../../components/admin/FullWeekTimetableGrid';
 import EditableTimetableGrid from '../../components/admin/EditableTimetableGrid';
-import { Calendar, Search, Edit2 } from 'lucide-react';
+import { Calendar, Search, Edit2, List, LayoutGrid } from 'lucide-react';
 
 export default function TimetablesView() {
   const [activeTab, setActiveTab] = useState('Classrooms'); // Classrooms, Sections, Faculty
   const [isEditMode, setIsEditMode] = useState(false);
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
 
   const [resourceList, setResourceList] = useState([]);
   const [facultyList, setFacultyList] = useState([]);
-  const [sections, setSections] = useState([]);
+  const [sectionsData, setSectionsData] = useState([]); // [{section, departmentId, studentYear}]
   
   const [timetables, setTimetables] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const [selectedResource, setSelectedResource] = useState('');
-  const [selectedSection, setSelectedSection] = useState('');
   const [selectedFaculty, setSelectedFaculty] = useState('');
+  
+  const [selectedStudentYear, setSelectedStudentYear] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('');
+  const [selectedSection, setSelectedSection] = useState('');
+  
   const [selectedBlock, setSelectedBlock] = useState('');
   const [selectedDay, setSelectedDay] = useState('');
+  const [selectedDate, setSelectedDate] = useState('');
   
   const [departments, setDepartments] = useState([]);
   const [blocks, setBlocks] = useState([]);
@@ -31,18 +36,13 @@ export default function TimetablesView() {
     Promise.all([
       resourcesApi.list().then(data => {
         const filtered = data.filter(r => 
-          (r.resourceType?.typeName === 'Classroom' || r.resourceType?.typeName === 'Lab') &&
+          (r.resourceType?.typeName === 'Classroom' || r.resourceType?.typeName === 'Laboratory' || r.resourceType?.typeName === 'Lab') &&
           !/^\d(?:st|nd|rd|th)\s+Year/i.test(r.resourceName)
         );
         setResourceList(filtered);
       }),
       masterDataApi.faculty().then(setFacultyList),
-      masterDataApi.sections().then(data => {
-        // The backend returns an array of objects: { section, departmentId }
-        // We need an array of unique section strings to populate the dropdown.
-        const uniqueSections = Array.from(new Set(data.map(item => item.section)));
-        setSections(uniqueSections);
-      }),
+      masterDataApi.sections().then(setSectionsData),
       masterDataApi.departments().then(setDepartments),
       masterDataApi.blocks().then(setBlocks)
     ]).catch(err => {
@@ -64,12 +64,11 @@ export default function TimetablesView() {
         }
         params.resourceId = selectedResource;
       } else if (activeTab === 'Sections') {
-        if (!selectedSection) {
+        if (!selectedSection || !selectedDepartment || !selectedStudentYear) {
           setTimetables([]);
           setLoading(false);
           return;
         }
-        params.section = selectedSection;
       } else if (activeTab === 'Faculty') {
         if (!selectedFaculty) {
           setTimetables([]);
@@ -78,18 +77,29 @@ export default function TimetablesView() {
         }
         params.facultyName = selectedFaculty;
       }
+      
+      // Pass any other selected filters to narrow down the view
+      if (selectedStudentYear) params.studentYear = selectedStudentYear;
+      if (selectedDepartment) params.departmentId = selectedDepartment;
+      if (selectedSection) params.section = selectedSection;
+      if (selectedResource && activeTab !== 'Classrooms') params.resourceId = selectedResource;
+      if (selectedFaculty && activeTab !== 'Faculty') params.facultyName = selectedFaculty;
+      
+      const derivedDay = selectedDate ? new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long' }) : selectedDay;
+      if (derivedDay) params.dayOfWeek = derivedDay;
     } else {
+      if (selectedStudentYear) params.studentYear = selectedStudentYear;
       if (selectedDepartment) params.departmentId = selectedDepartment;
       if (selectedSection) params.section = selectedSection;
       if (selectedFaculty) params.facultyName = selectedFaculty;
       if (selectedResource) params.resourceId = selectedResource;
-      if (selectedDay) params.dayOfWeek = selectedDay;
+      const derivedDay = selectedDate ? new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long' }) : selectedDay;
+      if (derivedDay) params.dayOfWeek = derivedDay;
     }
 
     timetableApi
       .list(params)
       .then(data => {
-        // If edit mode is true, it fetches ALL timetables. This might be heavy, but allows global search/edit.
         setTimetables(data);
         setError('');
       })
@@ -99,7 +109,7 @@ export default function TimetablesView() {
       .finally(() => {
         setLoading(false);
       });
-  }, [activeTab, isEditMode, selectedResource, selectedSection, selectedFaculty, selectedDepartment, selectedBlock, selectedDay]);
+  }, [activeTab, isEditMode, selectedResource, selectedSection, selectedFaculty, selectedDepartment, selectedBlock, selectedDay, selectedDate, selectedStudentYear]);
 
   // Fetch when selection changes
   useEffect(() => {
@@ -110,7 +120,36 @@ export default function TimetablesView() {
     setActiveTab(tab);
     setIsEditMode(false);
     setTimetables([]);
+    // Reset filters
+    setSelectedResource('');
+    setSelectedSection('');
+    setSelectedFaculty('');
+    setSelectedDepartment('');
+    setSelectedStudentYear('');
+    setSelectedDay('');
+    setSelectedDate('');
   };
+
+  const availableSections = sectionsData
+    .filter(s => {
+      if (selectedStudentYear && s.studentYear !== selectedStudentYear) return false;
+      if (selectedDepartment && s.departmentId !== parseInt(selectedDepartment)) return false;
+      return true;
+    })
+    .map(s => s.section)
+    .filter((value, index, self) => self.indexOf(value) === index)
+    .sort();
+
+  const sortedDepartments = [...departments].sort((a, b) => {
+    if (!selectedStudentYear) return a.departmentName.localeCompare(b.departmentName);
+    
+    const aHasData = sectionsData.some(s => s.departmentId === a.departmentId && s.studentYear === selectedStudentYear);
+    const bHasData = sectionsData.some(s => s.departmentId === b.departmentId && s.studentYear === selectedStudentYear);
+    
+    if (aHasData && !bHasData) return -1;
+    if (!aHasData && bHasData) return 1;
+    return a.departmentName.localeCompare(b.departmentName);
+  });
 
   return (
     <div className="p-6 bg-slate-50 min-h-full">
@@ -182,47 +221,38 @@ export default function TimetablesView() {
                 {resourceList
                   .filter(r => !selectedBlock || r.blockId === parseInt(selectedBlock))
                   .map(r => (
-                  <option key={r.resourceId} value={r.resourceId}>{r.resourceName}</option>
+                  <option key={r.resourceId} value={r.resourceId}>{r.resourceName} ({r.resourceType?.typeName || 'Room'})</option>
                 ))}
               </select>
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={e => setSelectedDate(e.target.value)}
+                className="flex-1 min-w-[140px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
+              />
             </>
           )}
 
           {(!isEditMode && activeTab === 'Sections') && (
-            <select
-              value={selectedSection}
-              onChange={e => setSelectedSection(e.target.value)}
-              className="flex-1 min-w-[200px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
-            >
-              <option value="">Select a Section...</option>
-              {sections.map(s => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
-          )}
-
-          {(!isEditMode && activeTab === 'Faculty') && (
-            <select
-              value={selectedFaculty}
-              onChange={e => setSelectedFaculty(e.target.value)}
-              className="flex-1 min-w-[200px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
-            >
-              <option value="">Select a Faculty Member...</option>
-              {facultyList.map(f => (
-                <option key={f} value={f}>{f}</option>
-              ))}
-            </select>
-          )}
-
-          {isEditMode && (
             <>
               <select
+                value={selectedStudentYear}
+                onChange={e => { setSelectedStudentYear(e.target.value); setSelectedSection(''); }}
+                className="flex-1 min-w-[120px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
+              >
+                <option value="">Select Year...</option>
+                <option value="1">1st Year</option>
+                <option value="2">2nd Year</option>
+                <option value="3">3rd Year</option>
+                <option value="4">4th Year</option>
+              </select>
+              <select
                 value={selectedDepartment}
-                onChange={e => setSelectedDepartment(e.target.value)}
+                onChange={e => { setSelectedDepartment(e.target.value); setSelectedSection(''); }}
                 className="flex-1 min-w-[150px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
               >
-                <option value="">All Departments</option>
-                {departments.map(d => (
+                <option value="">Select Branch...</option>
+                {sortedDepartments.map(d => (
                   <option key={d.departmentId} value={d.departmentId}>{d.departmentName}</option>
                 ))}
               </select>
@@ -230,16 +260,80 @@ export default function TimetablesView() {
                 value={selectedSection}
                 onChange={e => setSelectedSection(e.target.value)}
                 className="flex-1 min-w-[120px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
+                disabled={!selectedStudentYear || !selectedDepartment}
+              >
+                <option value="">Select Section...</option>
+                {availableSections.map(s => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={e => setSelectedDate(e.target.value)}
+                className="flex-1 min-w-[140px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
+              />
+            </>
+          )}
+
+          {(!isEditMode && activeTab === 'Faculty') && (
+            <>
+              <select
+                value={selectedFaculty}
+                onChange={e => setSelectedFaculty(e.target.value)}
+                className="flex-1 min-w-[200px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
+              >
+                <option value="">Select a Faculty Member...</option>
+                {facultyList.map((f, i) => (
+                  <option key={f.name || f || i} value={f.name || f}>{f.label || f}</option>
+                ))}
+              </select>
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={e => setSelectedDate(e.target.value)}
+                className="flex-1 min-w-[140px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
+              />
+            </>
+          )}
+
+          {isEditMode && (
+            <>
+              <select
+                value={selectedStudentYear}
+                onChange={e => setSelectedStudentYear(e.target.value)}
+                className="flex-1 min-w-[100px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
+              >
+                <option value="">All Years</option>
+                <option value="1">1st Year</option>
+                <option value="2">2nd Year</option>
+                <option value="3">3rd Year</option>
+                <option value="4">4th Year</option>
+              </select>
+              <select
+                value={selectedDepartment}
+                onChange={e => setSelectedDepartment(e.target.value)}
+                className="flex-1 min-w-[120px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
+              >
+                <option value="">All Depts</option>
+                {sortedDepartments.map(d => (
+                  <option key={d.departmentId} value={d.departmentId}>{d.branchCode}</option>
+                ))}
+              </select>
+              <select
+                value={selectedSection}
+                onChange={e => setSelectedSection(e.target.value)}
+                className="flex-1 min-w-[100px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
               >
                 <option value="">All Sections</option>
-                {sections.map(s => (
+                {availableSections.map(s => (
                   <option key={s} value={s}>{s}</option>
                 ))}
               </select>
               <select
                 value={selectedFaculty}
                 onChange={e => setSelectedFaculty(e.target.value)}
-                className="flex-1 min-w-[180px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
+                className="flex-1 min-w-[150px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
               >
                 <option value="">All Faculty</option>
                 {facultyList.map(f => (
@@ -249,7 +343,7 @@ export default function TimetablesView() {
               <select
                 value={selectedDay}
                 onChange={e => setSelectedDay(e.target.value)}
-                className="flex-1 min-w-[120px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
+                className="flex-1 min-w-[110px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
               >
                 <option value="">All Days</option>
                 {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(d => (
@@ -257,6 +351,30 @@ export default function TimetablesView() {
                 ))}
               </select>
             </>
+          )}
+
+          {/* View Mode Toggle (Grid/List) */}
+          {!isEditMode && (
+            <div className="flex bg-slate-100 p-1 rounded-lg ml-auto">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                  viewMode === 'grid' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-navy'
+                }`}
+              >
+                <LayoutGrid size={14} />
+                Grid View
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                  viewMode === 'list' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-navy'
+                }`}
+              >
+                <List size={14} />
+                List View
+              </button>
+            </div>
           )}
         </div>
 
@@ -279,13 +397,27 @@ export default function TimetablesView() {
 
           {!isEditMode && !loading && timetables.length > 0 && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <FullWeekTimetableGrid timetables={timetables} viewMode={activeTab} />
+              {viewMode === 'grid' ? (
+                <FullWeekTimetableGrid timetables={timetables} viewMode={activeTab} />
+              ) : (
+                <EditableTimetableGrid 
+                  timetables={timetables} 
+                  resources={resourceList} 
+                  readOnly={true} 
+                />
+              )}
             </div>
           )}
 
-          {!isEditMode && !loading && timetables.length === 0 && (selectedResource || selectedSection || selectedFaculty) && (
+          {!isEditMode && !loading && timetables.length === 0 && (selectedResource || (selectedSection && selectedDepartment && selectedStudentYear) || selectedFaculty) && (
             <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
               No classes scheduled for the selected {activeTab.toLowerCase().slice(0, -1)}.
+            </div>
+          )}
+          
+          {!isEditMode && !loading && timetables.length === 0 && activeTab === 'Sections' && (!selectedSection || !selectedDepartment || !selectedStudentYear) && (
+            <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
+              Please select a Year, Branch, and Section to view the timetable.
             </div>
           )}
 
@@ -300,6 +432,7 @@ export default function TimetablesView() {
                 timetables={timetables} 
                 resources={resourceList} 
                 setTimetables={setTimetables} 
+                readOnly={false}
               />
             </div>
           )}

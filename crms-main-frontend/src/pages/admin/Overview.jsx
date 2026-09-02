@@ -50,9 +50,6 @@ export default function Overview() {
           <h1 className="font-display text-3xl font-semibold text-navy">Welcome back, {user?.name}</h1>
           <p className="mt-1 text-sm text-ink/60">Here is what is happening across your resources today.</p>
         </div>
-        <Link to="/admin/live" className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white hover:bg-navy-dark transition-colors shadow-sm">
-          View Live Status
-        </Link>
       </div>
 
       {loading ? (

@@ -3,7 +3,7 @@ import { timetableApi } from '../../api/endpoints';
 import { Check, X, Edit2 } from 'lucide-react';
 import { fmtTime } from '../../utils/formatters';
 
-export default function EditableTimetableGrid({ timetables, resources, setTimetables }) {
+export default function EditableTimetableGrid({ timetables, resources, setTimetables, readOnly = false }) {
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [saving, setSaving] = useState(false);
@@ -63,7 +63,7 @@ export default function EditableTimetableGrid({ timetables, resources, setTimeta
             <th className="px-4 py-3 font-semibold">Course</th>
             <th className="px-4 py-3 font-semibold">Section</th>
             <th className="px-4 py-3 font-semibold">Faculty</th>
-            <th className="px-4 py-3 font-semibold text-right">Actions</th>
+            {!readOnly && <th className="px-4 py-3 font-semibold text-right">Actions</th>}
           </tr>
         </thead>
         <tbody className="divide-y divide-line">
@@ -140,36 +140,38 @@ export default function EditableTimetableGrid({ timetables, resources, setTimeta
                   )}
                 </td>
                 
-                <td className="px-4 py-3 text-right">
-                  {isEditing ? (
-                    <div className="flex justify-end gap-2">
+                {!readOnly && (
+                  <td className="px-4 py-3 text-right">
+                    {isEditing ? (
+                      <div className="flex justify-end gap-2">
+                        <button 
+                          onClick={() => handleSave(t.timetableId)}
+                          disabled={saving}
+                          className="p-1.5 bg-green-50 text-green-600 rounded hover:bg-green-100 disabled:opacity-50"
+                          title="Save"
+                        >
+                          <Check size={16} />
+                        </button>
+                        <button 
+                          onClick={handleCancel}
+                          disabled={saving}
+                          className="p-1.5 bg-red-50 text-red-600 rounded hover:bg-red-100 disabled:opacity-50"
+                          title="Cancel"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    ) : (
                       <button 
-                        onClick={() => handleSave(t.timetableId)}
-                        disabled={saving}
-                        className="p-1.5 bg-green-50 text-green-600 rounded hover:bg-green-100 disabled:opacity-50"
-                        title="Save"
+                        onClick={() => handleEdit(t)}
+                        className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/10 rounded transition-colors"
+                        title="Edit"
                       >
-                        <Check size={16} />
+                        <Edit2 size={16} />
                       </button>
-                      <button 
-                        onClick={handleCancel}
-                        disabled={saving}
-                        className="p-1.5 bg-red-50 text-red-600 rounded hover:bg-red-100 disabled:opacity-50"
-                        title="Cancel"
-                      >
-                        <X size={16} />
-                      </button>
-                    </div>
-                  ) : (
-                    <button 
-                      onClick={() => handleEdit(t)}
-                      className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/10 rounded transition-colors"
-                      title="Edit"
-                    >
-                      <Edit2 size={16} />
-                    </button>
-                  )}
-                </td>
+                    )}
+                  </td>
+                )}
               </tr>
             );
           })}

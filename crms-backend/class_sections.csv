@@ -1,0 +1,54 @@
+section_id,source_file,department,branch_name,academic_year,programme,regulation,class_year,semester,section,room_no,wef_date,class_coordinator,ic_timetables,hod_name,table_kind
+1,AE_B.Tech VII Sem 2026-27.docx,AE,Automobile Engineering,2026-27,B.Tech.,R22,IV Year,VII,A,D-421,2026-07-06,Mr. R. Ramu,Mr. M. Krishna & Balappa H,HOD-AE,class
+2,CE_B.Tech VII Sem 2026-27.docx,CE,Civil Engineering,2026-27,B.Tech.,R22,IV Year,VII,A,D-104/1,2026-07-06,Dr.D.Praseeda,Mrs. V. Ramya Krishna,HOD-CED,class
+3,CE_B.Tech VII Sem 2026-27.docx,CE,Civil Engineering,2026-27,B.Tech.,R22,IV Year,VII,B,D-104/1,2026-07-06,Mr.P.Rama Rao,Mrs. V. Ramya Krishna,HOD-CED,class
+4,CSE_B.Tech VII Sem 2026-27.docx,CSE,Computer Science & Engineering,2026-2027,B.Tech.,R22,IV Year,VII,A,E-012,2026-07-06,Mrs. N. Lakshmi Kalyani,Mrs. N. Sarika/Mrs. G. Laxmi Deepthi/Mrs. K. Swathi,HOD-CSE,class
+5,CSE_B.Tech VII Sem 2026-27.docx,CSE,Computer Science & Engineering,2026-2027,B.Tech.,R22,IV Year,VII,B,E-113,2026-07-06,Dr. V. Srikanth Reddy,Mrs. N. Sarika/Mrs. G. Laxmi Deepthi/Mrs. K. Swathi,HOD-CSE,class
+6,CSE_B.Tech VII Sem 2026-27.docx,CSE,Computer Science & Engineering,2026-2027,B.Tech.,R22,IV Year,VII,C,E-A013,2026-07-06,Mr. K. Pratap Joshi,Mrs. N. Sarika/Mrs. G. Laxmi Deepthi/Mrs. K. Swathi,HOD-CSE,class
+7,CSE_B.Tech VII Sem 2026-27.docx,CSE,Computer Science & Engineering,2026-2027,B.Tech.,R22,IV Year,VII,D,E-037,2026-07-06,Mrs. K. Jyothsna Latha,Mrs. N. Sarika/Mrs. G. Laxmi Deepthi/Mrs. K. Swathi,HOD-CSE,class
+8,CSE_B.Tech VII Sem 2026-27.docx,CSE,Computer Science & Business Systems,2026-2027,B.Tech.,R22,IV Year,VII,--,E-038,2026-07-06,Mrs. K. Bhagya Rekha,Mrs. G. Laxmi Deepthi/ Mrs. N. Sarika /Mrs. K. Swathi,HOD-CSE,class
+9,DS_B.Tech VII Sem 2026-27.docx,DS,CSE-DS,2026-2027,B. Tech,R22,IV Year,VII,A,D-518,2026-07-06,Mrs.G.Vanaja Kumari,Mr.B.Sangameshwar/Mr.N.Sudheer,"HOD-CSE (CyS, DS) and AI&DS",class
+10,DS_B.Tech VII Sem 2026-27.docx,DS,CSE-DS,2026-2027,B. Tech,R22,IV Year,VII,B,D-304/2,2026-07-06,Mrs.P.Lalitha,Mr.B.Sangameshwar/Mr.N.Sudheer,"HOD-CSE (CyS, DS) and AI&DS",class
+11,DS_B.Tech VII Sem 2026-27.docx,DS,CSE-DS,2026-2027,B. Tech,R22,IV Year,VII,C,--,2026-07-06,Mrs.P. Swathi,Mr.B.Sangameshwar/Mr.N.Sudheer,"HOD-CSE (CyS, DS) and AI&DS",class
+12,DS_B.Tech VII Sem 2026-27.docx,CYS,CSE-CYS,2026-2027,B. Tech,R22,IV Year,VII,A,---,2026-07-06,Mrs.T.Sowjanya,Mr.B.Sangameshwar/Mr.N.Sudheer,"HOD-CSE (CyS, DS) and AI&DS",class
+13,DS_B.Tech VII Sem 2026-27.docx,AI&DS,CSE-AI&DS,2026-2027,B. Tech,R22,IV Year,VII,A,---,2026-07-06,Mrs.G.Shravani,Mr.B.Sangameshwar/Mr.N.Sudheer,"HOD-CSE (CyS, DS) and AI&DS",class
+14,DS_B.Tech VII Sem Minor 2026-27.docx,DS-Minor,Data Science,2026-2027,B.Tech-Minor-DS,R22,IV Year,VII,A,E-437,2026-07-16,Dr.G.Spoorthy,Mr.B.Sangameshwar/Mr.N.Sudheer,"HOD-CSE (CyS, DS) and AI&DS",class
+15,ECE_B.Tech VII Sem 2026-27.pdf,ECE,Electronics and Communication Engineering,2026-2027,B.Tech.,R-22,IV Year,VII,A,D-508,2026-07-06,Mrs. M. Bhagya Lakshmi,Dr. G. Kiran Kumar & Dr. Sk. Shoukat Vali,Dr. P. Kishore (HOD ECE),class
+16,ECE_B.Tech VII Sem 2026-27.pdf,ECE,Electronics and Communication Engineering,2026-2027,B.Tech.,R-22,IV Year,VII,B,D-404/1,2026-07-06,Dr.T.Srinivas,Dr. G. Kiran Kumar & Dr. Sk. Shoukat Vali,Dr. P. Kishore (HOD ECE),class
+17,ECE_B.Tech VII Sem 2026-27.pdf,ECE,Electronics and Communication Engineering,2026-2027,B.Tech.,R-22,IV Year,VII,C,D-404/2,2026-07-06,Dr. G.Kiran Kumar,Dr. G. Kiran Kumar & Dr. Sk. Shoukat Vali,Dr. P. Kishore (HOD ECE),class
+18,ECE_B.Tech VII Sem 2026-27.pdf,ECE,Electronics and Communication Engineering,2026-2027,B.Tech.,R-22,IV Year,VII,D,C-203,2026-07-06,Dr Ch.Raja Kumari,Dr. G. Kiran Kumar & Dr. Sk. Shoukat Vali,Dr. P. Kishore (HOD ECE),class
+19,EEE_Department_Class_Timetables.docx,EEE,Electrical & Electronics Engineering,2026-2027,B.Tech.,R22,IV Year,VII,A,D-104/2,2026-08-10,Mrs. S. Poornima,Dr. B. Neelakanteshwar Rao,Dr. V. Ramesh Babu (HOD-EEE),class
+20,EEE_Department_Class_Timetables.docx,EEE,Electrical & Electronics Engineering,2026-2027,B.Tech.,R22,IV Year,VII,B,,2026-08-10,Dr. P. Nagabushanam,Dr. B. Neelakanteshwar Rao,Dr. V. Ramesh Babu (HOD-EEE),class
+21,EIE_B.Tech VII Sem 2026-27.docx,EIE,Electronics and Instrumentation Engineering,2026-2027,B.Tech.,R22,IV Year,VII,A,D – 509,2025-07-06,Dr. S. Vandana,Mr. C. V. Rambabu / Mr. Ch. Venkanna,HOD-EIE,class
+22,EIE_B.Tech VII Sem 2026-27.docx,EIE,Electronics and Instrumentation Engineering,2026-2027,B.Tech.,R22,IV Year,VII,B,C – 302,2025-07-06,Dr. S. Senthil Kumar,Mr. C. V. Rambabu / Mr. Ch. Venkanna,HOD-EIE,class
+23,IT_B.Tech VII Sem 2026-27.docx,IT,Information Technology,2026-2027,B.Tech.,R22,IV Year,VII,A,D-203/1,2026-07-06,Dr K Sravanthi,Mrs. Ch.Kamala/Mrs S Renudeepti,HOD-IT,class
+24,IT_B.Tech VII Sem 2026-27.docx,IT,Information Technology,2026-2027,B.Tech.,R22,IV Year,VII,B,D-203/2,2026-07-06,Mrs. B. Raswitha,Mrs. Ch.Kamala/Mrs S Renudeepti,HOD-IT,class
+25,IT_B.Tech VII Sem 2026-27.docx,IT,Information Technology,2026-2027,B.Tech.,R22,IV Year,VII,C,,2026-07-06,Mrs. S. Anoosha,Mrs. Ch.Kamala/Mrs S Renudeepti,HOD-IT,class
+26,AIML_III B.Tech I Sem AIML&IoT 2026-27.pdf,IoT,CSE-IoT,2026-2027,B.Tech.,R22,III Year,V,--,E238,2026-07-06,Ms.M Mehar Sharanya,Ms.Y.V.Sahiti/Ms.V.Manjula,"Dr. Sagar Yeruva (HOD-CSE AIML&IoT,R&AI)",class
+27,AIML_III B.Tech I Sem AIML&IoT 2026-27.pdf,AIML,CSE-AIML,2026-2027,B.Tech.,R22,III Year,V,A,E 304,2026-07-06,Mr. Kakumanu Sreenivasa Rao,Ms.Y.V.Sahiti/Ms.V.Manjula,"Dr. Sagar Yeruva (HOD-CSE AIML&IoT,R&AI)",class
+28,AIML_III B.Tech I Sem AIML&IoT 2026-27.pdf,AIML,CSE-AIML,2026-2027,B.Tech.,R22,III Year,V,B,E 305,2026-07-06,Ms.Dondeti Sowmya Chowdary,Ms.Y.V.Sahiti/Ms.V.Manjula,"Dr. Sagar Yeruva (HOD-CSE AIML&IoT,R&AI)",class
+29,AIML_III B.Tech I Sem AIML&IoT 2026-27.pdf,AIML,CSE-AIML,2026-2027,B.Tech.,R22,III Year,V,C,E 307,2026-07-06,Ms.Chilukuri Divya,Ms.Y.V.Sahiti/Ms.V.Manjula,"Dr. Sagar Yeruva (HOD-CSE AIML&IoT,R&AI)",class
+30,AE_B.Tech V Sem 2026-27.docx,AE,Automobile Engineering,2026-27,B.Tech.,R22,III Year,V,A,D-413,2026-07-06,Mr. T. Praveen Kumar,Mr. M. Krishna & Mr. Balappa Hadagali,HOD-AE,class
+31,CE_B.Tech V Sem 2026-27.docx,CE,Civil Engineering,2026-27,B.Tech.,R22,III Year,V,A,D - 105,2026-07-06,Mrs.V.Ramya Krishna,Mrs. V. Ramya Krishna,HOD-CE,class
+32,CE_B.Tech V Sem 2026-27.docx,CE,Civil Engineering,2025-26,B.Tech.,R22,III Year,V,B,D 116,2026-07-06,Dr.K.Pardhasaradhi,Mrs. V. Ramya Krishna,HOD-CE,class
+33,CSE_B.Tech V Sem 2026-27.docx,CSE,Computer Science & Engineering,2026-2027,B.Tech.,R22,III Year,V,A,E-005,2026-07-06,Mr. N. Thirupathi,Mrs. N. Sarika/Mrs. G. Laxmi Deepthi/Mrs. K. Swathi,Dr.V.BABY (HOD-CSE),class
+34,CSE_B.Tech V Sem 2026-27.docx,CSE,Computer Science & Engineering,2026-2027,B.Tech.,R22,III Year,V,B,E-006,2026-07-06,Mr. S. Saddam Hussain,Mrs. N. Sarika/Mrs. G. Laxmi Deepthi/Mrs. K. Swathi,Dr.V.BABY (HOD-CSE),class
+35,CSE_B.Tech V Sem 2026-27.docx,CSE,Computer Science & Engineering,2026-2027,B.Tech.,R22,III Year,V,C,E-003,2026-07-06,Dr. M. Srikanth,Mrs. N. Sarika/Mrs. G. Laxmi Deepthi/Mrs. K. Swathi,Dr.V.BABY (HOD-CSE),class
+36,CSE_B.Tech V Sem 2026-27.docx,CSE,Computer Science & Engineering,2026-2027,B.Tech.,R22,III Year,V,D,E-004,2026-07-06,Mr. Ch. Suresh Kumar Raju,Mrs. N. Sarika/Mrs. G. Laxmi Deepthi/Mrs. K. Swathi,Dr. V .BABY (HOD-CSE),class
+37,CSE_B.Tech V Sem 2026-27.docx,CSE,Computer Science & Business Systems,2026-2027,B.Tech.,R22,III Year,V,--,E106,2026-07-06,Mr. M. Sandeep,Mrs. G. Laxmi Deepthi/Mrs. N. Sarika/Mrs. K. Swathi,Dr.V.BABY (HOD-CSE),class
+38,DS_B.Tech V Sem 2026-27.docx,DS,CSE-DS,2026-2027,B. Tech,R22,III Year,V,A,E-434,2026-07-06,Mr.P. Venkateswara rao,Mr.B.Sangameshwar/Mr.N.Sudheer,"Dr. P V Siva Kumar (HOD-CSE (CyS, DS) and AI&DS)",class
+39,DS_B.Tech V Sem 2026-27.docx,DS,CSE-DS,2026-2027,B. Tech,R22,III Year,V,B,E-435,2026-07-06,Mr.Y.Manohar Reddy,Mr.B.Sangameshwar/Mr.N.Sudheer,"Dr. P V Siva Kumar (HOD-CSE (CyS, DS) and AI&DS)",class
+40,DS_B.Tech V Sem 2026-27.docx,DS,CSE-DS,2026-2027,B. Tech,R22,III Year,V,C,E-413,2026-07-06,Mrs.P. Meenakshi,Mr.B.Sangameshwar/Mr.N.Sudheer,"Dr. P V Siva Kumar (HOD-CSE (CyS, DS) and AI&DS)",class
+41,DS_B.Tech V Sem 2026-27.docx,CYS,CSE-CYS,2026-2027,B. Tech,R22,III Year,V,A,E-313,2026-07-06,Mrs.B.Dhanalaxmi,Mr.B.Sangameshwar/Mr.N.Sudheer,"Dr. P V Siva Kumar (HOD-CSE (CyS, DS) and AI&DS)",class
+42,DS_B.Tech V Sem 2026-27.docx,AI&DS,AI&DS,2026-2027,B. Tech,R22,III Year,V,A,E-526,2026-07-06,Dr.M.Laxmidevi,Mr.B.Sangameshwar/Mr.N.Sudheer,"Dr. P V Siva Kumar (HOD-CSE (CyS, DS) and AI&DS)",class
+43,ECE_B.Tech V Sem 2026-27.pdf,ECE,Electronics and Communication Engineering,2026-2027,B.Tech.,R-22,III Year,V,A,A-001,2026-07-06,Mrs. V. Alekhya,Dr. G. Kiran Kumar & Dr. Sk. Shoukat Vali,Dr. P. Kishore (HOD ECE),class
+44,ECE_B.Tech V Sem 2026-27.pdf,ECE,Electronics and Communication Engineering,2026-2027,B.Tech.,R-22,III Year,V,B,B-412,2026-07-06,Dr. B. Sindhu,Dr. G. Kiran Kumar & Dr. Sk. Shoukat Vali,Dr. P. Kishore (HOD ECE),class
+45,ECE_B.Tech V Sem 2026-27.pdf,ECE,Electronics and Communication Engineering,2026-2027,B.Tech.,R-22,III Year,V,C,D-516,2026-07-06,Ms. Shruti S Munde,Dr. G. Kiran Kumar & Dr. Sk. Shoukat Vali,Dr. P. Kishore (HOD ECE),class
+46,ECE_B.Tech V Sem 2026-27.pdf,ECE,Electronics and Communication Engineering,2026-2027,B.Tech.,R-22,III Year,V,D,D-517,2026-07-06,Dr Pradeep Kumar,Dr. G. Kiran Kumar & Dr. Sk. Shoukat Vali,Dr. P. Kishore (HOD ECE),class
+47,EEE_Department_Class_Timetables.docx,EEE,Electrical & Electronics Engineering,2026-2027,B.Tech.,R22,III Year,V,A,A-303,2026-08-10,Ms. B Harshini,Dr. B. Neelakanteshwar Rao,Dr. V. Ramesh Babu (HOD-EEE),class
+48,EEE_Department_Class_Timetables.docx,EEE,Electrical & Electronics Engineering,2026-2027,B.Tech.,R22,III Year,V,B,C-314,2026-08-10,Dr. A. Ravi Kumar,Dr. B. Neelakanteshwar Rao,Dr. V. Ramesh Babu (HOD-EEE),class
+49,EIE_B.Tech V Sem 2026-27.docx,EIE,Electronics and Instrumentation Engineering,2026-2027,B.Tech.,R22,III Year,V,A,C – 301,2025-07-06,Dr. J. Jyothirmai,Mr. C. V. Rambabu / Mr. Ch. Venkanna,HOD-EIE,class
+50,EIE_B.Tech V Sem 2026-27.docx,EIE,Electronics and Instrumentation Engineering,2026-2027,B.Tech.,R22,III Year,V,B,C – 302,2025-07-06,Dr. P. Sampurna Lakshmi,Mr. C. V. Rambabu / Mr. Ch. Venkanna,HOD-EIE,class
+51,IT_B.Tech V Sem 2026-27.docx,IT,Information Technology,2026-2027,B.Tech.,R22,III Year,V,A,A-103,2026-07-06,Mrs Jyotsna Rani Tripathy,Mrs. Ch.Kamala/Mrs S Renudeepti,HOD-IT,class
+52,IT_B.Tech V Sem 2026-27.docx,IT,Information Technology,2026-2027,B.Tech.,R22,III Year,V,B,B-411,2026-07-06,Dr D Kalyani,Mrs. Ch.Kamala/Mrs S Renudeepti,HOD-IT,class
+53,IT_B.Tech V Sem 2026-27.docx,IT,Information Technology,2026-2027,B.Tech.,R22,III Year,V,C,B-215,2026-07-06,Mrs K Radhika,Mrs. Ch.Kamala/Mrs S Renudeepti,HOD-IT,class

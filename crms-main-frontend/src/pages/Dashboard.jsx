@@ -399,12 +399,6 @@ export default function Dashboard() {
 }
 
 function ResourceCardContent({ r, isFree, occupant, since, until, filterType }) {
-  // Format the time strings (e.g., '1970-01-01T09:00:00.000Z' -> '09:00')
-  const formatTime = (timeStr) => {
-    if (!timeStr) return '';
-    const date = new Date(timeStr);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
-  };
   return (
     <>
       <div className="flex items-start justify-between">
@@ -441,7 +435,7 @@ function ResourceCardContent({ r, isFree, occupant, since, until, filterType }) 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink/60">
           {r.department && <span>{r.department.departmentName}</span>}
           {r.block && <span>{r.block.blockName}{r.floor ? `, Floor ${r.floor}` : ''}</span>}
-              {r.capacityOrAreaSqm && (
+          {r.capacityOrAreaSqm && (
             <span>
               Capacity {Math.floor(r.capacityOrAreaSqm)}
             </span>
@@ -462,7 +456,7 @@ function ResourceCardContent({ r, isFree, occupant, since, until, filterType }) 
             <span className="truncate">{occupant}</span>
             {since && until && (
               <span className="mt-0.5 font-mono text-[10px] text-brick-dark/70">
-                {formatTime(since)} to {formatTime(until)}
+                {new Date(since).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })} to {new Date(until).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })}
               </span>
             )}
           </div>

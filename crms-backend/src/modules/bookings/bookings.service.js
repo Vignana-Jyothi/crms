@@ -278,32 +278,41 @@ async function getLiveStatus(dateInput, startTimeInput, endTimeInput) {
 
   const dayOfWeek = dayOfWeekFor(dateStr);
   
-  let startVal, endVal;
+  let startVal, endVal, startValIST, endValIST;
   
   if (startTimeInput && endTimeInput) {
-    // Frontend sends IST times (e.g. "09:00") but DB stores UTC (09:00 IST = 03:30 UTC)
-    // Convert IST -> UTC by subtracting 5h30m = 330 minutes
     const IST_OFFSET_MINUTES = 330;
     const toUTCTimeValue = (hhmm) => {
       const [h, m] = hhmm.split(':').map(Number);
       let totalMins = h * 60 + m - IST_OFFSET_MINUTES;
-      // Handle underflow (e.g. times before 05:30 IST)
       totalMins = ((totalMins % 1440) + 1440) % 1440;
       const utcH = String(Math.floor(totalMins / 60)).padStart(2, '0');
       const utcM = String(totalMins % 60).padStart(2, '0');
       return new Date(`1970-01-01T${utcH}:${utcM}:00Z`);
     };
+    const toISTTimeValue = (hhmm) => {
+      const [h, m] = hhmm.split(':').map(Number);
+      const isth = String(h).padStart(2, '0');
+      const istm = String(m).padStart(2, '0');
+      return new Date(`1970-01-01T${isth}:${istm}:00Z`);
+    }
     startVal = toUTCTimeValue(startTimeInput);
     endVal = toUTCTimeValue(endTimeInput);
+    startValIST = toISTTimeValue(startTimeInput);
+    endValIST = toISTTimeValue(endTimeInput);
   } else {
-    // Default to current time point check
-    // Times in the DB are stored as UTC (1970-01-01Thh:mm:00Z)
-    // So we must compare using UTC hours/minutes from 'now'
     const now = new Date();
-    const hours = String(now.getUTCHours()).padStart(2, '0');
-    const mins = String(now.getUTCMinutes()).padStart(2, '0');
-    startVal = toTimeValue(`${hours}:${mins}`);
-    endVal = startVal; // Point in time
+    const utcH = String(now.getUTCHours()).padStart(2, '0');
+    const utcM = String(now.getUTCMinutes()).padStart(2, '0');
+    startVal = new Date(`1970-01-01T${utcH}:${utcM}:00Z`);
+    
+    const istNow = new Date(now.getTime() + (330 * 60000));
+    const istH = String(istNow.getUTCHours()).padStart(2, '0');
+    const istM = String(istNow.getUTCMinutes()).padStart(2, '0');
+    startValIST = new Date(`1970-01-01T${istH}:${istM}:00Z`);
+    
+    endVal = startVal;
+    endValIST = startValIST;
   }
 
   const [resources, activeTimetables, activeBookings] = await Promise.all([
@@ -324,9 +333,10 @@ async function getLiveStatus(dateInput, startTimeInput, endTimeInput) {
     prisma.timetable.findMany({
       where: { 
         dayOfWeek, 
-        startTime: { lt: endTimeInput ? endVal : new Date(startVal.getTime() + 60000) }, // End time is exclusive or +1min
-        endTime: { gt: startVal }
-      }
+        startTime: { lt: endTimeInput ? endValIST : new Date(startValIST.getTime() + 60000) },
+        endTime: { gt: startValIST }
+      },
+      include: { department: true }
     }),
     prisma.booking.findMany({
       where: { 
@@ -339,7 +349,6 @@ async function getLiveStatus(dateInput, startTimeInput, endTimeInput) {
     })
   ]);
 
-  // Group overlaps by resource
   const timetableMap = {};
   for (let t of activeTimetables) {
     if (!timetableMap[t.resourceId]) timetableMap[t.resourceId] = [];
@@ -361,39 +370,39 @@ async function getLiveStatus(dateInput, startTimeInput, endTimeInput) {
 
     if (timetableMap[r.resourceId] && timetableMap[r.resourceId].length > 0) {
       isFree = false;
-      const t = timetableMap[r.resourceId][0]; // Just show the first overlapping one for simplicity
-      const branch = r.allocatedBranch || r.department?.branchCode || 'Unknown Branch';
-      const section = t.section || r.allocatedSection || '';
-      const sectionStr = section ? ` - Sec ${section}` : '';
-      let yearPrefix = '';
-      const sem = r.allocatedSemester;
-      if (sem) {
-        if (sem === '1' || sem === '2' || sem === '2025') yearPrefix = '1st Year ';
-        else if (sem === '3' || sem === '4' || sem === '2024') yearPrefix = '2nd Year ';
-        else if (sem === '5' || sem === '6' || sem === '2023') yearPrefix = '3rd Year ';
-        else if (sem === '7' || sem === '8' || sem === '2022') yearPrefix = '4th Year ';
-        else yearPrefix = `${sem} `;
-      } else {
-        yearPrefix = '1st Year '; // Fallback since the OCR was for 1st years
-      }
+      const overlaps = timetableMap[r.resourceId].sort((a,b) => new Date(a.startTime) - new Date(b.startTime));
       
-      let occupantStr = `Class: ${t.courseCode} (${yearPrefix}${branch}${sectionStr})`;
-      if (t.facultyName) {
-        occupantStr += ` • Faculty: ${t.facultyName}`;
-      }
-      occupant = occupantStr;
-      since = t.startTime;
-      until = t.endTime;
+      occupant = overlaps.map(t => {
+        const branch = t.department?.branchCode || r.allocatedBranch || r.department?.branchCode || 'Unknown Branch';
+        const section = t.section || r.allocatedSection || '';
+        const sectionStr = section ? ` - Sec ${section}` : '';
+        let yearPrefix = '';
+        if (t.studentYear) {
+          if (t.studentYear == 1) yearPrefix = '1st Year ';
+          else if (t.studentYear == 2) yearPrefix = '2nd Year ';
+          else if (t.studentYear == 3) yearPrefix = '3rd Year ';
+          else if (t.studentYear == 4) yearPrefix = '4th Year ';
+          else yearPrefix = `${t.studentYear} Year `;
+        }
+        
+        const startTimeStr = new Date(t.startTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' });
+        const endTimeStr = new Date(t.endTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' });
+        
+        let occupantStr = `[${startTimeStr} - ${endTimeStr}] Class: ${t.courseCode} (${yearPrefix}${branch}${sectionStr})`;
+        if (t.facultyName) {
+          occupantStr += ` • Faculty: ${t.facultyName}`;
+        }
+        return occupantStr;
+      }).join(' | ');
+      
+      since = overlaps[0].startTime;
+      until = overlaps[overlaps.length - 1].endTime;
     } else if (bookingMap[r.resourceId] && bookingMap[r.resourceId].length > 0) {
       isFree = false;
       const b = bookingMap[r.resourceId][0];
       const req = b.requester;
       occupant = `Event: ${b.purpose} (${req?.name})`;
-      occupantContact = {
-        name: req?.name,
-        email: req?.email,
-        phone: req?.phone
-      };
+      occupantContact = { name: req?.name, email: req?.email, phone: req?.phone };
       since = b.startTime;
       until = b.endTime;
     }

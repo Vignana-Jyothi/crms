@@ -13,11 +13,11 @@ const {
 
 const router = Router();
 router.use(authenticate);
+router.get('/live-status', controller.liveStatus);
 
 // GET /api/v1/resources?resourceTypeId=&departmentId=&blockId=&status=&search=
 router.get('/', validateRequest(listResourcesSchema), controller.list);
 
-router.get('/live-status', controller.liveStatus);
 router.get('/:resourceId', validateRequest(resourceIdParamSchema), controller.getById);
 router.get('/:resourceId/availability', validateRequest(availabilitySchema), controller.availability);
 

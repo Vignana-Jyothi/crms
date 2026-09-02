@@ -12,7 +12,6 @@ import Bookings from './pages/Bookings';
 import Resources from './pages/Resources';
 import Users from './pages/Users';
 import AuditLogs from './pages/AuditLogs';
-import LiveStatus from './pages/LiveStatus';
 
 function AppShell({ children }) {
   const { user } = useAuth();
@@ -35,7 +34,6 @@ export default function App() {
             <Route path="/" element={<ProtectedRoute><Overview /></ProtectedRoute>} />
             <Route path="/approvals" element={<ProtectedRoute><Approvals /></ProtectedRoute>} />
             <Route path="/bookings" element={<ProtectedRoute><Bookings /></ProtectedRoute>} />
-            <Route path="/live" element={<ProtectedRoute><LiveStatus /></ProtectedRoute>} />
             <Route
               path="/resources"
               element={
