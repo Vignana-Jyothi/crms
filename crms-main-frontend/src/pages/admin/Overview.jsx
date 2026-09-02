@@ -61,7 +61,7 @@ export default function Overview() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 mb-10">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 mb-8">
             <StatCard label="Pending Approvals" value={stats.pending ?? '0'} to="/admin/approvals" color={stats.pending > 0 ? 'amber' : 'navy'} />
             <StatCard label="Approved Bookings" value={stats.activeBookings ?? '0'} to="/admin/bookings" color="forest" />
             <StatCard

@@ -41,6 +41,7 @@ export default function Dashboard() {
   const [filterType, setFilterType] = useState('Now'); // Now, Morning, Afternoon, Whole, Custom
   const [customStart, setCustomStart] = useState('09:00');
   const [customEnd, setCustomEnd] = useState('17:00');
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
   
   const [resources, setResources] = useState([]);
   const [liveStatusMap, setLiveStatusMap] = useState({});
@@ -165,15 +166,27 @@ export default function Dashboard() {
         Search classrooms, labs, seminar halls, and auditoriums across campus.
       </p>
 
-      <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
+      <div className="mt-6">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            placeholder="Search by name..."
+            value={filters.search}
+            onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
+            className="rounded border border-line bg-white px-3 py-2 text-sm flex-1"
+          />
+          <button 
+            onClick={() => setShowMobileFilters(!showMobileFilters)}
+            className="md:hidden flex items-center justify-center rounded border border-line bg-white px-3 py-2 text-ink/70 hover:bg-paper"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+          </button>
+        </div>
+
+        <div className={`${showMobileFilters ? 'grid' : 'hidden'} md:grid mt-3 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4`}>
         {/* Row 1 */}
-        <input
-          type="text"
-          placeholder="Search by name..."
-          value={filters.search}
-          onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
-          className="rounded border border-line bg-white px-3 py-2 text-sm w-full"
-        />
         
         <div className="flex items-center gap-2 w-full">
           <input
@@ -280,6 +293,7 @@ export default function Dashboard() {
             </option>
           ))}
         </select>
+        </div>
       </div>
 
       {loading ? (
