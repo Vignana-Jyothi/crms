@@ -3,6 +3,7 @@ import { masterDataApi, resourcesApi, timetableApi } from '../../api/endpoints';
 import FullWeekTimetableGrid from '../../components/admin/FullWeekTimetableGrid';
 import EditableTimetableGrid from '../../components/admin/EditableTimetableGrid';
 import { Calendar, Search, Edit2, List, LayoutGrid } from 'lucide-react';
+import SearchableSelect from '../../components/common/SearchableSelect';
 
 export default function TimetablesView() {
   const [activeTab, setActiveTab] = useState('Classrooms'); // Classrooms, Sections, Faculty
@@ -202,28 +203,28 @@ export default function TimetablesView() {
           
           {(!isEditMode && activeTab === 'Classrooms') && (
             <>
-              <select
+              <SearchableSelect
                 value={selectedBlock}
-                onChange={e => setSelectedBlock(e.target.value)}
-                className="flex-1 min-w-[150px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
-              >
-                <option value="">All Blocks</option>
-                {blocks.map(b => (
-                  <option key={b.blockId} value={b.blockId}>{b.blockName}</option>
-                ))}
-              </select>
-              <select
+                onChange={setSelectedBlock}
+                placeholder="All Blocks"
+                options={[
+                  { value: '', label: 'All Blocks' },
+                  ...blocks.map(b => ({ value: b.blockId.toString(), label: b.blockName }))
+                ]}
+                className="min-w-[150px]"
+              />
+              <SearchableSelect
                 value={selectedResource}
-                onChange={e => setSelectedResource(e.target.value)}
-                className="flex-1 min-w-[200px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
-              >
-                <option value="">Select a Classroom / Lab...</option>
-                {resourceList
-                  .filter(r => !selectedBlock || r.blockId === parseInt(selectedBlock))
-                  .map(r => (
-                  <option key={r.resourceId} value={r.resourceId}>{r.resourceName} ({r.resourceType?.typeName || 'Room'})</option>
-                ))}
-              </select>
+                onChange={setSelectedResource}
+                placeholder="Select a Classroom / Lab..."
+                options={[
+                  { value: '', label: 'Select a Classroom / Lab...' },
+                  ...resourceList
+                    .filter(r => !selectedBlock || r.blockId === parseInt(selectedBlock))
+                    .map(r => ({ value: r.resourceId, label: `${r.resourceName} (${r.resourceType?.typeName || 'Room'})` }))
+                ]}
+                className="min-w-[250px]"
+              />
               <input
                 type="date"
                 value={selectedDate}
@@ -235,38 +236,40 @@ export default function TimetablesView() {
 
           {(!isEditMode && activeTab === 'Sections') && (
             <>
-              <select
+              <SearchableSelect
                 value={selectedStudentYear}
-                onChange={e => { setSelectedStudentYear(e.target.value); setSelectedSection(''); }}
-                className="flex-1 min-w-[120px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
-              >
-                <option value="">Select Year...</option>
-                <option value="1">1st Year</option>
-                <option value="2">2nd Year</option>
-                <option value="3">3rd Year</option>
-                <option value="4">4th Year</option>
-              </select>
-              <select
+                onChange={val => { setSelectedStudentYear(val); setSelectedSection(''); }}
+                placeholder="Select Year..."
+                options={[
+                  { value: '', label: 'Select Year...' },
+                  { value: '1', label: '1st Year' },
+                  { value: '2', label: '2nd Year' },
+                  { value: '3', label: '3rd Year' },
+                  { value: '4', label: '4th Year' }
+                ]}
+                className="min-w-[140px]"
+              />
+              <SearchableSelect
                 value={selectedDepartment}
-                onChange={e => { setSelectedDepartment(e.target.value); setSelectedSection(''); }}
-                className="flex-1 min-w-[150px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
-              >
-                <option value="">Select Branch...</option>
-                {sortedDepartments.map(d => (
-                  <option key={d.departmentId} value={d.departmentId}>{d.departmentName}</option>
-                ))}
-              </select>
-              <select
+                onChange={val => { setSelectedDepartment(val); setSelectedSection(''); }}
+                placeholder="Select Branch..."
+                options={[
+                  { value: '', label: 'Select Branch...' },
+                  ...sortedDepartments.map(d => ({ value: d.departmentId.toString(), label: d.departmentName }))
+                ]}
+                className="min-w-[200px]"
+              />
+              <SearchableSelect
                 value={selectedSection}
-                onChange={e => setSelectedSection(e.target.value)}
-                className="flex-1 min-w-[120px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
+                onChange={setSelectedSection}
+                placeholder="Select Section..."
                 disabled={!selectedStudentYear || !selectedDepartment}
-              >
-                <option value="">Select Section...</option>
-                {availableSections.map(s => (
-                  <option key={s} value={s}>{s}</option>
-                ))}
-              </select>
+                options={[
+                  { value: '', label: 'Select Section...' },
+                  ...availableSections.map(s => ({ value: s, label: s }))
+                ]}
+                className="min-w-[150px]"
+              />
               <input
                 type="date"
                 value={selectedDate}
@@ -278,16 +281,16 @@ export default function TimetablesView() {
 
           {(!isEditMode && activeTab === 'Faculty') && (
             <>
-              <select
+              <SearchableSelect
                 value={selectedFaculty}
-                onChange={e => setSelectedFaculty(e.target.value)}
-                className="flex-1 min-w-[200px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
-              >
-                <option value="">Select a Faculty Member...</option>
-                {facultyList.map((f, i) => (
-                  <option key={f.name || f || i} value={f.name || f}>{f.label || f}</option>
-                ))}
-              </select>
+                onChange={setSelectedFaculty}
+                placeholder="Select a Faculty Member..."
+                options={[
+                  { value: '', label: 'Select a Faculty Member...' },
+                  ...facultyList.map(f => ({ value: (f.name || f).toString(), label: (f.label || f).toString() }))
+                ]}
+                className="min-w-[250px]"
+              />
               <input
                 type="date"
                 value={selectedDate}
@@ -299,57 +302,59 @@ export default function TimetablesView() {
 
           {isEditMode && (
             <>
-              <select
+              <SearchableSelect
                 value={selectedStudentYear}
-                onChange={e => setSelectedStudentYear(e.target.value)}
-                className="flex-1 min-w-[100px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
-              >
-                <option value="">All Years</option>
-                <option value="1">1st Year</option>
-                <option value="2">2nd Year</option>
-                <option value="3">3rd Year</option>
-                <option value="4">4th Year</option>
-              </select>
-              <select
+                onChange={setSelectedStudentYear}
+                placeholder="All Years"
+                options={[
+                  { value: '', label: 'All Years' },
+                  { value: '1', label: '1st Year' },
+                  { value: '2', label: '2nd Year' },
+                  { value: '3', label: '3rd Year' },
+                  { value: '4', label: '4th Year' }
+                ]}
+                className="min-w-[120px]"
+              />
+              <SearchableSelect
                 value={selectedDepartment}
-                onChange={e => setSelectedDepartment(e.target.value)}
-                className="flex-1 min-w-[120px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
-              >
-                <option value="">All Depts</option>
-                {sortedDepartments.map(d => (
-                  <option key={d.departmentId} value={d.departmentId}>{d.branchCode}</option>
-                ))}
-              </select>
-              <select
+                onChange={setSelectedDepartment}
+                placeholder="All Depts"
+                options={[
+                  { value: '', label: 'All Depts' },
+                  ...sortedDepartments.map(d => ({ value: d.departmentId.toString(), label: d.branchCode }))
+                ]}
+                className="min-w-[120px]"
+              />
+              <SearchableSelect
                 value={selectedSection}
-                onChange={e => setSelectedSection(e.target.value)}
-                className="flex-1 min-w-[100px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
-              >
-                <option value="">All Sections</option>
-                {availableSections.map(s => (
-                  <option key={s} value={s}>{s}</option>
-                ))}
-              </select>
-              <select
+                onChange={setSelectedSection}
+                placeholder="All Sections"
+                options={[
+                  { value: '', label: 'All Sections' },
+                  ...availableSections.map(s => ({ value: s, label: s }))
+                ]}
+                className="min-w-[120px]"
+              />
+              <SearchableSelect
                 value={selectedFaculty}
-                onChange={e => setSelectedFaculty(e.target.value)}
-                className="flex-1 min-w-[150px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
-              >
-                <option value="">All Faculty</option>
-                {facultyList.map(f => (
-                  <option key={f} value={f}>{f}</option>
-                ))}
-              </select>
-              <select
+                onChange={setSelectedFaculty}
+                placeholder="All Faculty"
+                options={[
+                  { value: '', label: 'All Faculty' },
+                  ...facultyList.map(f => ({ value: (f.name || f).toString(), label: (f.label || f).toString() }))
+                ]}
+                className="min-w-[180px]"
+              />
+              <SearchableSelect
                 value={selectedDay}
-                onChange={e => setSelectedDay(e.target.value)}
-                className="flex-1 min-w-[110px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
-              >
-                <option value="">All Days</option>
-                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(d => (
-                  <option key={d} value={d}>{d}</option>
-                ))}
-              </select>
+                onChange={setSelectedDay}
+                placeholder="All Days"
+                options={[
+                  { value: '', label: 'All Days' },
+                  ...['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(d => ({ value: d, label: d }))
+                ]}
+                className="min-w-[140px]"
+              />
             </>
           )}
 
