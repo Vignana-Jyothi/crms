@@ -12,6 +12,7 @@ export default function EditableTimetableGrid({ timetables, resources, setTimeta
     setEditingId(t.timetableId);
     setEditForm({
       courseCode: t.courseCode || '',
+      courseName: t.courseName || '',
       facultyName: t.facultyName || '',
       resourceId: t.resourceId || '',
       section: t.section || ''
@@ -35,6 +36,7 @@ export default function EditableTimetableGrid({ timetables, resources, setTimeta
           return {
             ...t,
             courseCode: editForm.courseCode,
+            courseName: editForm.courseName,
             facultyName: editForm.facultyName,
             resourceId: editForm.resourceId,
             section: editForm.section,
@@ -97,14 +99,24 @@ export default function EditableTimetableGrid({ timetables, resources, setTimeta
                 
                 <td className="px-4 py-3">
                   {isEditing ? (
-                    <input
-                      type="text"
-                      value={editForm.courseCode}
-                      onChange={e => setEditForm({...editForm, courseCode: e.target.value})}
-                      className="w-full p-1 border border-line rounded text-sm"
-                      placeholder="Course Code"
-                      disabled={saving}
-                    />
+                    <div className="flex flex-col gap-1.5">
+                      <input
+                        type="text"
+                        value={editForm.courseCode}
+                        onChange={e => setEditForm({...editForm, courseCode: e.target.value})}
+                        className="w-full p-1 border border-line rounded text-sm"
+                        placeholder="Course Code"
+                        disabled={saving}
+                      />
+                      <input
+                        type="text"
+                        value={editForm.courseName}
+                        onChange={e => setEditForm({...editForm, courseName: e.target.value})}
+                        className="w-full p-1 border border-line rounded text-sm bg-slate-50"
+                        placeholder="Course Name"
+                        disabled={saving}
+                      />
+                    </div>
                   ) : (
                     <span className="text-navy">{t.courseName && t.courseName !== t.courseCode ? `${t.courseName} (${t.courseCode})` : (t.courseCode || '-')}</span>
                   )}

@@ -78,6 +78,7 @@ export default function FullWeekTimetableGrid({ timetables, viewMode, isEditMode
     setEditingId(timetable.timetableId);
     setEditForm({
       courseCode: timetable.courseCode || '',
+      courseName: timetable.courseName || '',
       section: timetable.section || '',
       facultyName: timetable.facultyName || '',
       resourceId: timetable.resourceId || ''
@@ -269,6 +270,10 @@ export default function FullWeekTimetableGrid({ timetables, viewMode, isEditMode
                         <div>
                           <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Course Code</label>
                           <input type="text" value={editForm.courseCode} onChange={e => setEditForm({...editForm, courseCode: e.target.value})} className="w-full p-2 border border-line rounded-lg text-sm bg-slate-50" disabled={saving} />
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Course Name</label>
+                          <input type="text" value={editForm.courseName} onChange={e => setEditForm({...editForm, courseName: e.target.value})} className="w-full p-2 border border-line rounded-lg text-sm bg-slate-50" disabled={saving} />
                         </div>
                         <div>
                           <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Section</label>
