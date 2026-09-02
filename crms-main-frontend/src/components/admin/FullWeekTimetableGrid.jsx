@@ -300,13 +300,8 @@ export default function FullWeekTimetableGrid({ timetables, viewMode, isEditMode
                     </div>
                   ) : (
                     <>
-                      {isEditMode && (
-                        <button onClick={() => handleEdit(c)} className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors">
-                          <Edit2 size={16} />
-                        </button>
-                      )}
                       <div className="flex items-start justify-between gap-4">
-                        <div className="pr-8">
+                        <div className="pr-4">
                           <h4 className="font-bold text-indigo-900 mb-1">
                             {c.courseName && c.courseName !== c.courseCode ? `${c.courseName} (${c.courseCode})` : c.courseCode}
                           </h4>
@@ -314,8 +309,15 @@ export default function FullWeekTimetableGrid({ timetables, viewMode, isEditMode
                             {c.studentYear && `${c.studentYear}${c.studentYear === '1' ? 'st' : c.studentYear === '2' ? 'nd' : c.studentYear === '3' ? 'rd' : 'th'} Year`} {c.department?.branchCode} - {c.section}
                           </p>
                         </div>
-                        <div className="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-md text-xs font-bold border border-indigo-100 whitespace-nowrap shrink-0">
-                          {c.resource?.resourceName || 'No Room Assigned'}
+                        <div className="flex items-center gap-2 shrink-0">
+                          <div className="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-md text-xs font-bold border border-indigo-100 whitespace-nowrap">
+                            {c.resource?.resourceName || 'No Room Assigned'}
+                          </div>
+                          {isEditMode && (
+                            <button onClick={() => handleEdit(c)} className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors shadow-sm border border-transparent hover:border-indigo-100">
+                              <Edit2 size={16} />
+                            </button>
+                          )}
                         </div>
                       </div>
                       <div className="mt-2 pt-2 border-t border-line/50">
