@@ -398,45 +398,43 @@ export default function TimetablesView() {
             </div>
           )}
 
-          {!isEditMode && !loading && timetables.length > 0 && (
+          {!loading && timetables.length > 0 && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {isEditMode && (
+                <div className="bg-white p-4 rounded-xl border border-line shadow-sm mb-4">
+                  <p className="text-sm text-slate-600">
+                    <strong>Edit Mode Active:</strong> {viewMode === 'grid' ? 'Click on any class in the grid to edit it directly.' : 'You can click the Edit icon on any row below to update the Course, Section, Faculty, or Room.'} Changes are saved instantly.
+                  </p>
+                </div>
+              )}
               {viewMode === 'grid' ? (
-                <FullWeekTimetableGrid timetables={timetables} viewMode={activeTab} />
+                <FullWeekTimetableGrid 
+                  timetables={timetables} 
+                  viewMode={activeTab}
+                  isEditMode={isEditMode}
+                  resources={resourceList}
+                  setTimetables={setTimetables}
+                />
               ) : (
                 <EditableTimetableGrid 
                   timetables={timetables} 
                   resources={resourceList} 
-                  readOnly={true} 
+                  setTimetables={setTimetables}
+                  readOnly={!isEditMode} 
                 />
               )}
             </div>
           )}
 
-          {!isEditMode && !loading && timetables.length === 0 && (selectedResource || (selectedSection && selectedDepartment && selectedStudentYear) || selectedFaculty) && (
+          {!loading && timetables.length === 0 && (selectedResource || (selectedSection && selectedDepartment && selectedStudentYear) || selectedFaculty) && (
             <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
               No classes scheduled for the selected {activeTab.toLowerCase().slice(0, -1)}.
             </div>
           )}
           
-          {!isEditMode && !loading && timetables.length === 0 && activeTab === 'Sections' && (!selectedSection || !selectedDepartment || !selectedStudentYear) && (
+          {!loading && timetables.length === 0 && activeTab === 'Sections' && (!selectedSection || !selectedDepartment || !selectedStudentYear) && (
             <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
               Please select a Year, Branch, and Section to view the timetable.
-            </div>
-          )}
-
-          {isEditMode && (
-            <div className="animate-in fade-in zoom-in-95 duration-300">
-              <div className="bg-white p-4 rounded-xl border border-line shadow-sm mb-4">
-                <p className="text-sm text-slate-600">
-                  <strong>Edit Mode Active:</strong> You can click the Edit icon on any row below to update the Course, Section, Faculty, or Room. Changes are saved instantly.
-                </p>
-              </div>
-              <EditableTimetableGrid 
-                timetables={timetables} 
-                resources={resourceList} 
-                setTimetables={setTimetables} 
-                readOnly={false}
-              />
             </div>
           )}
         </div>

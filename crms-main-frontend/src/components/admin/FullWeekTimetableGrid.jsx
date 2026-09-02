@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Check, Edit2 } from 'lucide-react';
 import { fmtTimeSlot } from '../../utils/formatters';
+import { timetableApi } from '../../api/endpoints';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const TIME_SLOTS_STANDARD = [
@@ -23,9 +24,11 @@ const TIME_SLOTS_FIRST_YEAR = [
   { start: '14:40', end: '15:40' }
 ];
 
-export default function FullWeekTimetableGrid({ timetables, viewMode }) {
-  const [selectedSlotClasses, setSelectedSlotClasses] = useState(null);
-  const [selectedSlotInfo, setSelectedSlotInfo] = useState({ day: '', time: '' });
+export default function FullWeekTimetableGrid({ timetables, viewMode, isEditMode, resources = [], setTimetables }) {
+  const [selectedSlot, setSelectedSlot] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [saving, setSaving] = useState(false);
   // Determine if this view is predominantly 1st year
   const isFirstYearView = timetables.length > 0 && timetables.every(t => t.studentYear === '1');
   const activeTimeSlots = isFirstYearView ? TIME_SLOTS_FIRST_YEAR : TIME_SLOTS_STANDARD;
@@ -68,6 +71,36 @@ export default function FullWeekTimetableGrid({ timetables, viewMode }) {
       return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' });
     } catch(e) {
       return '';
+    }
+  };
+
+  const handleEdit = (timetable) => {
+    setEditingId(timetable.timetableId);
+    setEditForm({
+      courseCode: timetable.courseCode || '',
+      section: timetable.section || '',
+      facultyName: timetable.facultyName || '',
+      resourceId: timetable.resourceId || ''
+    });
+  };
+
+  const handleCancel = () => {
+    setEditingId(null);
+    setEditForm({});
+  };
+
+  const handleSave = async (id) => {
+    setSaving(true);
+    try {
+      const updated = await timetableApi.update(id, editForm);
+      if (setTimetables) {
+        setTimetables(prev => prev.map(t => (t.timetableId === id ? { ...t, ...updated } : t)));
+      }
+      setEditingId(null);
+    } catch (error) {
+      alert(error.response?.data?.error || 'Failed to update timetable');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -149,7 +182,7 @@ export default function FullWeekTimetableGrid({ timetables, viewMode }) {
 
                 return (
                   <td key={idx} className={`border-r border-line p-2 text-center align-middle h-full ${!hasClasses ? 'bg-slate-50/50' : 'bg-white hover:bg-slate-50 cursor-pointer transition-colors'}`}
-                      onClick={() => hasClasses && (setSelectedSlotClasses(groupedClasses), setSelectedSlotInfo({day, time: fmtTimeSlot(`1970-01-01T${slot.start}:00Z`, `1970-01-01T${slot.end}:00Z`)}))}>
+                      onClick={() => hasClasses && setSelectedSlot({ day, start: slot.start, end: slot.end, label: `${day} • ${fmtTimeSlot(`1970-01-01T${slot.start}:00Z`, `1970-01-01T${slot.end}:00Z`)}` })}>
                     {hasClasses ? (
                       <div className="flex flex-col items-center justify-center p-2 rounded-lg bg-indigo-50 border border-indigo-100 w-full h-[85px] overflow-hidden">
                         <div className="font-bold text-indigo-900 text-[10px] text-center leading-tight line-clamp-2 mb-0.5">
@@ -215,39 +248,83 @@ export default function FullWeekTimetableGrid({ timetables, viewMode }) {
       </table>
       
       {/* Detailed Modal for overlapping classes */}
-      {selectedSlotClasses && selectedSlotClasses.length > 0 && (
-        <div className="fixed inset-0 bg-navy/40 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setSelectedSlotClasses(null)}>
+      {selectedSlot && (
+        <div className="fixed inset-0 bg-navy/40 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => { setSelectedSlot(null); handleCancel(); }}>
           <div className="bg-white rounded-2xl shadow-xl border border-line w-full max-w-2xl max-h-[80vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between p-4 border-b border-line bg-slate-50">
               <div>
-                <h3 className="font-bold text-navy text-lg">{selectedSlotInfo.day} • {selectedSlotInfo.time}</h3>
-                <p className="text-xs text-slate-500 font-medium">{selectedSlotClasses.length} Scheduled Class{selectedSlotClasses.length !== 1 ? 'es' : ''}</p>
+                <h3 className="font-bold text-navy text-lg">{selectedSlot.label}</h3>
+                <p className="text-xs text-slate-500 font-medium">Class Details</p>
               </div>
-              <button onClick={() => setSelectedSlotClasses(null)} className="p-2 hover:bg-slate-200 rounded-full text-slate-500 transition-colors">
+              <button onClick={() => { setSelectedSlot(null); handleCancel(); }} className="p-2 hover:bg-slate-200 rounded-full text-slate-500 transition-colors">
                 <X size={20} />
               </button>
             </div>
             <div className="p-4 overflow-y-auto bg-slate-50 flex-1 space-y-3">
-              {selectedSlotClasses.map((c, i) => (
-                <div key={i} className="bg-white p-4 rounded-xl border border-line shadow-sm hover:border-indigo-200 transition-colors">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h4 className="font-bold text-indigo-900 mb-1">
-                        {c.courseName ? `${c.courseName} (${c.courseCode})` : c.courseCode}
-                      </h4>
-                      <p className="text-xs text-indigo-700 font-medium mb-2">
-                        {c.studentYear && `${c.studentYear}${c.studentYear === '1' ? 'st' : c.studentYear === '2' ? 'nd' : c.studentYear === '3' ? 'rd' : 'th'} Year`} {c.department?.branchCode} - {c.section}
-                      </p>
+              {getClassesForSlot(selectedSlot.day, selectedSlot.start, selectedSlot.end).map((c, i) => (
+                <div key={c.timetableId || i} className="bg-white p-4 rounded-xl border border-line shadow-sm hover:border-indigo-200 transition-colors relative">
+                  {isEditMode && editingId === c.timetableId ? (
+                    <div className="flex flex-col gap-3">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Course Code</label>
+                          <input type="text" value={editForm.courseCode} onChange={e => setEditForm({...editForm, courseCode: e.target.value})} className="w-full p-2 border border-line rounded-lg text-sm bg-slate-50" disabled={saving} />
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Section</label>
+                          <input type="text" value={editForm.section} onChange={e => setEditForm({...editForm, section: e.target.value})} className="w-full p-2 border border-line rounded-lg text-sm bg-slate-50" disabled={saving} />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Faculty Name</label>
+                          <input type="text" value={editForm.facultyName} onChange={e => setEditForm({...editForm, facultyName: e.target.value})} className="w-full p-2 border border-line rounded-lg text-sm bg-slate-50" disabled={saving} />
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Classroom</label>
+                          <select value={editForm.resourceId} onChange={e => setEditForm({...editForm, resourceId: e.target.value ? parseInt(e.target.value) : ''})} className="w-full p-2 border border-line rounded-lg text-sm bg-slate-50" disabled={saving}>
+                            <option value="">No Room</option>
+                            {resources.map(r => (
+                              <option key={r.resourceId} value={r.resourceId}>{r.resourceName}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                      <div className="flex justify-end gap-2 mt-2 pt-2 border-t border-line">
+                        <button onClick={handleCancel} disabled={saving} className="px-3 py-1.5 rounded text-xs font-medium text-slate-600 hover:bg-slate-100">Cancel</button>
+                        <button onClick={() => handleSave(c.timetableId)} disabled={saving} className="px-3 py-1.5 rounded flex items-center gap-1.5 text-xs font-medium bg-indigo-600 text-white hover:bg-indigo-700">
+                          {saving ? <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Check size={14} />}
+                          Save
+                        </button>
+                      </div>
                     </div>
-                    <div className="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-md text-xs font-bold border border-indigo-100 whitespace-nowrap">
-                      {c.resourceNames?.length > 0 ? c.resourceNames.join(' / ') : 'No Room Assigned'}
-                    </div>
-                  </div>
-                  <div className="mt-2 pt-2 border-t border-line/50">
-                    <p className="text-xs text-slate-600 flex items-center gap-2">
-                      <span className="font-semibold text-slate-400">Faculty:</span> {c.facultyNames?.length > 0 ? c.facultyNames.join(' / ') : 'Unassigned'}
-                    </p>
-                  </div>
+                  ) : (
+                    <>
+                      {isEditMode && (
+                        <button onClick={() => handleEdit(c)} className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors">
+                          <Edit2 size={16} />
+                        </button>
+                      )}
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="pr-8">
+                          <h4 className="font-bold text-indigo-900 mb-1">
+                            {c.courseName && c.courseName !== c.courseCode ? `${c.courseName} (${c.courseCode})` : c.courseCode}
+                          </h4>
+                          <p className="text-xs text-indigo-700 font-medium mb-2">
+                            {c.studentYear && `${c.studentYear}${c.studentYear === '1' ? 'st' : c.studentYear === '2' ? 'nd' : c.studentYear === '3' ? 'rd' : 'th'} Year`} {c.department?.branchCode} - {c.section}
+                          </p>
+                        </div>
+                        <div className="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-md text-xs font-bold border border-indigo-100 whitespace-nowrap shrink-0">
+                          {c.resource?.resourceName || 'No Room Assigned'}
+                        </div>
+                      </div>
+                      <div className="mt-2 pt-2 border-t border-line/50">
+                        <p className="text-xs text-slate-600 flex items-center gap-2">
+                          <span className="font-semibold text-slate-400">Faculty:</span> {c.facultyName || 'Unassigned'}
+                        </p>
+                      </div>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
