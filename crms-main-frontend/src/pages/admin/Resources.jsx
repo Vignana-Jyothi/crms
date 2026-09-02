@@ -186,35 +186,37 @@ export default function Resources() {
 
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-semibold text-navy">Resources</h1>
           <p className="mt-1 text-sm text-ink/60">{resources.length} resources across campus.</p>
         </div>
-        <div className="flex gap-4 items-center">
+        <div className="flex flex-wrap gap-3 items-center">
           <input
             type="text"
             placeholder="Search resources..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="rounded border border-line px-3 py-2 text-sm w-64"
+            className="rounded border border-line px-3 py-2 text-sm w-full md:w-64"
           />
-          <button
-            onClick={handleSync}
-            disabled={syncing}
-            className="rounded bg-sky-100 px-4 py-2 text-sm font-semibold text-navy hover:bg-sky-200 disabled:opacity-60 whitespace-nowrap"
-          >
-            {syncing ? 'Syncing...' : 'Sync EduPrime'}
-          </button>
-          <button
-            onClick={() => {
-              setShowForm((s) => !s);
-              setError('');
-            }}
-            className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white hover:bg-navy-dark whitespace-nowrap"
-          >
-            {showForm ? 'Cancel' : '+ Add resource'}
-          </button>
+          <div className="flex gap-2 w-full md:w-auto">
+            <button
+              onClick={handleSync}
+              disabled={syncing}
+              className="flex-1 md:flex-none rounded bg-sky-100 px-4 py-2 text-sm font-semibold text-navy hover:bg-sky-200 disabled:opacity-60 whitespace-nowrap text-center"
+            >
+              {syncing ? 'Syncing...' : 'Sync EduPrime'}
+            </button>
+            <button
+              onClick={() => {
+                setShowForm((s) => !s);
+                setError('');
+              }}
+              className="flex-1 md:flex-none rounded bg-navy px-4 py-2 text-sm font-semibold text-white hover:bg-navy-dark whitespace-nowrap text-center"
+            >
+              {showForm ? 'Cancel' : '+ Add resource'}
+            </button>
+          </div>
         </div>
       </div>
 
