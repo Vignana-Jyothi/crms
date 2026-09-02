@@ -15,7 +15,7 @@ router.post('/sync', authorizeRole(ROLES.SUPER_ADMIN), controller.syncEduPrime);
 router.get('/:timetableId', validateRequest(timetableIdParamSchema), controller.getById);
 router.put(
   '/:timetableId',
-  authorizeRole([ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN]),
+  authorizeRole(ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN),
   validateRequest(updateTimetableSchema),
   controller.update
 );

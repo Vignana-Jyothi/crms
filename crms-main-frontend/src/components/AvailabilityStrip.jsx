@@ -82,7 +82,7 @@ export default function AvailabilityStrip({ availability, date }) {
               startMin={s}
               endMin={e}
               color="bg-navy"
-              label={`Class: ${t.courseCode || 'Scheduled'}`}
+              label={`Class: ${t.courseName ? `${t.courseName} (${t.courseCode})` : (t.courseCode || 'Scheduled')}`}
               onClick={() => setSelectedBlock({ type: 'class', data: t })}
               isCurrent={isCurrent}
             />
@@ -146,7 +146,11 @@ export default function AvailabilityStrip({ availability, date }) {
                 <>
                   <div>
                     <span className="block text-[10px] font-bold uppercase tracking-wider text-ink/40">Course</span>
-                    <span className="text-sm font-medium text-ink">{selectedBlock.data.courseCode || 'Unknown'}</span>
+                    <span className="text-sm font-medium text-ink">
+                      {selectedBlock.data.courseName && selectedBlock.data.courseName !== selectedBlock.data.courseCode 
+                        ? `${selectedBlock.data.courseName} (${selectedBlock.data.courseCode})` 
+                        : (selectedBlock.data.courseCode || 'Unknown')}
+                    </span>
                   </div>
                   <div>
                     <span className="block text-[10px] font-bold uppercase tracking-wider text-ink/40">Faculty</span>
