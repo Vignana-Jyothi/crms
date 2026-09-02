@@ -359,28 +359,26 @@ export default function TimetablesView() {
           )}
 
           {/* View Mode Toggle (Grid/List) */}
-          {!isEditMode && (
-            <div className="flex bg-slate-100 p-1 rounded-lg w-full md:w-auto md:ml-auto mt-2 md:mt-0 justify-center">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                  viewMode === 'grid' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-navy'
-                }`}
-              >
-                <LayoutGrid size={14} />
-                Grid View
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                  viewMode === 'list' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-navy'
-                }`}
-              >
-                <List size={14} />
-                List View
-              </button>
-            </div>
-          )}
+          <div className="flex bg-slate-100 p-1 rounded-lg w-full md:w-auto md:ml-auto mt-2 md:mt-0 justify-center">
+            <button
+              onClick={() => { setViewMode('grid'); setIsEditMode(false); }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                viewMode === 'grid' && !isEditMode ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-navy'
+              }`}
+            >
+              <LayoutGrid size={14} />
+              Grid View
+            </button>
+            <button
+              onClick={() => { setViewMode('list'); setIsEditMode(false); }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                viewMode === 'list' && !isEditMode ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-navy'
+              }`}
+            >
+              <List size={14} />
+              List View
+            </button>
+          </div>
         </div>
 
         {/* Content Area */}

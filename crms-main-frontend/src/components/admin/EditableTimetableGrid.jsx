@@ -106,7 +106,7 @@ export default function EditableTimetableGrid({ timetables, resources, setTimeta
                       disabled={saving}
                     />
                   ) : (
-                    <span className="text-navy">{t.courseCode || '-'}</span>
+                    <span className="text-navy">{t.courseName && t.courseName !== t.courseCode ? `${t.courseName} (${t.courseCode})` : (t.courseCode || '-')}</span>
                   )}
                 </td>
 
