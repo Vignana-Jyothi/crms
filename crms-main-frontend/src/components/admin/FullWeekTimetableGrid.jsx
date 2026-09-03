@@ -24,7 +24,7 @@ const TIME_SLOTS_FIRST_YEAR = [
   { start: '14:40', end: '15:40' }
 ];
 
-export default function FullWeekTimetableGrid({ timetables, viewMode, isEditMode, resources = [], setTimetables }) {
+export default function FullWeekTimetableGrid({ timetables, viewMode, isEditMode, resources = [], setTimetables, selectedDate, selectedDay }) {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
@@ -105,6 +105,9 @@ export default function FullWeekTimetableGrid({ timetables, viewMode, isEditMode
     }
   };
 
+  const derivedDay = selectedDate ? new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long' }) : selectedDay;
+  const displayDays = derivedDay && DAYS.includes(derivedDay) ? [derivedDay] : DAYS;
+
   return (
     <div className="overflow-x-auto rounded-xl border border-line bg-white shadow-sm">
       <table className="w-full text-left text-sm text-ink border-collapse table-fixed">
@@ -119,7 +122,7 @@ export default function FullWeekTimetableGrid({ timetables, viewMode, isEditMode
           </tr>
         </thead>
         <tbody className="divide-y divide-line">
-          {DAYS.map(day => (
+          {displayDays.map(day => (
             <tr key={day} className="hover:bg-paper/50 transition-colors">
               <td className="px-4 py-4 border-r border-line font-semibold text-navy bg-paper/20 sticky left-0 z-10 backdrop-blur-md">
                 {day}

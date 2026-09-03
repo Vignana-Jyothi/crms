@@ -18,6 +18,8 @@ const SEMINAR_HALL_NAMES = {
   'D204': 'APJ Abdul Kalam Auditorium'
 };
 
+const STORAGE_KEY = 'crms_dashboard_filters';
+
 export default function Dashboard() {
   const { user } = useAuth();
   const isAdmin = user && [ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN].includes(user.roleId);
@@ -25,20 +27,22 @@ export default function Dashboard() {
   const [resourceTypes, setResourceTypes] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [blocks, setBlocks] = useState([]);
-  const [filters, setFilters] = useState({
-    resourceTypeId: '',
-    departmentId: '',
-    blockId: '',
-    minCapacity: '',
-    search: '',
-    availability: 'Free'
+  
+  const savedFilters = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || '{}');
+
+  const [filters, setFilters] = useState(savedFilters.filters || {
+    resourceTypeId: '', departmentId: '', blockId: '', minCapacity: '', search: '', availability: 'Free'
   });
   
-  const [selectedDate, setSelectedDate] = useState(todayStr());
-  const [filterType, setFilterType] = useState('Now'); // Now, Morning, Afternoon, Whole, Custom
-  const [customStart, setCustomStart] = useState('09:00');
-  const [customEnd, setCustomEnd] = useState('17:00');
+  const [selectedDate, setSelectedDate] = useState(savedFilters.selectedDate || todayStr());
+  const [filterType, setFilterType] = useState(savedFilters.filterType || 'Whole'); // Now, Morning, Afternoon, Whole, Custom
+  const [customStart, setCustomStart] = useState(savedFilters.customStart || '09:00');
+  const [customEnd, setCustomEnd] = useState(savedFilters.customEnd || '17:00');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  useEffect(() => {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ filters, selectedDate, filterType, customStart, customEnd }));
+  }, [filters, selectedDate, filterType, customStart, customEnd]);
   
   const [resources, setResources] = useState([]);
   const [liveStatusMap, setLiveStatusMap] = useState({});
@@ -364,21 +368,20 @@ export default function Dashboard() {
                   {(() => {
                      if (!selectedRoom.occupantList || selectedRoom.occupantList.length === 0) return null;
                      const merged = [];
-                     selectedRoom.occupantList.forEach(occ => {
-                        if (merged.length > 0) {
-                           let last = merged[merged.length - 1];
-                           if (
-                              last.type === occ.type &&
-                              last.courseCode === occ.courseCode &&
-                              last.branchStr === occ.branchStr &&
-                              last.purpose === occ.purpose &&
-                              last.endTime === occ.startTime
-                           ) {
-                              last.endTime = occ.endTime;
-                              return;
-                           }
+                     const sorted = [...selectedRoom.occupantList].sort((a, b) => a.startTime.localeCompare(b.startTime));
+                     sorted.forEach(occ => {
+                        let mergedIdx = merged.findIndex(m => 
+                           m.type === occ.type &&
+                           m.courseCode === occ.courseCode &&
+                           m.branchStr === occ.branchStr &&
+                           m.purpose === occ.purpose &&
+                           m.endTime === occ.startTime
+                        );
+                        if (mergedIdx !== -1) {
+                           merged[mergedIdx].endTime = occ.endTime;
+                        } else {
+                           merged.push({ ...occ });
                         }
-                        merged.push({ ...occ });
                      });
                      
                      return (

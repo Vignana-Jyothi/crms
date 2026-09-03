@@ -5,10 +5,14 @@ import EditableTimetableGrid from '../../components/admin/EditableTimetableGrid'
 import { Calendar, Search, Edit2, List, LayoutGrid } from 'lucide-react';
 import SearchableSelect from '../../components/common/SearchableSelect';
 
+const STORAGE_KEY = 'crms_timetables_filters';
+
 export default function TimetablesView() {
-  const [activeTab, setActiveTab] = useState('Classrooms'); // Classrooms, Sections, Faculty
+  const savedFilters = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || '{}');
+
+  const [activeTab, setActiveTab] = useState(savedFilters.activeTab || 'Classrooms'); // Classrooms, Sections, Faculty
   const [isEditMode, setIsEditMode] = useState(false);
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
+  const [viewMode, setViewMode] = useState(savedFilters.viewMode || 'grid'); // 'grid' or 'list'
 
   const [resourceList, setResourceList] = useState([]);
   const [facultyList, setFacultyList] = useState([]);
@@ -18,19 +22,27 @@ export default function TimetablesView() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const [selectedResource, setSelectedResource] = useState('');
-  const [selectedFaculty, setSelectedFaculty] = useState('');
+  const [selectedResource, setSelectedResource] = useState(savedFilters.selectedResource || '');
+  const [selectedFaculty, setSelectedFaculty] = useState(savedFilters.selectedFaculty || '');
   
-  const [selectedStudentYear, setSelectedStudentYear] = useState('');
-  const [selectedDepartment, setSelectedDepartment] = useState('');
-  const [selectedSection, setSelectedSection] = useState('');
+  const [selectedStudentYear, setSelectedStudentYear] = useState(savedFilters.selectedStudentYear || '');
+  const [selectedDepartment, setSelectedDepartment] = useState(savedFilters.selectedDepartment || '');
+  const [selectedSection, setSelectedSection] = useState(savedFilters.selectedSection || '');
   
-  const [selectedBlock, setSelectedBlock] = useState('');
-  const [selectedDay, setSelectedDay] = useState('');
-  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedBlock, setSelectedBlock] = useState(savedFilters.selectedBlock || '');
+  const [selectedDay, setSelectedDay] = useState(savedFilters.selectedDay || '');
+  const [selectedDate, setSelectedDate] = useState(savedFilters.selectedDate || '');
   
   const [departments, setDepartments] = useState([]);
   const [blocks, setBlocks] = useState([]);
+
+  useEffect(() => {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+      activeTab, viewMode, selectedResource, selectedFaculty,
+      selectedStudentYear, selectedDepartment, selectedSection,
+      selectedBlock, selectedDay, selectedDate
+    }));
+  }, [activeTab, viewMode, selectedResource, selectedFaculty, selectedStudentYear, selectedDepartment, selectedSection, selectedBlock, selectedDay, selectedDate]);
 
   // Load all master data on mount
   useEffect(() => {
@@ -414,6 +426,8 @@ export default function TimetablesView() {
                   isEditMode={isEditMode}
                   resources={resourceList}
                   setTimetables={setTimetables}
+                  selectedDate={selectedDate}
+                  selectedDay={selectedDay}
                 />
               ) : (
                 <EditableTimetableGrid 

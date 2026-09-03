@@ -15,8 +15,12 @@ const listFaculty = async () => {
   
   const facultyMap = {};
   for (const r of records) {
-    if (!facultyMap[r.facultyName]) facultyMap[r.facultyName] = new Set();
-    if (r.courseCode) facultyMap[r.facultyName].add(r.courseCode);
+    if (!r.facultyName) continue;
+    const names = r.facultyName.split(/[\/,&]/).map(n => n.trim()).filter(Boolean);
+    for (const name of names) {
+      if (!facultyMap[name]) facultyMap[name] = new Set();
+      if (r.courseCode) facultyMap[name].add(r.courseCode);
+    }
   }
   
   return Object.keys(facultyMap).sort().map(f => {
