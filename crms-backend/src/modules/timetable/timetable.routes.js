@@ -3,7 +3,7 @@ const controller = require('./timetable.controller');
 const authenticate = require('../../middleware/authenticate');
 const { authorizeRole, ROLES } = require('../../middleware/authorizeRole');
 const validateRequest = require('../../middleware/validateRequest');
-const { timetableIdParamSchema, updateTimetableSchema } = require('./timetable.validation');
+const { timetableIdParamSchema, updateTimetableSchema, createTimetableSchema } = require('./timetable.validation');
 
 const router = Router();
 
@@ -13,6 +13,12 @@ router.use(authenticate);
 router.get('/', controller.list);
 router.post('/sync', authorizeRole(ROLES.SUPER_ADMIN), controller.syncEduPrime);
 router.get('/:timetableId', validateRequest(timetableIdParamSchema), controller.getById);
+router.post(
+  '/',
+  authorizeRole(ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN),
+  validateRequest(createTimetableSchema),
+  controller.create
+);
 router.put(
   '/:timetableId',
   authorizeRole(ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN),

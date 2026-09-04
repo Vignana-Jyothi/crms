@@ -24,13 +24,27 @@ const TIME_SLOTS_FIRST_YEAR = [
   { start: '14:40', end: '15:40' }
 ];
 
-export default function FullWeekTimetableGrid({ timetables, viewMode, isEditMode, resources = [], setTimetables, selectedDate, selectedDay }) {
+export default function FullWeekTimetableGrid({ 
+  timetables, 
+  viewMode, 
+  isEditMode, 
+  resources = [], 
+  setTimetables, 
+  selectedDate, 
+  selectedDay,
+  selectedStudentYear,
+  selectedDepartment,
+  selectedSection,
+  selectedFaculty,
+  selectedResource
+}) {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [saving, setSaving] = useState(false);
+  
   // Determine if this view is predominantly 1st year
-  const isFirstYearView = timetables.length > 0 && timetables.every(t => t.studentYear === '1');
+  const isFirstYearView = selectedStudentYear === '1' || (timetables.length > 0 && timetables.every(t => t.studentYear === '1'));
   const activeTimeSlots = isFirstYearView ? TIME_SLOTS_FIRST_YEAR : TIME_SLOTS_STANDARD;
 
   // Helper to find all classes for a specific day and time slot
@@ -51,27 +65,16 @@ export default function FullWeekTimetableGrid({ timetables, viewMode, isEditMode
       return d.getUTCHours() * 60 + d.getUTCMinutes();
     };
 
-    const slotStartMins = toMins(startSlot);
-    const slotEndMins = toMins(endSlot);
+    const s = toMins(startSlot);
+    const e = toMins(endSlot);
 
     return timetables.filter(t => {
       if (t.dayOfWeek !== day) return false;
-      const tStartMins = toMins(t.startTime);
-      const tEndMins = toMins(t.endTime);
-
-      // Overlap condition: max(start1, start2) < min(end1, end2)
-      return Math.max(slotStartMins, tStartMins) < Math.min(slotEndMins, tEndMins);
+      const ts = toMins(t.startTime);
+      const te = toMins(t.endTime);
+      // overlap check: start < slotEnd AND end > slotStart
+      return ts < e && te > s;
     });
-  };
-  // Helper to format ISO time to HH:MM
-  const formatTime = (timeStr) => {
-    if (!timeStr) return '';
-    try {
-      const d = new Date(timeStr);
-      return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' });
-    } catch(e) {
-      return '';
-    }
   };
 
   const handleEdit = (timetable) => {
@@ -93,11 +96,31 @@ export default function FullWeekTimetableGrid({ timetables, viewMode, isEditMode
   const handleSave = async (id) => {
     setSaving(true);
     try {
-      const updated = await timetableApi.update(id, editForm);
-      if (setTimetables) {
-        setTimetables(prev => prev.map(t => (t.timetableId === id ? { ...t, ...updated } : t)));
+      if (id === 'new') {
+        // Need to set missing context when creating a new record
+        const dataToCreate = {
+           ...editForm,
+           departmentId: selectedDepartment ? parseInt(selectedDepartment, 10) : undefined,
+           studentYear: selectedStudentYear || undefined,
+           academicYear: '2026-27',
+        };
+        const created = await timetableApi.create(dataToCreate);
+        if (setTimetables) {
+          setTimetables(prev => [...prev, created]);
+        }
+      } else {
+        const updated = await timetableApi.update(id, editForm);
+        if (setTimetables) {
+          setTimetables(prev => prev.map(t => (t.timetableId === id ? { ...t, ...updated } : t)));
+        }
       }
       setEditingId(null);
+      
+      // If we just added the very first class to an empty slot, close the modal because
+      // the existing modal view doesn't auto-update nicely for purely new slots.
+      if (id === 'new' && getClassesForSlot(selectedSlot.day, selectedSlot.start, selectedSlot.end).length === 0) {
+         setSelectedSlot(null);
+      }
     } catch (error) {
       alert(error.response?.data?.error || 'Failed to update timetable');
     } finally {
@@ -130,8 +153,6 @@ export default function FullWeekTimetableGrid({ timetables, viewMode, isEditMode
               {activeTimeSlots.map((slot, idx) => {
                 const classesForSlotRaw = getClassesForSlot(day, slot.start, slot.end);
                 
-                // Aggregate ALL overlapping classes into a single display object for the grid cell
-                // We still keep groupedClasses for the modal
                 const groupedClasses = [];
                 const aggregatedDisplay = {
                   courseShortNames: [],
@@ -140,7 +161,6 @@ export default function FullWeekTimetableGrid({ timetables, viewMode, isEditMode
                 };
 
                 classesForSlotRaw.forEach(c => {
-                  // For the modal grouping (groups by courseCode + section)
                   const existing = groupedClasses.find(g => g.courseCode === c.courseCode && g.section === c.section);
                   if (existing) {
                     if (c.resource?.resourceName && !existing.resourceNames.includes(c.resource.resourceName)) {
@@ -157,7 +177,6 @@ export default function FullWeekTimetableGrid({ timetables, viewMode, isEditMode
                     });
                   }
 
-                  // For the single grid cell display (aggregates everything)
                   const shortName = c.courseShortName || c.courseCode;
                   if (shortName && !aggregatedDisplay.courseShortNames.includes(shortName)) {
                     aggregatedDisplay.courseShortNames.push(shortName);
@@ -171,7 +190,6 @@ export default function FullWeekTimetableGrid({ timetables, viewMode, isEditMode
                 });
 
                 const hasClasses = classesForSlotRaw.length > 0;
-                // Just use the first class for base properties like section/department, which should be the same
                 const baseClass = hasClasses ? classesForSlotRaw[0] : null;
                 
                 if (slot.isLunch) {
@@ -185,8 +203,19 @@ export default function FullWeekTimetableGrid({ timetables, viewMode, isEditMode
                 }
 
                 return (
-                  <td key={idx} className={`border-r border-line p-2 text-center align-middle h-full ${!hasClasses ? 'bg-slate-50/50' : 'bg-white hover:bg-slate-50 cursor-pointer transition-colors'}`}
-                      onClick={() => hasClasses && setSelectedSlot({ day, start: slot.start, end: slot.end, label: `${day} • ${fmtTimeSlot(`1970-01-01T${slot.start}:00Z`, `1970-01-01T${slot.end}:00Z`)}` })}>
+                  <td key={idx} className={`border-r border-line p-2 text-center align-middle h-full ${!hasClasses && !isEditMode ? 'bg-slate-50/50' : 'bg-white hover:bg-slate-50 cursor-pointer transition-colors'}`}
+                      onClick={() => {
+                        if (hasClasses || isEditMode) {
+                          setSelectedSlot({ day, start: slot.start, end: slot.end, label: `${day} • ${fmtTimeSlot(`1970-01-01T${slot.start}:00Z`, `1970-01-01T${slot.end}:00Z`)}` });
+                          if (!hasClasses && isEditMode) {
+                            setEditingId('new');
+                            setEditForm({
+                              courseCode: '', courseName: '', section: selectedSection || '', facultyName: selectedFaculty || '', resourceId: selectedResource || '',
+                              dayOfWeek: day, startTime: `${slot.start}:00`, endTime: `${slot.end}:00`
+                            });
+                          }
+                        }
+                      }}>
                     {hasClasses ? (
                       <div className="flex flex-col items-center justify-center p-2 rounded-lg bg-indigo-50 border border-indigo-100 w-full h-[85px] overflow-hidden">
                         <div className="font-bold text-indigo-900 text-[10px] text-center leading-tight line-clamp-2 mb-0.5">
@@ -223,7 +252,6 @@ export default function FullWeekTimetableGrid({ timetables, viewMode, isEditMode
                           </>
                         )}
                         
-                        {/* Default fallback for when viewMode is undefined or empty */}
                         {!viewMode && (
                           <>
                             <div className="text-[9px] text-indigo-700 font-medium whitespace-nowrap">
@@ -236,8 +264,8 @@ export default function FullWeekTimetableGrid({ timetables, viewMode, isEditMode
                         )}
                       </div>
                     ) : (
-                      <div className="flex items-center justify-center h-full w-full text-slate-400 italic text-xs py-4">
-                        Free
+                      <div className={`flex items-center justify-center h-full w-full text-xs py-4 ${isEditMode ? 'text-indigo-400 font-medium hover:text-indigo-600' : 'text-slate-400 italic'}`}>
+                        {isEditMode ? '+ Add' : 'Free'}
                       </div>
                     )}
                   </td>
@@ -248,7 +276,6 @@ export default function FullWeekTimetableGrid({ timetables, viewMode, isEditMode
         </tbody>
       </table>
       
-      {/* Detailed Modal for overlapping classes */}
       {selectedSlot && (
         <div className="fixed inset-0 bg-navy/40 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => { setSelectedSlot(null); handleCancel(); }}>
           <div className="bg-white rounded-2xl shadow-xl border border-line w-full max-w-2xl max-h-[80vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
@@ -334,6 +361,65 @@ export default function FullWeekTimetableGrid({ timetables, viewMode, isEditMode
                   )}
                 </div>
               ))}
+              
+              {isEditMode && editingId === 'new' && (
+                <div className="bg-white p-4 rounded-xl border border-indigo-300 shadow-sm relative">
+                  <h4 className="text-sm font-bold text-indigo-900 mb-3 border-b border-line pb-2">Add New Class</h4>
+                  <div className="flex flex-col gap-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Course Code</label>
+                        <input type="text" value={editForm.courseCode} onChange={e => setEditForm({...editForm, courseCode: e.target.value})} className="w-full p-2 border border-line rounded-lg text-sm bg-slate-50" disabled={saving} placeholder="e.g. CS101" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Course Name</label>
+                        <input type="text" value={editForm.courseName} onChange={e => setEditForm({...editForm, courseName: e.target.value})} className="w-full p-2 border border-line rounded-lg text-sm bg-slate-50" disabled={saving} placeholder="e.g. Intro to CS" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Section</label>
+                        <input type="text" value={editForm.section} onChange={e => setEditForm({...editForm, section: e.target.value})} className="w-full p-2 border border-line rounded-lg text-sm bg-slate-50" disabled={saving} placeholder="e.g. A" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Faculty Name</label>
+                        <input type="text" value={editForm.facultyName} onChange={e => setEditForm({...editForm, facultyName: e.target.value})} className="w-full p-2 border border-line rounded-lg text-sm bg-slate-50" disabled={saving} placeholder="e.g. John Doe" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Classroom</label>
+                        <select value={editForm.resourceId} onChange={e => setEditForm({...editForm, resourceId: e.target.value ? e.target.value : ''})} className="w-full p-2 border border-line rounded-lg text-sm bg-slate-50" disabled={saving}>
+                          <option value="">No Room</option>
+                          {resources.map(r => (
+                            <option key={r.resourceId} value={r.resourceId}>{r.resourceName}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    <div className="flex justify-end gap-2 mt-2 pt-2 border-t border-line">
+                      <button onClick={handleCancel} disabled={saving} className="px-3 py-1.5 rounded text-xs font-medium text-slate-600 hover:bg-slate-100">Cancel</button>
+                      <button onClick={() => handleSave('new')} disabled={saving} className="px-3 py-1.5 rounded flex items-center gap-1.5 text-xs font-medium bg-indigo-600 text-white hover:bg-indigo-700">
+                        {saving ? <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Check size={14} />}
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {isEditMode && editingId !== 'new' && getClassesForSlot(selectedSlot.day, selectedSlot.start, selectedSlot.end).length > 0 && (
+                <button 
+                  onClick={() => {
+                    setEditingId('new');
+                    setEditForm({
+                      courseCode: '', courseName: '', section: selectedSection || '', facultyName: selectedFaculty || '', resourceId: selectedResource || '',
+                      dayOfWeek: selectedSlot.day, startTime: `${selectedSlot.start}:00`, endTime: `${selectedSlot.end}:00`
+                    });
+                  }}
+                  className="w-full py-2.5 rounded-xl border border-dashed border-indigo-200 text-indigo-600 font-semibold text-sm hover:bg-indigo-50 hover:border-indigo-300 transition-colors flex items-center justify-center gap-2"
+                >
+                  + Add Another Class
+                </button>
+              )}
             </div>
           </div>
         </div>

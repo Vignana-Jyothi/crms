@@ -118,4 +118,10 @@ async function update(timetableId, data) {
   });
 }
 
-module.exports = { list, getById, syncEduPrime, update };
+async function create(data) {
+  if (data.startTime) data.startTime = toTimeValue(data.startTime);
+  if (data.endTime) data.endTime = toTimeValue(data.endTime);
+  return repo.create(data);
+}
+
+module.exports = { list, getById, syncEduPrime, update, create };

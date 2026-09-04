@@ -16,5 +16,22 @@ const updateTimetableSchema = z.object({
     })
     .strict(),
 });
+const createTimetableSchema = z.object({
+  body: z
+    .object({
+      dayOfWeek: z.string().min(1).max(10),
+      startTime: z.string(),
+      endTime: z.string(),
+      departmentId: z.coerce.number().int().positive().optional().nullable(),
+      studentYear: z.string().max(20).optional(),
+      academicYear: z.string().max(20).optional(),
+      facultyName: z.string().trim().max(500).optional().nullable(),
+      courseCode: z.string().trim().max(255).optional().nullable(),
+      courseName: z.string().trim().max(500).optional().nullable(),
+      resourceId: z.string().trim().max(20).optional().nullable(),
+      section: z.string().trim().max(20).optional().nullable(),
+    })
+    .strict(),
+});
 
-module.exports = { timetableIdParamSchema, updateTimetableSchema };
+module.exports = { timetableIdParamSchema, updateTimetableSchema, createTimetableSchema };

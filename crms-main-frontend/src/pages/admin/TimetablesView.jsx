@@ -411,41 +411,49 @@ export default function TimetablesView() {
             </div>
           )}
 
-          {!loading && timetables.length > 0 && (
+          {(!loading && (timetables.length > 0 || isEditMode)) && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
               {isEditMode && (
                 <div className="bg-white p-4 rounded-xl border border-line shadow-sm mb-4">
                   <p className="text-sm text-slate-600">
-                    <strong>Edit Mode Active:</strong> {viewMode === 'grid' ? 'Click on any class in the grid to edit it directly.' : 'You can click the Edit icon on any row below to update the Course, Section, Faculty, or Room.'} Changes are saved instantly.
+                    <strong>Edit Mode Active:</strong> {viewMode === 'grid' ? 'Click on any class in the grid to edit it directly, or click a Free slot to add a new class.' : 'You can click the Edit icon on any row below to update the Course, Section, Faculty, or Room.'} Changes are saved instantly.
                   </p>
                 </div>
               )}
-              {viewMode === 'grid' ? (
-                <FullWeekTimetableGrid 
-                  timetables={timetables} 
-                  viewMode={activeTab}
-                  isEditMode={isEditMode}
-                  resources={resourceList}
-                  setTimetables={setTimetables}
-                  selectedDate={selectedDate}
-                  selectedDay={selectedDay}
-                />
-              ) : (
-                <EditableTimetableGrid 
-                  timetables={timetables} 
-                  resources={resourceList} 
-                  setTimetables={setTimetables}
-                  readOnly={!isEditMode} 
-                />
+              
+              {/* Only show if we have data OR we are in edit mode with sufficient filters selected */}
+              {(timetables.length > 0 || (isEditMode && (selectedResource || selectedFaculty || (selectedSection && selectedDepartment && selectedStudentYear)))) && (
+                viewMode === 'grid' ? (
+                  <FullWeekTimetableGrid 
+                    timetables={timetables} 
+                    viewMode={activeTab}
+                    isEditMode={isEditMode}
+                    resources={resourceList}
+                    setTimetables={setTimetables}
+                    selectedDate={selectedDate}
+                    selectedDay={selectedDay}
+                    selectedStudentYear={selectedStudentYear}
+                    selectedDepartment={selectedDepartment}
+                    selectedSection={selectedSection}
+                    selectedFaculty={selectedFaculty}
+                    selectedResource={selectedResource}
+                  />
+                ) : (
+                  <EditableTimetableGrid 
+                    timetables={timetables} 
+                    resources={resourceList} 
+                    setTimetables={setTimetables}
+                    readOnly={!isEditMode} 
+                  />
+                )
               )}
             </div>
           )}
 
-          {!loading && timetables.length === 0 && (
+          {!loading && timetables.length === 0 && !isEditMode && (
             (!isEditMode && activeTab === 'Classrooms' && selectedResource) ||
             (!isEditMode && activeTab === 'Sections' && (selectedSection && selectedDepartment && selectedStudentYear)) ||
-            (!isEditMode && activeTab === 'Faculty' && selectedFaculty) ||
-            (isEditMode && (selectedResource || selectedFaculty || (selectedSection && selectedDepartment && selectedStudentYear)))
+            (!isEditMode && activeTab === 'Faculty' && selectedFaculty)
           ) && (
             <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
               No classes scheduled for the selected {activeTab ? activeTab.toLowerCase().slice(0, -1) : 'filters'}.

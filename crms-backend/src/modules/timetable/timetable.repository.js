@@ -57,4 +57,15 @@ function findById(timetableId) {
   });
 }
 
-module.exports = { list, findById };
+function create(data) {
+  return prisma.timetable.create({ data });
+}
+
+function update(timetableId, data) {
+  return prisma.timetable.update({
+    where: { timetableId: Number(timetableId) },
+    data,
+  });
+}
+
+module.exports = { list, findById, create, update };
