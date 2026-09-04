@@ -115,7 +115,7 @@ export default function FullWeekTimetableGrid({ timetables, viewMode, isEditMode
           <tr>
             <th className="px-4 py-3 border-r border-line w-28 font-semibold bg-white/50 sticky left-0 z-10 backdrop-blur-md">Day \ Time</th>
             {activeTimeSlots.map((slot, idx) => (
-              <th key={idx} className="px-2 py-3 border-r border-line font-semibold text-center whitespace-nowrap overflow-hidden text-ellipsis">
+              <th key={idx} className="px-2 py-3 min-w-[120px] lg:min-w-[140px] border-r border-line font-semibold text-center whitespace-nowrap overflow-hidden text-ellipsis">
                 {fmtTimeSlot(`1970-01-01T${slot.start}:00Z`, `1970-01-01T${slot.end}:00Z`)}
               </th>
             ))}

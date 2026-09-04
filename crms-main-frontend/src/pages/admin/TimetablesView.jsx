@@ -166,16 +166,16 @@ export default function TimetablesView() {
       <div className="max-w-7xl mx-auto space-y-6">
         
         {/* Header & Navigation */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-navy flex items-center gap-2">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="shrink-0">
+            <h1 className="text-2xl font-bold text-navy flex items-center gap-2 whitespace-nowrap">
               <Calendar className="text-primary" size={24} />
               Unified Timetables
             </h1>
             <p className="text-slate-500 mt-1">Manage and view weekly schedules</p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 mt-4 md:mt-0">
+          <div className="flex flex-wrap items-center gap-2 mt-2 lg:mt-0">
             <div className="flex flex-wrap items-center gap-1 bg-white p-1.5 rounded-xl border border-line shadow-sm">
               {['Classrooms', 'Sections', 'Faculty'].map(tab => (
                 <button
@@ -207,9 +207,12 @@ export default function TimetablesView() {
         </div>
 
         {/* Filters Area */}
-        <div className="bg-white p-4 rounded-xl border border-line shadow-sm flex flex-wrap items-center gap-4">
-          <Search size={20} className="text-slate-400 shrink-0" />
+        <div className="bg-white p-4 rounded-xl border border-line shadow-sm flex flex-col xl:flex-row items-start xl:items-center gap-4">
+          <div className="hidden lg:block shrink-0">
+            <Search size={20} className="text-slate-400" />
+          </div>
           
+          <div className={`w-full flex-1 ${isEditMode ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3' : 'flex flex-wrap items-center gap-3'}`}>
           {(!isEditMode && activeTab === 'Classrooms') && (
             <>
               <SearchableSelect
@@ -366,9 +369,10 @@ export default function TimetablesView() {
               />
             </>
           )}
+          </div>
 
           {/* View Mode Toggle (Grid/List) */}
-          <div className="flex bg-slate-100 p-1 rounded-lg w-full md:w-auto md:ml-auto mt-2 md:mt-0 justify-center">
+          <div className="flex bg-slate-100 p-1 rounded-lg w-full xl:w-auto xl:ml-auto justify-center shrink-0 mt-2 xl:mt-0">
             <button
               onClick={() => { setViewMode('grid'); setIsEditMode(false); }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
