@@ -437,7 +437,12 @@ export default function TimetablesView() {
             </div>
           )}
 
-          {!loading && timetables.length === 0 && (selectedResource || (selectedSection && selectedDepartment && selectedStudentYear) || selectedFaculty) && (
+          {!loading && timetables.length === 0 && (
+            (!isEditMode && activeTab === 'Classrooms' && selectedResource) ||
+            (!isEditMode && activeTab === 'Sections' && (selectedSection && selectedDepartment && selectedStudentYear)) ||
+            (!isEditMode && activeTab === 'Faculty' && selectedFaculty) ||
+            (isEditMode && (selectedResource || selectedFaculty || (selectedSection && selectedDepartment && selectedStudentYear)))
+          ) && (
             <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
               No classes scheduled for the selected {activeTab ? activeTab.toLowerCase().slice(0, -1) : 'filters'}.
             </div>
