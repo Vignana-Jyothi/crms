@@ -206,10 +206,7 @@ export default function FullWeekTimetableGrid({ timetables, viewMode, isEditMode
 
                         {viewMode === 'Sections' && (
                           <>
-                            <div className="text-[9px] text-indigo-700 font-medium whitespace-nowrap">
-                              {baseClass.studentYear && `${baseClass.studentYear}${baseClass.studentYear === '1' ? 'st' : baseClass.studentYear === '2' ? 'nd' : baseClass.studentYear === '3' ? 'rd' : 'th'} Yr`} {baseClass.department?.branchCode} - {baseClass.section}
-                            </div>
-                            <div className="text-[9px] text-indigo-600/80 line-clamp-1 text-center px-1">
+                            <div className="text-[9px] text-indigo-600/80 line-clamp-2 text-center px-1">
                               {aggregatedDisplay.resourceNames?.length > 0 ? aggregatedDisplay.resourceNames.join(' / ') : 'No Room'} • {aggregatedDisplay.facultyNames?.length > 0 ? aggregatedDisplay.facultyNames.join(' / ') : 'Unassigned'}
                             </div>
                           </>

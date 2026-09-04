@@ -16,8 +16,32 @@ const listFaculty = async () => {
   const facultyMap = {};
   for (const r of records) {
     if (!r.facultyName) continue;
-    const names = r.facultyName.split(/[\/,&]/).map(n => n.trim()).filter(Boolean);
-    for (const name of names) {
+    
+    // Remove day suffixes like (W), (F), (Th) etc.
+    let cleaned = r.facultyName.replace(/\(\s*(M|T|W|Th|F|S)\s*\)/ig, '');
+    
+    // Split by /, &, ,
+    let names = cleaned.split(/[\/,&]/).map(n => n.trim()).filter(Boolean);
+    
+    // Split accidentally concatenated names (e.g. "Dr. A Dr. B")
+    let finalNames = [];
+    names.forEach(name => {
+      const parts = name.split(/(?=\b(?:Dr\.?|Mr\.?|Ms\.?|Prof\.?)\s*[A-Z])/i)
+                        .map(n => n.trim())
+                        .filter(Boolean);
+      finalNames.push(...parts);
+    });
+
+    for (let name of finalNames) {
+      // Remove trailing hyphens or random punctuation
+      name = name.replace(/^[-.]+|-+$/g, '').trim();
+      
+      // Ignore if it's just a title or a single letter
+      const lower = name.toLowerCase().replace(/[^a-z]/g, '');
+      if (['dr', 'mr', 'ms', 'prof', 'w', 'f', 't', 's', 'th', 'm'].includes(lower) || name.length <= 2) {
+        continue;
+      }
+      
       if (!facultyMap[name]) facultyMap[name] = new Set();
       if (r.courseCode) facultyMap[name].add(r.courseCode);
     }
