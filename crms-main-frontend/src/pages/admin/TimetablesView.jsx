@@ -101,6 +101,11 @@ export default function TimetablesView() {
       const derivedDay = selectedDate ? new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long' }) : selectedDay;
       if (derivedDay) params.dayOfWeek = derivedDay;
     } else {
+      if (!selectedStudentYear && !selectedDepartment && !selectedSection && !selectedFaculty && !selectedResource) {
+        setTimetables([]);
+        setLoading(false);
+        return;
+      }
       if (selectedStudentYear) params.studentYear = selectedStudentYear;
       if (selectedDepartment) params.departmentId = selectedDepartment;
       if (selectedSection) params.section = selectedSection;
@@ -132,15 +137,7 @@ export default function TimetablesView() {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setIsEditMode(false);
-    setTimetables([]);
-    // Reset filters
-    setSelectedResource('');
-    setSelectedSection('');
-    setSelectedFaculty('');
-    setSelectedDepartment('');
-    setSelectedStudentYear('');
-    setSelectedDay('');
-    setSelectedDate('');
+    // Don't reset timetables or filters so state is preserved when switching back
   };
 
   const availableSections = sectionsData
@@ -442,13 +439,31 @@ export default function TimetablesView() {
 
           {!loading && timetables.length === 0 && (selectedResource || (selectedSection && selectedDepartment && selectedStudentYear) || selectedFaculty) && (
             <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
-              No classes scheduled for the selected {activeTab.toLowerCase().slice(0, -1)}.
+              No classes scheduled for the selected {activeTab ? activeTab.toLowerCase().slice(0, -1) : 'filters'}.
             </div>
           )}
           
-          {!loading && timetables.length === 0 && activeTab === 'Sections' && (!selectedSection || !selectedDepartment || !selectedStudentYear) && (
+          {!loading && timetables.length === 0 && !isEditMode && activeTab === 'Sections' && (!selectedSection || !selectedDepartment || !selectedStudentYear) && (
             <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
               Please select a Year, Branch, and Section to view the timetable.
+            </div>
+          )}
+
+          {!loading && timetables.length === 0 && !isEditMode && activeTab === 'Classrooms' && !selectedResource && (
+            <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
+              Please select a Classroom / Lab to view the timetable.
+            </div>
+          )}
+
+          {!loading && timetables.length === 0 && !isEditMode && activeTab === 'Faculty' && !selectedFaculty && (
+            <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
+              Please select a Faculty Member to view the timetable.
+            </div>
+          )}
+
+          {!loading && timetables.length === 0 && isEditMode && (!selectedResource && !selectedFaculty && (!selectedSection || !selectedDepartment || !selectedStudentYear)) && (
+            <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
+              Please select filters above to find the timetable you want to edit.
             </div>
           )}
         </div>

@@ -24,12 +24,7 @@ const listFaculty = async () => {
   }
   
   return Object.keys(facultyMap).sort().map(f => {
-    const subjects = Array.from(facultyMap[f]);
-    let label = f;
-    if (subjects.length > 0) {
-      label = `${f} (${subjects.join(', ')})`;
-    }
-    return { name: f, label };
+    return { name: f, label: f };
   });
 };
 
