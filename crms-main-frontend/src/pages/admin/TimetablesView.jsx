@@ -534,6 +534,9 @@ export default function TimetablesView() {
           studentYear: selectedStudentYear,
           section: selectedSection
         }}
+        departments={departments}
+        resources={resourceList}
+        facultyList={facultyList}
         onSaveSuccess={() => {
           refreshTimetables();
         }}

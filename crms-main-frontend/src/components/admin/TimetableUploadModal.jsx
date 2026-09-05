@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Upload, X, FileText, Image as ImageIcon, Check, Loader2, AlertCircle, Edit2, Trash2 } from 'lucide-react';
 import { timetableApi } from '../../api/endpoints';
 
-export default function TimetableUploadModal({ isOpen, onClose, contextFilters, onSaveSuccess, initialMode = 'upload' }) {
+export default function TimetableUploadModal({ isOpen, onClose, contextFilters, onSaveSuccess, initialMode = 'upload', departments = [], resources = [], facultyList = [] }) {
   const [file, setFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
@@ -118,7 +118,7 @@ export default function TimetableUploadModal({ isOpen, onClose, contextFilters, 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/50 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-[95vw] lg:max-w-[90vw] xl:max-w-[1400px] max-h-[95vh] flex flex-col overflow-hidden">
         
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-line shrink-0">
@@ -249,29 +249,34 @@ export default function TimetableUploadModal({ isOpen, onClose, contextFilters, 
             /* Preview State */
             <div className="space-y-4">
               <div className="flex justify-between items-center mb-2">
-                 <h3 className="font-semibold text-navy">Extracted Classes ({extractedData.length})</h3>
+                 <h3 className="font-semibold text-navy">{initialMode === 'manual' ? 'Classes to Add' : 'Extracted Classes'} ({extractedData.length})</h3>
                  <button 
                     onClick={handleAddRow}
                     className="text-sm text-primary font-medium hover:underline flex items-center gap-1"
                  >
-                    + Add Missing Class
+                    + Add Row
                  </button>
               </div>
               <div className="bg-white rounded-xl border border-line shadow-sm overflow-x-auto">
-                <table className="w-full text-sm text-left">
+                <table className="w-full text-sm text-left whitespace-nowrap min-w-[1200px]">
                   <thead className="bg-slate-50 border-b border-line text-slate-600 font-medium">
                     <tr>
-                      <th className="px-4 py-3">Day</th>
-                      <th className="px-4 py-3">Start Time</th>
-                      <th className="px-4 py-3">End Time</th>
-                      <th className="px-4 py-3 w-1/3">Subject</th>
-                      <th className="px-4 py-3 w-16"></th>
+                      <th className="px-3 py-3 w-32">Day</th>
+                      <th className="px-3 py-3 w-32">Start Time</th>
+                      <th className="px-3 py-3 w-32">End Time</th>
+                      <th className="px-3 py-3 w-48">Subject</th>
+                      <th className="px-3 py-3 w-32">Year</th>
+                      <th className="px-3 py-3 w-32">Dept</th>
+                      <th className="px-3 py-3 w-24">Section</th>
+                      <th className="px-3 py-3 w-48">Faculty</th>
+                      <th className="px-3 py-3 w-48">Classroom</th>
+                      <th className="px-3 py-3 w-12"></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-line">
                     {extractedData.map((row, index) => (
                       <tr key={row.id || index} className="hover:bg-slate-50/50">
-                        <td className="px-4 py-2">
+                        <td className="px-3 py-2">
                           <select 
                             value={row.dayOfWeek}
                             onChange={(e) => handleRowChange(index, 'dayOfWeek', e.target.value)}
@@ -282,7 +287,7 @@ export default function TimetableUploadModal({ isOpen, onClose, contextFilters, 
                             ))}
                           </select>
                         </td>
-                        <td className="px-4 py-2">
+                        <td className="px-3 py-2">
                           <input 
                             type="time" 
                             value={row.startTime}
@@ -290,7 +295,7 @@ export default function TimetableUploadModal({ isOpen, onClose, contextFilters, 
                             className="w-full p-1.5 border border-line rounded-lg bg-white"
                           />
                         </td>
-                        <td className="px-4 py-2">
+                        <td className="px-3 py-2">
                           <input 
                             type="time" 
                             value={row.endTime}
@@ -298,16 +303,72 @@ export default function TimetableUploadModal({ isOpen, onClose, contextFilters, 
                             className="w-full p-1.5 border border-line rounded-lg bg-white"
                           />
                         </td>
-                        <td className="px-4 py-2">
+                        <td className="px-3 py-2">
                           <input 
                             type="text" 
                             value={row.courseName || ''}
                             onChange={(e) => handleRowChange(index, 'courseName', e.target.value)}
                             className="w-full p-1.5 border border-line rounded-lg bg-white placeholder:text-slate-300"
-                            placeholder="Enter Subject Name..."
+                            placeholder="Subject..."
                           />
                         </td>
-                        <td className="px-4 py-2 text-right">
+                        <td className="px-3 py-2">
+                          <select 
+                            value={row.studentYear || ''}
+                            onChange={(e) => handleRowChange(index, 'studentYear', e.target.value)}
+                            className="w-full p-1.5 border border-line rounded-lg bg-white"
+                          >
+                            <option value="">Any</option>
+                            <option value="1">1st Year</option>
+                            <option value="2">2nd Year</option>
+                            <option value="3">3rd Year</option>
+                            <option value="4">4th Year</option>
+                          </select>
+                        </td>
+                        <td className="px-3 py-2">
+                          <select 
+                            value={row.departmentId || ''}
+                            onChange={(e) => handleRowChange(index, 'departmentId', e.target.value ? parseInt(e.target.value) : '')}
+                            className="w-full p-1.5 border border-line rounded-lg bg-white"
+                          >
+                            <option value="">Any</option>
+                            {departments.map(d => (
+                              <option key={d.departmentId} value={d.departmentId}>{d.departmentName}</option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className="px-3 py-2">
+                          <input 
+                            type="text" 
+                            value={row.section || ''}
+                            onChange={(e) => handleRowChange(index, 'section', e.target.value)}
+                            className="w-full p-1.5 border border-line rounded-lg bg-white placeholder:text-slate-300"
+                            placeholder="Section..."
+                          />
+                        </td>
+                        <td className="px-3 py-2">
+                          <input 
+                            type="text" 
+                            value={row.facultyName || ''}
+                            onChange={(e) => handleRowChange(index, 'facultyName', e.target.value)}
+                            className="w-full p-1.5 border border-line rounded-lg bg-white placeholder:text-slate-300"
+                            placeholder="Faculty..."
+                            list="facultyList"
+                          />
+                        </td>
+                        <td className="px-3 py-2">
+                          <select 
+                            value={row.resourceId || ''}
+                            onChange={(e) => handleRowChange(index, 'resourceId', e.target.value ? parseInt(e.target.value) : '')}
+                            className="w-full p-1.5 border border-line rounded-lg bg-white"
+                          >
+                            <option value="">No Room</option>
+                            {resources.map(r => (
+                              <option key={r.resourceId} value={r.resourceId}>{r.resourceName}</option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className="px-3 py-2 text-right">
                           <button 
                             onClick={() => handleRemoveRow(index)}
                             className="p-1.5 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50"
@@ -320,14 +381,19 @@ export default function TimetableUploadModal({ isOpen, onClose, contextFilters, 
                     ))}
                     {extractedData.length === 0 && (
                       <tr>
-                        <td colSpan="5" className="px-4 py-12 text-center text-slate-500">
-                           No classes were automatically detected. You can add them manually above.
+                        <td colSpan="10" className="px-4 py-12 text-center text-slate-500">
+                           No classes to show. Click "Add Row" above.
                         </td>
                       </tr>
                     )}
                   </tbody>
                 </table>
               </div>
+              <datalist id="facultyList">
+                 {facultyList.map(f => (
+                   <option key={f} value={f} />
+                 ))}
+              </datalist>
             </div>
           )}
         </div>
