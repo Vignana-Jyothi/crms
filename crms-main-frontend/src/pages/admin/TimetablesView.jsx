@@ -240,11 +240,15 @@ export default function TimetablesView() {
                 ]}
                 className="min-w-[250px]"
               />
-              <input
-                type="date"
-                value={selectedDate}
-                onChange={e => setSelectedDate(e.target.value)}
-                className="flex-1 min-w-[140px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
+              <SearchableSelect
+                value={selectedDay}
+                onChange={setSelectedDay}
+                placeholder="All Days"
+                options={[
+                  { value: '', label: 'All Days' },
+                  ...['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(d => ({ value: d, label: d }))
+                ]}
+                className="min-w-[140px]"
               />
             </>
           )}
@@ -285,11 +289,15 @@ export default function TimetablesView() {
                 ]}
                 className="min-w-[150px]"
               />
-              <input
-                type="date"
-                value={selectedDate}
-                onChange={e => setSelectedDate(e.target.value)}
-                className="flex-1 min-w-[140px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
+              <SearchableSelect
+                value={selectedDay}
+                onChange={setSelectedDay}
+                placeholder="All Days"
+                options={[
+                  { value: '', label: 'All Days' },
+                  ...['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(d => ({ value: d, label: d }))
+                ]}
+                className="min-w-[140px]"
               />
             </>
           )}
@@ -306,11 +314,15 @@ export default function TimetablesView() {
                 ]}
                 className="min-w-[250px]"
               />
-              <input
-                type="date"
-                value={selectedDate}
-                onChange={e => setSelectedDate(e.target.value)}
-                className="flex-1 min-w-[140px] p-2 border border-line bg-slate-50 rounded-lg text-sm text-navy focus:ring-0 outline-none"
+              <SearchableSelect
+                value={selectedDay}
+                onChange={setSelectedDay}
+                placeholder="All Days"
+                options={[
+                  { value: '', label: 'All Days' },
+                  ...['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(d => ({ value: d, label: d }))
+                ]}
+                className="min-w-[140px]"
               />
             </>
           )}
