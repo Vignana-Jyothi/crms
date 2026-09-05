@@ -295,26 +295,24 @@ export default function BulkGridEditor({
                             {classesInSlot.map((c, i) => {
                               const localIdx = localClasses.findIndex(lc => lc === c);
                               return (
-                                <div key={i} className="flex flex-col items-center justify-center p-2 rounded-lg bg-indigo-500 text-white shadow-sm w-full relative group/item"
+                                <div key={i} className="flex flex-col p-1.5 rounded border bg-indigo-50/80 border-indigo-200/60 text-indigo-950 shadow-sm w-full relative group/item text-left hover:border-indigo-400 transition-colors"
                                      onClick={(e) => {
                                        e.stopPropagation();
                                        setSelectedSlot({ day, start: slot.start, end: slot.end, label: `${day} • ${fmtTimeSlot(`1970-01-01T${slot.start}:00Z`, `1970-01-01T${slot.end}:00Z`)}` });
                                        setEditingIndex(localIdx);
                                        setEditForm({...c});
                                      }}>
-                                  <div className="font-bold text-[10px] text-center leading-tight line-clamp-1" title={c.courseName ? `${c.courseName} (${c.courseCode})` : c.courseCode}>
+                                  <div className="font-bold text-[10px] leading-tight line-clamp-2 mb-1" title={c.courseName ? `${c.courseName} (${c.courseCode})` : c.courseCode}>
                                     {c.courseName || c.courseCode}
                                   </div>
-                                  {c.courseName && c.courseCode && (
-                                    <div className="text-[8px] text-indigo-200 leading-tight mb-0.5">
-                                      {c.courseCode}
+                                  <div className="mt-auto flex flex-col gap-0.5">
+                                    <div className="text-[9px] font-semibold text-indigo-700/80 line-clamp-1 flex items-center gap-1">
+                                      <span className="w-1 h-1 rounded-full bg-indigo-400"></span>
+                                      {c.resource?.resourceName || 'No Room'}
                                     </div>
-                                  )}
-                                  <div className="text-[9px] text-indigo-100 line-clamp-1">
-                                    {c.resource?.resourceName || 'No Room'}
-                                  </div>
-                                  <div className="text-[9px] text-indigo-100 line-clamp-1">
-                                    {c.facultyName || 'No Faculty'}
+                                    <div className="text-[8px] text-slate-500 line-clamp-1 pl-2">
+                                      {c.facultyName || 'No Faculty'}
+                                    </div>
                                   </div>
                                 </div>
                               );
