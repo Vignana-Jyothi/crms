@@ -71,19 +71,19 @@ export default function RoomQuickSearchModal({ isOpen, onClose, onSearch, resour
             <div className="grid grid-cols-3 gap-3">
               <button
                 onClick={() => setDuration('FN')}
-                className={`py-2.5 rounded-lg text-sm font-semibold transition-all border ${duration === 'FN' ? 'bg-primary text-white border-primary shadow-md' : 'bg-white text-slate-600 border-line hover:bg-slate-50'}`}
+                className={`py-2.5 rounded-lg text-sm font-semibold transition-all border ${duration === 'FN' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white text-slate-600 border-line hover:bg-slate-50'}`}
               >
                 FN (Morning)
               </button>
               <button
                 onClick={() => setDuration('AN')}
-                className={`py-2.5 rounded-lg text-sm font-semibold transition-all border ${duration === 'AN' ? 'bg-primary text-white border-primary shadow-md' : 'bg-white text-slate-600 border-line hover:bg-slate-50'}`}
+                className={`py-2.5 rounded-lg text-sm font-semibold transition-all border ${duration === 'AN' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white text-slate-600 border-line hover:bg-slate-50'}`}
               >
                 AN (Afternoon)
               </button>
               <button
                 onClick={() => setDuration('FullDay')}
-                className={`py-2.5 rounded-lg text-sm font-semibold transition-all border ${duration === 'FullDay' ? 'bg-primary text-white border-primary shadow-md' : 'bg-white text-slate-600 border-line hover:bg-slate-50'}`}
+                className={`py-2.5 rounded-lg text-sm font-semibold transition-all border ${duration === 'FullDay' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white text-slate-600 border-line hover:bg-slate-50'}`}
               >
                 Full Day
               </button>
