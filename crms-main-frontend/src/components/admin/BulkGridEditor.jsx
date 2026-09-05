@@ -46,25 +46,32 @@ export default function BulkGridEditor({
     if (selectedStudentYear && selectedDepartment && selectedSection) {
       setLoadingExisting(true);
       timetableApi.list({
-        year: selectedStudentYear,
+        studentYear: selectedStudentYear,
         departmentId: selectedDepartment,
         section: selectedSection
       }).then(data => {
-        const mapped = data.map(item => ({
-          timetableId: item.timetableId,
-          dayOfWeek: item.dayOfWeek,
-          startTime: item.startTime,
-          endTime: item.endTime,
-          courseCode: item.courseCode,
-          courseName: item.courseName || '',
-          courseType: item.courseType || '',
-          facultyName: item.facultyName || '',
-          resourceId: item.resourceId || '',
-          studentYear: item.studentYear || selectedStudentYear,
-          departmentId: item.departmentId || selectedDepartment,
-          section: item.section || selectedSection,
-          resource: item.resource || null
-        }));
+        const mapped = data.map(item => {
+          // The API returns startTime and endTime as ISO strings like "1970-01-01T10:00:00.000Z"
+          // We need to extract the HH:mm part for the grid to match them
+          const st = item.startTime ? item.startTime.substring(11, 16) : '';
+          const et = item.endTime ? item.endTime.substring(11, 16) : '';
+          
+          return {
+            timetableId: item.timetableId,
+            dayOfWeek: item.dayOfWeek,
+            startTime: st,
+            endTime: et,
+            courseCode: item.courseCode,
+            courseName: item.courseName || '',
+            courseType: item.courseType || '',
+            facultyName: item.facultyName || '',
+            resourceId: item.resourceId || '',
+            studentYear: item.studentYear || selectedStudentYear,
+            departmentId: item.departmentId || selectedDepartment,
+            section: item.section || selectedSection,
+            resource: item.resource || null
+          };
+        });
         setLocalClasses(mapped);
       }).catch(err => {
         console.error('Failed to load existing timetable', err);
