@@ -3,6 +3,7 @@ import { masterDataApi, resourcesApi, timetableApi } from '../../api/endpoints';
 import FullWeekTimetableGrid from '../../components/admin/FullWeekTimetableGrid';
 import EditableTimetableGrid from '../../components/admin/EditableTimetableGrid';
 import TimetableUploadModal from '../../components/admin/TimetableUploadModal';
+import BulkGridEditor from '../../components/admin/BulkGridEditor';
 import { Calendar, Search, Edit2, List, LayoutGrid, X, Upload } from 'lucide-react';
 import SearchableSelect from '../../components/common/SearchableSelect';
 
@@ -466,7 +467,7 @@ export default function TimetablesView() {
                       className={`flex items-center gap-2 px-4 py-2 ${isUploadModalOpen && uploadModalMode === 'manual' ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border-line'} rounded-lg text-sm font-medium transition-colors border`}
                     >
                       <LayoutGrid size={16} />
-                      {isUploadModalOpen && uploadModalMode === 'manual' ? 'Hide Empty Grid' : 'Add via Grid'}
+                      {isUploadModalOpen && uploadModalMode === 'manual' ? 'Cancel Bulk Entry' : 'Manual Bulk Entry'}
                     </button>
                     <button
                       onClick={() => { setUploadModalMode('upload'); setIsUploadModalOpen(true); }}
@@ -479,8 +480,23 @@ export default function TimetablesView() {
                 </div>
               )}
               
-              {/* Only show if we have data OR we are in edit mode with sufficient filters selected OR manual bulk entry is clicked */}
-              {(timetables.length > 0 || (isEditMode && (selectedResource || selectedFaculty || (selectedSection && selectedDepartment && selectedStudentYear) || (isUploadModalOpen && uploadModalMode === 'manual')))) && (
+              {isUploadModalOpen && uploadModalMode === 'manual' && (
+                <BulkGridEditor
+                  departments={departments}
+                  resources={resourceList}
+                  onSaveSuccess={() => {
+                    refreshTimetables();
+                    setIsUploadModalOpen(false);
+                  }}
+                  onCancel={() => setIsUploadModalOpen(false)}
+                  initialDepartment={selectedDepartment}
+                  initialStudentYear={selectedStudentYear}
+                  initialSection={selectedSection}
+                />
+              )}
+
+              {/* Only show main grid if we have data OR we are in edit mode with sufficient filters selected, AND we are not in Bulk Grid Editor mode */}
+              {!(isUploadModalOpen && uploadModalMode === 'manual') && (timetables.length > 0 || (isEditMode && (selectedResource || selectedFaculty || (selectedSection && selectedDepartment && selectedStudentYear)))) && (
                 viewMode === 'grid' ? (
                   <FullWeekTimetableGrid 
                     timetables={timetables} 
