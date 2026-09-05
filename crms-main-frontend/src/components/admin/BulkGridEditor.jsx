@@ -302,9 +302,14 @@ export default function BulkGridEditor({
                                        setEditingIndex(localIdx);
                                        setEditForm({...c});
                                      }}>
-                                  <div className="font-bold text-[10px] text-center leading-tight line-clamp-1">
-                                    {c.courseCode}
+                                  <div className="font-bold text-[10px] text-center leading-tight line-clamp-1" title={c.courseName ? `${c.courseName} (${c.courseCode})` : c.courseCode}>
+                                    {c.courseName || c.courseCode}
                                   </div>
+                                  {c.courseName && c.courseCode && (
+                                    <div className="text-[8px] text-indigo-200 leading-tight mb-0.5">
+                                      {c.courseCode}
+                                    </div>
+                                  )}
                                   <div className="text-[9px] text-indigo-100 line-clamp-1">
                                     {c.resource?.resourceName || 'No Room'}
                                   </div>
