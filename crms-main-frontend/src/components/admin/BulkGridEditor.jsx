@@ -290,31 +290,40 @@ export default function BulkGridEditor({
                           }}>
                         {hasClasses ? (
                           <div className="flex flex-col gap-1.5 min-h-[85px] max-h-[250px] overflow-y-auto overflow-x-hidden custom-scrollbar pr-1">
-                            {classesInSlot.map((c, i) => {
-                              const localIdx = localClasses.findIndex(lc => lc === c);
+                            {(() => {
+                              const aggregatedDisplay = {
+                                courseShortNames: [],
+                                resourceNames: [],
+                                facultyNames: []
+                              };
+                              classesInSlot.forEach(c => {
+                                const shortName = c.courseShortName || c.courseName || c.courseCode;
+                                if (shortName && !aggregatedDisplay.courseShortNames.includes(shortName)) aggregatedDisplay.courseShortNames.push(shortName);
+                                const resourceName = c.resource?.resourceName || c.resourceId;
+                                if (resourceName && !aggregatedDisplay.resourceNames.includes(resourceName)) aggregatedDisplay.resourceNames.push(resourceName);
+                                if (c.facultyName && !aggregatedDisplay.facultyNames.includes(c.facultyName)) aggregatedDisplay.facultyNames.push(c.facultyName);
+                              });
+                              
+                              // Use the first class's index for editing
+                              const localIdx = localClasses.findIndex(lc => lc === classesInSlot[0]);
+
                               return (
-                                <div key={i} className="flex flex-col p-1.5 rounded border bg-indigo-50/80 border-indigo-200/60 text-indigo-950 shadow-sm w-full relative group/item text-left hover:border-indigo-400 transition-colors"
+                                <div className="flex flex-col items-center justify-center p-2 rounded-lg bg-indigo-50 border border-indigo-100 w-full relative group/item text-center hover:border-indigo-400 transition-colors cursor-pointer"
                                      onClick={(e) => {
                                        e.stopPropagation();
                                        setSelectedSlot({ day, start: slot.start, end: slot.end, label: `${day} • ${fmtTimeSlot(`1970-01-01T${slot.start}:00Z`, `1970-01-01T${slot.end}:00Z`)}` });
                                        setEditingIndex(localIdx);
-                                       setEditForm({...c});
+                                       setEditForm({...classesInSlot[0]});
                                      }}>
-                                  <div className="font-bold text-[10px] leading-tight line-clamp-2 mb-1" title={c.courseName ? `${c.courseName} (${c.courseCode})` : c.courseCode}>
-                                    {c.courseName || c.courseCode}
+                                  <div className="font-bold text-indigo-900 text-[10px] text-center leading-tight line-clamp-2 mb-0.5">
+                                    {aggregatedDisplay.courseShortNames.join(' / ')}
                                   </div>
-                                  <div className="mt-auto flex flex-col gap-0.5">
-                                    <div className="text-[9px] font-semibold text-indigo-700/80 line-clamp-1 flex items-center gap-1">
-                                      <span className="w-1 h-1 rounded-full bg-indigo-400"></span>
-                                      {c.resource?.resourceName || 'No Room'}
-                                    </div>
-                                    <div className="text-[8px] text-slate-500 line-clamp-1 pl-2">
-                                      {c.facultyName || 'No Faculty'}
-                                    </div>
+                                  <div className="text-[9px] text-indigo-600/80 line-clamp-2 text-center px-1">
+                                    {aggregatedDisplay.resourceNames?.length > 0 ? aggregatedDisplay.resourceNames.join(' / ') : 'No Room'} • {aggregatedDisplay.facultyNames?.length > 0 ? aggregatedDisplay.facultyNames.join(' / ') : 'Unassigned'}
                                   </div>
                                 </div>
                               );
-                            })}
+                            })()}
                             <div className="text-center mt-1">
                               <button 
                                 onClick={(e) => {
