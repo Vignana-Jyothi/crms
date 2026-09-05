@@ -471,6 +471,26 @@ export default function TimetablesView() {
                 </div>
               )}
               
+              {isUploadModalOpen && uploadModalMode === 'manual' && (
+                <TimetableUploadModal 
+                  isOpen={isUploadModalOpen} 
+                  onClose={() => setIsUploadModalOpen(false)} 
+                  initialMode={uploadModalMode}
+                  contextFilters={{
+                    departmentId: selectedDepartment,
+                    studentYear: selectedStudentYear,
+                    section: selectedSection
+                  }}
+                  departments={departments}
+                  resources={resourceList}
+                  facultyList={facultyList}
+                  onSaveSuccess={() => {
+                    refreshTimetables();
+                  }}
+                  isInline={true}
+                />
+              )}
+
               {/* Only show if we have data OR we are in edit mode with sufficient filters selected */}
               {(timetables.length > 0 || (isEditMode && (selectedResource || selectedFaculty || (selectedSection && selectedDepartment && selectedStudentYear)))) && (
                 viewMode === 'grid' ? (
@@ -537,22 +557,25 @@ export default function TimetablesView() {
         {/* End of max-w-7xl mx-auto space-y-6 */}
       </div>
 
-      <TimetableUploadModal 
-        isOpen={isUploadModalOpen} 
-        onClose={() => setIsUploadModalOpen(false)} 
-        initialMode={uploadModalMode}
-        contextFilters={{
-          departmentId: selectedDepartment,
-          studentYear: selectedStudentYear,
-          section: selectedSection
-        }}
-        departments={departments}
-        resources={resourceList}
-        facultyList={facultyList}
-        onSaveSuccess={() => {
-          refreshTimetables();
-        }}
-      />
+      {isUploadModalOpen && uploadModalMode === 'upload' && (
+        <TimetableUploadModal 
+          isOpen={isUploadModalOpen} 
+          onClose={() => setIsUploadModalOpen(false)} 
+          initialMode={uploadModalMode}
+          contextFilters={{
+            departmentId: selectedDepartment,
+            studentYear: selectedStudentYear,
+            section: selectedSection
+          }}
+          departments={departments}
+          resources={resourceList}
+          facultyList={facultyList}
+          onSaveSuccess={() => {
+            refreshTimetables();
+          }}
+          isInline={false}
+        />
+      )}
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { Upload, X, FileText, Image as ImageIcon, Check, Loader2, AlertCircle, E
 import { timetableApi } from '../../api/endpoints';
 import SearchableSelect from '../common/SearchableSelect';
 
-export default function TimetableUploadModal({ isOpen, onClose, contextFilters, onSaveSuccess, initialMode = 'upload', departments = [], resources = [], facultyList = [] }) {
+export default function TimetableUploadModal({ isOpen, onClose, contextFilters, onSaveSuccess, initialMode = 'upload', departments = [], resources = [], facultyList = [], isInline = false }) {
   const [file, setFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
@@ -117,11 +117,10 @@ export default function TimetableUploadModal({ isOpen, onClose, contextFilters, 
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/50 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-[95vw] lg:max-w-[90vw] xl:max-w-[1400px] max-h-[95vh] flex flex-col overflow-hidden">
-        
-        {/* Header */}
+  const content = (
+    <div className={isInline ? "bg-white rounded-2xl border border-line shadow-sm w-full flex flex-col overflow-hidden mb-6 animate-in fade-in" : "bg-white rounded-2xl shadow-xl w-full max-w-[95vw] lg:max-w-[90vw] xl:max-w-[1400px] max-h-[95vh] flex flex-col overflow-hidden"}>
+      
+      {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-line shrink-0">
           <div>
             <h2 className="text-xl font-bold text-navy">
@@ -422,6 +421,15 @@ export default function TimetableUploadModal({ isOpen, onClose, contextFilters, 
           </div>
         )}
       </div>
-    </div>
   );
+
+  if (isInline) {
+    return isOpen ? content : null;
+  }
+
+  return isOpen ? (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/50 backdrop-blur-sm animate-in fade-in duration-200">
+       {content}
+    </div>
+  ) : null;
 }
