@@ -369,6 +369,24 @@ export default function TimetablesView() {
               />
             </>
           )}
+            {/* Clear Filters Button */}
+            {(selectedStudentYear || selectedDepartment || selectedSection || selectedFaculty || selectedDay || selectedResource || selectedBlock || selectedDate) && (
+              <button
+                onClick={() => {
+                  setSelectedStudentYear('');
+                  setSelectedDepartment('');
+                  setSelectedSection('');
+                  setSelectedFaculty('');
+                  setSelectedDay('');
+                  setSelectedResource('');
+                  setSelectedBlock('');
+                  setSelectedDate('');
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors shrink-0 border border-red-200"
+              >
+                <X size={14} /> Clear
+              </button>
+            )}
           </div>
 
           {/* View Mode Toggle (Grid/List) */}
@@ -395,7 +413,7 @@ export default function TimetablesView() {
         </div>
 
         {/* Content Area */}
-        <div className="relative">
+        <div className="relative min-h-[400px]">
           {loading && (
             <div className="absolute inset-0 bg-white/60 backdrop-blur-sm z-20 flex items-center justify-center rounded-xl">
               <div className="flex flex-col items-center gap-3">
@@ -411,7 +429,7 @@ export default function TimetablesView() {
             </div>
           )}
 
-          {(!loading && (timetables.length > 0 || isEditMode)) && (
+          {(timetables.length > 0 || isEditMode) && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
               {isEditMode && (
                 <div className="bg-white p-4 rounded-xl border border-line shadow-sm mb-4">
@@ -450,7 +468,7 @@ export default function TimetablesView() {
             </div>
           )}
 
-          {!loading && timetables.length === 0 && !isEditMode && (
+          {timetables.length === 0 && !isEditMode && !loading && (
             (!isEditMode && activeTab === 'Classrooms' && selectedResource) ||
             (!isEditMode && activeTab === 'Sections' && (selectedSection && selectedDepartment && selectedStudentYear)) ||
             (!isEditMode && activeTab === 'Faculty' && selectedFaculty)
