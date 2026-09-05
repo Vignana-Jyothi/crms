@@ -5,6 +5,11 @@ const ApiError = require('../utils/ApiError');
 // consistent JSON response. Must be registered LAST in app.js.
 // eslint-disable-next-line no-unused-vars
 module.exports = function errorHandler(err, req, res, next) {
+  // Always log the exact error and request details to the server console
+  const timestamp = new Date().toISOString();
+  console.error(`[${timestamp}] ERROR in ${req.method} ${req.originalUrl}`);
+  console.error(err);
+
   if (err instanceof ApiError) {
     return res.status(err.statusCode).json({
       error: err.message,
@@ -29,7 +34,6 @@ module.exports = function errorHandler(err, req, res, next) {
     return res.status(409).json({ error: 'Concurrent booking conflict. Please retry your request.' });
   }
 
-  console.error(err);
   const status = err.statusCode || 500;
   const isDev = process.env.NODE_ENV !== 'production';
   res.status(status).json({
