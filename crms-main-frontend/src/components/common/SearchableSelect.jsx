@@ -1,10 +1,13 @@
 import React from 'react';
 import Select from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 
-export default function SearchableSelect({ options, value, onChange, placeholder, disabled, className }) {
+export default function SearchableSelect({ options, value, onChange, placeholder, disabled, className, allowCreate = false }) {
   // react-select expects options as { value, label }
   // Find the selected object based on value
-  const selectedOption = options.find(opt => opt.value === value) || null;
+  const selectedOption = options.find(opt => opt.value === value) || (allowCreate && value ? { value, label: value } : null);
+
+  const SelectComponent = allowCreate ? CreatableSelect : Select;
 
   const customStyles = {
     control: (base, state) => ({
@@ -64,7 +67,7 @@ export default function SearchableSelect({ options, value, onChange, placeholder
 
   return (
     <div className={`flex-1 ${className || ''}`}>
-      <Select
+      <SelectComponent
         value={selectedOption}
         onChange={(option) => onChange(option ? option.value : '')}
         options={options}
@@ -75,6 +78,7 @@ export default function SearchableSelect({ options, value, onChange, placeholder
         styles={customStyles}
         menuPortalTarget={document.body}
         menuPosition="fixed"
+        formatCreateLabel={(inputValue) => `Use custom "${inputValue}"`}
       />
     </div>
   );

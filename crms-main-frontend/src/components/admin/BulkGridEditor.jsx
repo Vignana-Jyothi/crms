@@ -196,13 +196,9 @@ export default function BulkGridEditor({
             <SearchableSelect
               value={selectedStudentYear}
               onChange={setSelectedStudentYear}
-              placeholder="Select Year"
-              options={[
-                { value: '1', label: '1st Year' },
-                { value: '2', label: '2nd Year' },
-                { value: '3', label: '3rd Year' },
-                { value: '4', label: '4th Year' }
-              ]}
+              placeholder="Select or Type Year"
+              options={[{value: '1', label: '1st Year'}, {value: '2', label: '2nd Year'}, {value: '3', label: '3rd Year'}, {value: '4', label: '4th Year'}]}
+              allowCreate={true}
               className="w-full"
             />
           </div>
