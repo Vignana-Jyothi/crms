@@ -408,18 +408,18 @@ export default function TimetablesView() {
           {/* View Mode Toggle (Grid/List) */}
           <div className="flex bg-slate-100 p-1 rounded-lg w-full xl:w-auto justify-center shrink-0 mt-2 xl:mt-0 xl:ml-auto">
             <button
-              onClick={() => { setViewMode('grid'); setIsEditMode(false); }}
+              onClick={() => { setViewMode('grid'); }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                viewMode === 'grid' && !isEditMode ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-navy'
+                viewMode === 'grid' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-navy'
               }`}
             >
               <LayoutGrid size={14} />
               Grid View
             </button>
             <button
-              onClick={() => { setViewMode('list'); setIsEditMode(false); }}
+              onClick={() => { setViewMode('list'); }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                viewMode === 'list' && !isEditMode ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-navy'
+                viewMode === 'list' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-navy'
               }`}
             >
               <List size={14} />
@@ -491,8 +491,8 @@ export default function TimetablesView() {
                 />
               )}
 
-              {/* Only show if we have data OR we are in edit mode with sufficient filters selected */}
-              {(timetables.length > 0 || (isEditMode && (selectedResource || selectedFaculty || (selectedSection && selectedDepartment && selectedStudentYear)))) && (
+              {/* Always show grid/list in edit mode, or if there's data */}
+              {(timetables.length > 0 || isEditMode) && (
                 viewMode === 'grid' ? (
                   <FullWeekTimetableGrid 
                     timetables={timetables} 
@@ -545,12 +545,6 @@ export default function TimetablesView() {
           {!loading && timetables.length === 0 && !isEditMode && activeTab === 'Faculty' && !selectedFaculty && (
             <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
               Please select a Faculty Member to view the timetable.
-            </div>
-          )}
-
-          {!loading && timetables.length === 0 && isEditMode && (!selectedResource && !selectedFaculty && (!selectedSection || !selectedDepartment || !selectedStudentYear)) && (
-            <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
-              Please select filters above to find the timetable you want to edit.
             </div>
           )}
         </div>
