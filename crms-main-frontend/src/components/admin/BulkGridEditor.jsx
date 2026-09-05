@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Check, Save } from 'lucide-react';
 import { fmtTimeSlot } from '../../utils/formatters';
 import { timetableApi } from '../../api/endpoints';
@@ -40,6 +40,41 @@ export default function BulkGridEditor({
 
   // Array of locally added classes
   const [localClasses, setLocalClasses] = useState([]);
+  const [loadingExisting, setLoadingExisting] = useState(false);
+
+  useEffect(() => {
+    if (selectedStudentYear && selectedDepartment && selectedSection) {
+      setLoadingExisting(true);
+      timetableApi.list({
+        year: selectedStudentYear,
+        departmentId: selectedDepartment,
+        section: selectedSection
+      }).then(data => {
+        const mapped = data.map(item => ({
+          timetableId: item.timetableId,
+          dayOfWeek: item.dayOfWeek,
+          startTime: item.startTime,
+          endTime: item.endTime,
+          courseCode: item.courseCode,
+          courseName: item.courseName || '',
+          courseType: item.courseType || '',
+          facultyName: item.facultyName || '',
+          resourceId: item.resourceId || '',
+          studentYear: item.studentYear || selectedStudentYear,
+          departmentId: item.departmentId || selectedDepartment,
+          section: item.section || selectedSection,
+          resource: item.resource || null
+        }));
+        setLocalClasses(mapped);
+      }).catch(err => {
+        console.error('Failed to load existing timetable', err);
+      }).finally(() => {
+        setLoadingExisting(false);
+      });
+    } else {
+      setLocalClasses([]);
+    }
+  }, [selectedStudentYear, selectedDepartment, selectedSection]);
   
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [editForm, setEditForm] = useState({});
@@ -191,6 +226,14 @@ export default function BulkGridEditor({
             <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-20 flex items-center justify-center">
               <div className="bg-white px-6 py-3 rounded-full shadow-lg border border-line text-sm font-semibold text-slate-600">
                 Select Year, Branch, and Section above to unlock the grid
+              </div>
+            </div>
+          )}
+          {loadingExisting && selectedStudentYear && selectedDepartment && selectedSection && (
+            <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-20 flex items-center justify-center">
+              <div className="bg-white px-6 py-3 rounded-full shadow-lg border border-line text-sm font-semibold text-slate-600 flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                Loading existing timetable...
               </div>
             </div>
           )}
