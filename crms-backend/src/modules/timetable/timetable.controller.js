@@ -21,4 +21,24 @@ const create = asyncHandler(async (req, res) => {
   res.json(await service.create(req.body));
 });
 
-module.exports = { list, getById, syncEduPrime, update, create };
+const extractFromFile = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' });
+  }
+  const extractionService = require('./timetable.extraction.service');
+  const rawText = await extractionService.extractTextFromFile(req.file);
+  const context = {
+    departmentId: req.body.departmentId,
+    studentYear: req.body.studentYear,
+    section: req.body.section
+  };
+  const extractedData = extractionService.parseTextToTimetable(rawText, context);
+  res.json(extractedData);
+});
+
+const batchCreate = asyncHandler(async (req, res) => {
+  // Pass the array of timetable entries to the service
+  res.json(await service.batchCreate(req.body.entries));
+});
+
+module.exports = { list, getById, syncEduPrime, update, create, extractFromFile, batchCreate };

@@ -124,4 +124,21 @@ async function create(data) {
   return repo.create(data);
 }
 
-module.exports = { list, getById, syncEduPrime, update, create };
+async function batchCreate(entries) {
+  if (!entries || !Array.isArray(entries)) {
+    throw ApiError.badRequest('Entries must be an array');
+  }
+
+  const processedEntries = entries.map(entry => {
+    const data = { ...entry };
+    if (data.startTime) data.startTime = toTimeValue(data.startTime);
+    if (data.endTime) data.endTime = toTimeValue(data.endTime);
+    // Remove the temporary 'id' field used by the frontend
+    if (data.id) delete data.id;
+    return data;
+  });
+
+  return repo.batchCreate(processedEntries);
+}
+
+module.exports = { list, getById, syncEduPrime, update, create, batchCreate };

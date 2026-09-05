@@ -62,4 +62,8 @@ export const timetableApi = {
   sync: () => client.post('/timetable/sync').then((r) => r.data),
   create: (data) => client.post('/timetable', data).then((r) => r.data),
   update: (id, data) => client.put(`/timetable/${id}`, data).then((r) => r.data),
+  extract: (formData) => client.post('/timetable/extract', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }).then((r) => r.data),
+  batch: (entries) => client.post('/timetable/batch', { entries }).then((r) => r.data),
 };

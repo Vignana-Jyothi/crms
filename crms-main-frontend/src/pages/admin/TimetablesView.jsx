@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { masterDataApi, resourcesApi, timetableApi } from '../../api/endpoints';
 import FullWeekTimetableGrid from '../../components/admin/FullWeekTimetableGrid';
 import EditableTimetableGrid from '../../components/admin/EditableTimetableGrid';
-import { Calendar, Search, Edit2, List, LayoutGrid, X } from 'lucide-react';
+import TimetableUploadModal from '../../components/admin/TimetableUploadModal';
+import { Calendar, Search, Edit2, List, LayoutGrid, X, Upload } from 'lucide-react';
 import SearchableSelect from '../../components/common/SearchableSelect';
 
 const STORAGE_KEY = 'crms_timetables_filters';
@@ -13,6 +14,7 @@ export default function TimetablesView() {
   const [activeTab, setActiveTab] = useState(savedFilters.activeTab || 'Classrooms'); // Classrooms, Sections, Faculty
   const [isEditMode, setIsEditMode] = useState(false);
   const [viewMode, setViewMode] = useState(savedFilters.viewMode || 'grid'); // 'grid' or 'list'
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
   const [resourceList, setResourceList] = useState([]);
   const [facultyList, setFacultyList] = useState([]);
@@ -433,10 +435,17 @@ export default function TimetablesView() {
           {(timetables.length > 0 || isEditMode) && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
               {isEditMode && (
-                <div className="bg-white p-4 rounded-xl border border-line shadow-sm mb-4">
+                <div className="bg-white p-4 rounded-xl border border-line shadow-sm mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                   <p className="text-sm text-slate-600">
                     <strong>Edit Mode Active:</strong> {viewMode === 'grid' ? 'Click on any class in the grid to edit it directly, or click a Free slot to add a new class.' : 'You can click the Edit icon on any row below to update the Course, Section, Faculty, or Room.'} Changes are saved instantly.
                   </p>
+                  <button
+                    onClick={() => setIsUploadModalOpen(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-lg text-sm font-medium transition-colors shrink-0"
+                  >
+                    <Upload size={16} />
+                    Auto-Extract PDF/Image
+                  </button>
                 </div>
               )}
               
@@ -503,7 +512,21 @@ export default function TimetablesView() {
             </div>
           )}
         </div>
+        {/* End of max-w-7xl mx-auto space-y-6 */}
       </div>
+
+      <TimetableUploadModal 
+        isOpen={isUploadModalOpen} 
+        onClose={() => setIsUploadModalOpen(false)} 
+        contextFilters={{
+          departmentId: selectedDepartment,
+          studentYear: selectedStudentYear,
+          section: selectedSection
+        }}
+        onSaveSuccess={() => {
+          refreshTimetables();
+        }}
+      />
     </div>
   );
 }

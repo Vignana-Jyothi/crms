@@ -68,4 +68,11 @@ function update(timetableId, data) {
   });
 }
 
-module.exports = { list, findById, create, update };
+function batchCreate(dataArray) {
+  return prisma.timetable.createMany({
+    data: dataArray,
+    skipDuplicates: true,
+  });
+}
+
+module.exports = { list, findById, create, update, batchCreate };
