@@ -367,6 +367,8 @@ export default function TimetablesView() {
                 ]}
                 className="min-w-[140px]"
               />
+            </>
+          )}
           </div>
 
           {/* Clear Filters Button */}
