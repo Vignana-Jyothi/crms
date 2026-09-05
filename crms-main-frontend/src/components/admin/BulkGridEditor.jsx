@@ -275,7 +275,7 @@ export default function BulkGridEditor({
                     const hasClasses = classesInSlot.length > 0;
 
                     return (
-                      <td key={idx} className={`border-r border-line p-2 text-center align-middle h-full ${!hasClasses ? 'bg-white hover:bg-indigo-50/50 cursor-pointer transition-colors' : 'bg-white'}`}
+                      <td key={idx} className={`border-r border-line p-2 text-center align-top h-full ${!hasClasses ? 'bg-white hover:bg-indigo-50/50 cursor-pointer transition-colors' : 'bg-white'}`}
                           onClick={() => {
                             if (!hasClasses) {
                               setSelectedSlot({ day, start: slot.start, end: slot.end, label: `${day} • ${fmtTimeSlot(`1970-01-01T${slot.start}:00Z`, `1970-01-01T${slot.end}:00Z`)}` });
@@ -313,7 +313,7 @@ export default function BulkGridEditor({
                                 </div>
                               );
                             })}
-                            <div className="text-center mt-auto">
+                            <div className="text-center mt-1">
                               <button 
                                 onClick={(e) => {
                                   e.stopPropagation();
