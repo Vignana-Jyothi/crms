@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { masterDataApi, resourcesApi, timetableApi } from '../../api/endpoints';
 import FullWeekTimetableGrid from '../../components/admin/FullWeekTimetableGrid';
 import EditableTimetableGrid from '../../components/admin/EditableTimetableGrid';
-import { Calendar, Search, Edit2, List, LayoutGrid } from 'lucide-react';
+import { Calendar, Search, Edit2, List, LayoutGrid, X } from 'lucide-react';
 import SearchableSelect from '../../components/common/SearchableSelect';
 
 const STORAGE_KEY = 'crms_timetables_filters';
