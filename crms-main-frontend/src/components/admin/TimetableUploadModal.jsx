@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Upload, X, FileText, Image as ImageIcon, Check, Loader2, AlertCircle, Edit2, Trash2 } from 'lucide-react';
 import { timetableApi } from '../../api/endpoints';
+import SearchableSelect from '../common/SearchableSelect';
 
 export default function TimetableUploadModal({ isOpen, onClose, contextFilters, onSaveSuccess, initialMode = 'upload', departments = [], resources = [], facultyList = [] }) {
   const [file, setFile] = useState(null);
@@ -277,22 +278,25 @@ export default function TimetableUploadModal({ isOpen, onClose, contextFilters, 
                     {extractedData.map((row, index) => (
                       <tr key={row.id || index} className="hover:bg-slate-50/50">
                         <td className="px-3 py-2">
-                          <select 
+                          <SearchableSelect 
                             value={row.dayOfWeek}
-                            onChange={(e) => handleRowChange(index, 'dayOfWeek', e.target.value)}
-                            className="w-full p-1.5 border border-line rounded-lg bg-white"
-                          >
-                            {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(d => (
-                               <option key={d} value={d}>{d}</option>
-                            ))}
-                          </select>
+                            onChange={(val) => handleRowChange(index, 'dayOfWeek', val)}
+                            options={[
+                               { value: 'Monday', label: 'Monday' },
+                               { value: 'Tuesday', label: 'Tuesday' },
+                               { value: 'Wednesday', label: 'Wednesday' },
+                               { value: 'Thursday', label: 'Thursday' },
+                               { value: 'Friday', label: 'Friday' },
+                               { value: 'Saturday', label: 'Saturday' }
+                            ]}
+                          />
                         </td>
                         <td className="px-3 py-2">
                           <input 
                             type="time" 
                             value={row.startTime}
                             onChange={(e) => handleRowChange(index, 'startTime', e.target.value)}
-                            className="w-full p-1.5 border border-line rounded-lg bg-white"
+                            className="w-full p-2 border border-line rounded-lg bg-white"
                           />
                         </td>
                         <td className="px-3 py-2">
@@ -300,7 +304,7 @@ export default function TimetableUploadModal({ isOpen, onClose, contextFilters, 
                             type="time" 
                             value={row.endTime}
                             onChange={(e) => handleRowChange(index, 'endTime', e.target.value)}
-                            className="w-full p-1.5 border border-line rounded-lg bg-white"
+                            className="w-full p-2 border border-line rounded-lg bg-white"
                           />
                         </td>
                         <td className="px-3 py-2">
@@ -308,65 +312,65 @@ export default function TimetableUploadModal({ isOpen, onClose, contextFilters, 
                             type="text" 
                             value={row.courseName || ''}
                             onChange={(e) => handleRowChange(index, 'courseName', e.target.value)}
-                            className="w-full p-1.5 border border-line rounded-lg bg-white placeholder:text-slate-300"
+                            className="w-full p-2 border border-line rounded-lg bg-white placeholder:text-slate-300 min-h-[38px]"
                             placeholder="Subject..."
                           />
                         </td>
-                        <td className="px-3 py-2">
-                          <select 
-                            value={row.studentYear || ''}
-                            onChange={(e) => handleRowChange(index, 'studentYear', e.target.value)}
-                            className="w-full p-1.5 border border-line rounded-lg bg-white"
-                          >
-                            <option value="">Any</option>
-                            <option value="1">1st Year</option>
-                            <option value="2">2nd Year</option>
-                            <option value="3">3rd Year</option>
-                            <option value="4">4th Year</option>
-                          </select>
+                        <td className="px-3 py-2 min-w-[120px]">
+                          <SearchableSelect 
+                            value={row.studentYear ? String(row.studentYear) : ''}
+                            onChange={(val) => handleRowChange(index, 'studentYear', val)}
+                            placeholder="Any"
+                            options={[
+                              { value: '', label: 'Any' },
+                              { value: '1', label: '1st Year' },
+                              { value: '2', label: '2nd Year' },
+                              { value: '3', label: '3rd Year' },
+                              { value: '4', label: '4th Year' }
+                            ]}
+                          />
                         </td>
-                        <td className="px-3 py-2">
-                          <select 
-                            value={row.departmentId || ''}
-                            onChange={(e) => handleRowChange(index, 'departmentId', e.target.value ? parseInt(e.target.value) : '')}
-                            className="w-full p-1.5 border border-line rounded-lg bg-white"
-                          >
-                            <option value="">Any</option>
-                            {departments.map(d => (
-                              <option key={d.departmentId} value={d.departmentId}>{d.departmentName}</option>
-                            ))}
-                          </select>
+                        <td className="px-3 py-2 min-w-[150px]">
+                          <SearchableSelect 
+                            value={row.departmentId ? String(row.departmentId) : ''}
+                            onChange={(val) => handleRowChange(index, 'departmentId', val ? parseInt(val) : '')}
+                            placeholder="Any"
+                            options={[
+                              { value: '', label: 'Any' },
+                              ...departments.map(d => ({ value: String(d.departmentId), label: d.departmentName }))
+                            ]}
+                          />
                         </td>
                         <td className="px-3 py-2">
                           <input 
                             type="text" 
                             value={row.section || ''}
                             onChange={(e) => handleRowChange(index, 'section', e.target.value)}
-                            className="w-full p-1.5 border border-line rounded-lg bg-white placeholder:text-slate-300"
+                            className="w-full p-2 border border-line rounded-lg bg-white placeholder:text-slate-300 min-h-[38px]"
                             placeholder="Section..."
                           />
                         </td>
-                        <td className="px-3 py-2">
-                          <input 
-                            type="text" 
+                        <td className="px-3 py-2 min-w-[180px]">
+                          <SearchableSelect 
                             value={row.facultyName || ''}
-                            onChange={(e) => handleRowChange(index, 'facultyName', e.target.value)}
-                            className="w-full p-1.5 border border-line rounded-lg bg-white placeholder:text-slate-300"
+                            onChange={(val) => handleRowChange(index, 'facultyName', val)}
                             placeholder="Faculty..."
-                            list="facultyList"
+                            options={[
+                              { value: '', label: 'Faculty...' },
+                              ...facultyList.map(f => ({ value: (f.name || f).toString(), label: (f.label || f).toString() }))
+                            ]}
                           />
                         </td>
-                        <td className="px-3 py-2">
-                          <select 
-                            value={row.resourceId || ''}
-                            onChange={(e) => handleRowChange(index, 'resourceId', e.target.value ? parseInt(e.target.value) : '')}
-                            className="w-full p-1.5 border border-line rounded-lg bg-white"
-                          >
-                            <option value="">No Room</option>
-                            {resources.map(r => (
-                              <option key={r.resourceId} value={r.resourceId}>{r.resourceName}</option>
-                            ))}
-                          </select>
+                        <td className="px-3 py-2 min-w-[180px]">
+                          <SearchableSelect 
+                            value={row.resourceId ? String(row.resourceId) : ''}
+                            onChange={(val) => handleRowChange(index, 'resourceId', val ? parseInt(val) : '')}
+                            placeholder="No Room"
+                            options={[
+                              { value: '', label: 'No Room' },
+                              ...resources.map(r => ({ value: String(r.resourceId), label: r.resourceName }))
+                            ]}
+                          />
                         </td>
                         <td className="px-3 py-2 text-right">
                           <button 
@@ -389,11 +393,6 @@ export default function TimetableUploadModal({ isOpen, onClose, contextFilters, 
                   </tbody>
                 </table>
               </div>
-              <datalist id="facultyList">
-                 {facultyList.map(f => (
-                   <option key={f} value={f} />
-                 ))}
-              </datalist>
             </div>
           )}
         </div>

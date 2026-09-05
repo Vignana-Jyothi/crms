@@ -74,6 +74,7 @@ export default function SearchableSelect({ options, value, onChange, placeholder
         isSearchable={true}
         styles={customStyles}
         menuPortalTarget={document.body}
+        menuPosition="fixed"
       />
     </div>
   );
