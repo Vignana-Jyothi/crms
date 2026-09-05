@@ -324,22 +324,6 @@ export default function BulkGridEditor({
                                 </div>
                               );
                             })()}
-                            <div className="text-center mt-1">
-                              <button 
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedSlot({ day, start: slot.start, end: slot.end, label: `${day} • ${fmtTimeSlot(`1970-01-01T${slot.start}:00Z`, `1970-01-01T${slot.end}:00Z`)}` });
-                                  setEditingIndex('new');
-                                  setEditForm({
-                                    courseCode: '', courseName: '', section: selectedSection, facultyName: '', resourceId: '',
-                                    dayOfWeek: day, startTime: `${slot.start}:00`, endTime: `${slot.end}:00`
-                                  });
-                                }}
-                                className="text-[10px] font-bold text-indigo-400 hover:text-indigo-600"
-                              >
-                                + Add
-                              </button>
-                            </div>
                           </div>
                         ) : (
                           <div className="flex items-center justify-center h-full w-full text-xs py-4 text-indigo-400 font-medium hover:text-indigo-600">
