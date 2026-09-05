@@ -32,7 +32,8 @@ export default function BulkGridEditor({
   onCancel,
   initialDepartment = '',
   initialStudentYear = '',
-  initialSection = ''
+  initialSection = '',
+  availableSections = []
 }) {
   const [selectedStudentYear, setSelectedStudentYear] = useState(initialStudentYear);
   const [selectedDepartment, setSelectedDepartment] = useState(initialDepartment);
@@ -214,12 +215,13 @@ export default function BulkGridEditor({
           </div>
           <div className="flex-1 min-w-[150px]">
             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Section <span className="text-red-500">*</span></label>
-            <input
-              type="text"
+            <SearchableSelect
               value={selectedSection}
-              onChange={e => setSelectedSection(e.target.value.toUpperCase())}
-              placeholder="e.g. A"
-              className="w-full p-2 border border-line bg-white rounded-lg text-sm text-navy focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+              onChange={val => setSelectedSection(val ? val.toUpperCase() : '')}
+              placeholder="Select or Type Section"
+              options={availableSections.map(s => ({ value: s, label: s }))}
+              allowCreate={true}
+              className="w-full"
             />
           </div>
         </div>

@@ -492,6 +492,7 @@ export default function TimetablesView() {
                   initialDepartment={selectedDepartment}
                   initialStudentYear={selectedStudentYear}
                   initialSection={selectedSection}
+                  availableSections={availableSections}
                 />
               )}
 
