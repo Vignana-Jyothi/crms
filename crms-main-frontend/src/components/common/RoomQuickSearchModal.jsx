@@ -71,19 +71,19 @@ export default function RoomQuickSearchModal({ isOpen, onClose, onSearch, resour
             <div className="grid grid-cols-3 gap-3">
               <button
                 onClick={() => setDuration('FN')}
-                className={`py-2.5 rounded-lg text-sm font-semibold transition-all border ${duration === 'FN' ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' : 'bg-white text-slate-600 border-line hover:bg-slate-50'}`}
+                className={`py-2.5 rounded-lg text-sm font-bold transition-all border ${duration === 'FN' ? 'bg-emerald-100 text-emerald-800 border-emerald-300 shadow-sm' : 'bg-white text-slate-600 border-line hover:bg-slate-50'}`}
               >
                 FN (Morning)
               </button>
               <button
                 onClick={() => setDuration('AN')}
-                className={`py-2.5 rounded-lg text-sm font-semibold transition-all border ${duration === 'AN' ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' : 'bg-white text-slate-600 border-line hover:bg-slate-50'}`}
+                className={`py-2.5 rounded-lg text-sm font-bold transition-all border ${duration === 'AN' ? 'bg-emerald-100 text-emerald-800 border-emerald-300 shadow-sm' : 'bg-white text-slate-600 border-line hover:bg-slate-50'}`}
               >
                 AN (Afternoon)
               </button>
               <button
                 onClick={() => setDuration('FullDay')}
-                className={`py-2.5 rounded-lg text-sm font-semibold transition-all border ${duration === 'FullDay' ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' : 'bg-white text-slate-600 border-line hover:bg-slate-50'}`}
+                className={`py-2.5 rounded-lg text-sm font-bold transition-all border ${duration === 'FullDay' ? 'bg-emerald-100 text-emerald-800 border-emerald-300 shadow-sm' : 'bg-white text-slate-600 border-line hover:bg-slate-50'}`}
               >
                 Full Day
               </button>
@@ -96,25 +96,25 @@ export default function RoomQuickSearchModal({ isOpen, onClose, onSearch, resour
             <div className="grid grid-cols-4 gap-3">
               <button
                 onClick={() => setRoomType('Room')}
-                className={`py-2.5 rounded-lg text-sm font-semibold transition-all border ${roomType === 'Room' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white text-slate-600 border-line hover:bg-slate-50'}`}
+                className={`py-2.5 rounded-lg text-sm font-bold transition-all border ${roomType === 'Room' ? 'bg-indigo-100 text-indigo-800 border-indigo-300 shadow-sm' : 'bg-white text-slate-600 border-line hover:bg-slate-50'}`}
               >
                 Room
               </button>
               <button
                 onClick={() => setRoomType('Lab')}
-                className={`py-2.5 rounded-lg text-sm font-semibold transition-all border ${roomType === 'Lab' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white text-slate-600 border-line hover:bg-slate-50'}`}
+                className={`py-2.5 rounded-lg text-sm font-bold transition-all border ${roomType === 'Lab' ? 'bg-indigo-100 text-indigo-800 border-indigo-300 shadow-sm' : 'bg-white text-slate-600 border-line hover:bg-slate-50'}`}
               >
                 Lab
               </button>
               <button
                 onClick={() => setRoomType('Seminar')}
-                className={`py-2.5 rounded-lg text-sm font-semibold transition-all border ${roomType === 'Seminar' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white text-slate-600 border-line hover:bg-slate-50'}`}
+                className={`py-2.5 rounded-lg text-sm font-bold transition-all border ${roomType === 'Seminar' ? 'bg-indigo-100 text-indigo-800 border-indigo-300 shadow-sm' : 'bg-white text-slate-600 border-line hover:bg-slate-50'}`}
               >
                 Seminar
               </button>
               <button
                 onClick={() => setRoomType('Size')}
-                className={`py-2.5 rounded-lg text-sm font-semibold transition-all border ${roomType === 'Size' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white text-slate-600 border-line hover:bg-slate-50'}`}
+                className={`py-2.5 rounded-lg text-sm font-bold transition-all border ${roomType === 'Size' ? 'bg-indigo-100 text-indigo-800 border-indigo-300 shadow-sm' : 'bg-white text-slate-600 border-line hover:bg-slate-50'}`}
               >
                 By Size
               </button>
