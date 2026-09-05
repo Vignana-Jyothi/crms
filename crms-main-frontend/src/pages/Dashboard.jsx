@@ -74,7 +74,7 @@ export default function Dashboard() {
       departmentId: '', 
       blockId: '',      
       search: '',
-      availability: 'All'
+      availability: 'Free'
     }));
 
     setIsQuickSearchOpen(false);

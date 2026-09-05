@@ -139,13 +139,19 @@ export default function RoomQuickSearchModal({ isOpen, onClose, onSearch, resour
           </div>
         </div>
 
-        <div className="p-6 pt-0">
+        <div className="p-6 pt-0 flex flex-col gap-3">
           <button
             onClick={handleSearch}
             className="w-full py-3.5 rounded-xl bg-navy hover:bg-navy/90 text-white font-bold shadow-lg shadow-navy/20 flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
           >
             <Search size={18} />
             Find Available Rooms
+          </button>
+          <button
+            onClick={onClose}
+            className="w-full py-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
+          >
+            Skip & Explore All Rooms
           </button>
         </div>
       </div>
