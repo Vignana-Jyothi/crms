@@ -287,7 +287,7 @@ export default function BulkGridEditor({
                             }
                           }}>
                         {hasClasses ? (
-                          <div className="flex flex-col gap-1.5 min-h-[85px]">
+                          <div className="flex flex-col gap-1.5 min-h-[85px] max-h-[250px] overflow-y-auto overflow-x-hidden custom-scrollbar pr-1">
                             {classesInSlot.map((c, i) => {
                               const localIdx = localClasses.findIndex(lc => lc === c);
                               return (
