@@ -454,11 +454,19 @@ export default function TimetablesView() {
                   </p>
                   <div className="flex gap-2 shrink-0">
                     <button
-                      onClick={() => { setUploadModalMode('manual'); setIsUploadModalOpen(true); }}
-                      className="flex items-center gap-2 px-4 py-2 bg-slate-50 text-slate-700 hover:bg-slate-100 rounded-lg text-sm font-medium transition-colors border border-line"
+                      onClick={() => { 
+                        if (isUploadModalOpen && uploadModalMode === 'manual') {
+                          setIsUploadModalOpen(false);
+                        } else {
+                          setUploadModalMode('manual'); 
+                          setIsUploadModalOpen(true); 
+                          setViewMode('grid');
+                        }
+                      }}
+                      className={`flex items-center gap-2 px-4 py-2 ${isUploadModalOpen && uploadModalMode === 'manual' ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border-line'} rounded-lg text-sm font-medium transition-colors border`}
                     >
-                      <List size={16} />
-                      Manual Bulk Entry
+                      <LayoutGrid size={16} />
+                      {isUploadModalOpen && uploadModalMode === 'manual' ? 'Hide Empty Grid' : 'Add via Grid'}
                     </button>
                     <button
                       onClick={() => { setUploadModalMode('upload'); setIsUploadModalOpen(true); }}
@@ -471,28 +479,8 @@ export default function TimetablesView() {
                 </div>
               )}
               
-              {isUploadModalOpen && uploadModalMode === 'manual' && (
-                <TimetableUploadModal 
-                  isOpen={isUploadModalOpen} 
-                  onClose={() => setIsUploadModalOpen(false)} 
-                  initialMode={uploadModalMode}
-                  contextFilters={{
-                    departmentId: selectedDepartment,
-                    studentYear: selectedStudentYear,
-                    section: selectedSection
-                  }}
-                  departments={departments}
-                  resources={resourceList}
-                  facultyList={facultyList}
-                  onSaveSuccess={() => {
-                    refreshTimetables();
-                  }}
-                  isInline={true}
-                />
-              )}
-
-              {/* Always show grid/list in edit mode, or if there's data */}
-              {(timetables.length > 0 || isEditMode) && (
+              {/* Only show if we have data OR we are in edit mode with sufficient filters selected OR manual bulk entry is clicked */}
+              {(timetables.length > 0 || (isEditMode && (selectedResource || selectedFaculty || (selectedSection && selectedDepartment && selectedStudentYear) || (isUploadModalOpen && uploadModalMode === 'manual')))) && (
                 viewMode === 'grid' ? (
                   <FullWeekTimetableGrid 
                     timetables={timetables} 
@@ -545,6 +533,12 @@ export default function TimetablesView() {
           {!loading && timetables.length === 0 && !isEditMode && activeTab === 'Faculty' && !selectedFaculty && (
             <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
               Please select a Faculty Member to view the timetable.
+            </div>
+          )}
+
+          {!loading && timetables.length === 0 && isEditMode && (!selectedResource && !selectedFaculty && (!selectedSection || !selectedDepartment || !selectedStudentYear)) && !(isUploadModalOpen && uploadModalMode === 'manual') && (
+            <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
+              Please select filters above to find the timetable you want to edit.
             </div>
           )}
         </div>
