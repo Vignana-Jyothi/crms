@@ -29,6 +29,8 @@ export function AuthProvider({ children }) {
 
   function logout() {
     authApi.logout();
+    sessionStorage.removeItem('crms_dashboard_filters');
+    sessionStorage.removeItem('crms_quick_search_shown');
     setUser(null);
   }
 

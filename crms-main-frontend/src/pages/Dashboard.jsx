@@ -20,6 +20,7 @@ const SEMINAR_HALL_NAMES = {
 };
 
 const STORAGE_KEY = 'crms_dashboard_filters';
+const QUICK_SEARCH_SHOWN_KEY = 'crms_quick_search_shown';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -31,7 +32,14 @@ export default function Dashboard() {
   
   const savedFiltersStr = sessionStorage.getItem(STORAGE_KEY);
   const savedFilters = JSON.parse(savedFiltersStr || '{}');
-  const [isQuickSearchOpen, setIsQuickSearchOpen] = useState(true);
+  const hasShownQuickSearch = sessionStorage.getItem(QUICK_SEARCH_SHOWN_KEY) === 'true';
+  const [isQuickSearchOpen, setIsQuickSearchOpen] = useState(!hasShownQuickSearch);
+
+  useEffect(() => {
+    if (!hasShownQuickSearch) {
+      sessionStorage.setItem(QUICK_SEARCH_SHOWN_KEY, 'true');
+    }
+  }, [hasShownQuickSearch]);
 
   const [filters, setFilters] = useState(savedFilters.filters || {
     resourceTypeId: '', departmentId: '', blockId: '', minCapacity: '', search: '', availability: 'Free'
