@@ -2,14 +2,21 @@ import React, { useState, useRef } from 'react';
 import { Upload, X, FileText, Image as ImageIcon, Check, Loader2, AlertCircle, Edit2, Trash2 } from 'lucide-react';
 import { timetableApi } from '../../api/endpoints';
 
-export default function TimetableUploadModal({ isOpen, onClose, contextFilters, onSaveSuccess }) {
+export default function TimetableUploadModal({ isOpen, onClose, contextFilters, onSaveSuccess, initialMode = 'upload' }) {
   const [file, setFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
   const [error, setError] = useState('');
-  const [extractedData, setExtractedData] = useState(null);
+  const [extractedData, setExtractedData] = useState(initialMode === 'manual' ? [] : null);
   const [isSaving, setIsSaving] = useState(false);
-  
+
+  // Update extractedData if initialMode changes while opening
+  React.useEffect(() => {
+    if (isOpen) {
+      setExtractedData(initialMode === 'manual' ? [] : null);
+    }
+  }, [isOpen, initialMode]);
+
   const fileInputRef = useRef(null);
 
   if (!isOpen) return null;
@@ -117,12 +124,20 @@ export default function TimetableUploadModal({ isOpen, onClose, contextFilters, 
         <div className="flex items-center justify-between p-6 border-b border-line shrink-0">
           <div>
             <h2 className="text-xl font-bold text-navy">
-              {extractedData ? 'Review Extracted Timetable' : 'Upload Timetable'}
+              {initialMode === 'manual' 
+                ? 'Manual Bulk Entry'
+                : extractedData 
+                  ? 'Review Extracted Timetable' 
+                  : 'Upload Timetable'
+              }
             </h2>
             <p className="text-sm text-slate-500 mt-1">
-              {extractedData 
-                ? 'Review and correct the extracted data below before saving to the database.'
-                : 'Upload an image or PDF of a timetable to auto-extract the classes.'}
+              {initialMode === 'manual'
+                ? 'Quickly add multiple classes to the schedule by filling out the table below.'
+                : extractedData 
+                  ? 'Review and correct the extracted data below before saving to the database.'
+                  : 'Upload an image or PDF of a timetable to auto-extract the classes.'
+              }
             </p>
           </div>
           <button
@@ -320,12 +335,16 @@ export default function TimetableUploadModal({ isOpen, onClose, contextFilters, 
         {/* Footer */}
         {extractedData && (
           <div className="p-4 border-t border-line bg-white flex justify-between items-center shrink-0">
-             <button
-                onClick={() => setExtractedData(null)}
-                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-navy transition-colors"
-              >
-                Back to Upload
-              </button>
+             {initialMode === 'manual' ? (
+                <div></div>
+             ) : (
+               <button
+                  onClick={() => setExtractedData(null)}
+                  className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-navy transition-colors"
+                >
+                  Back to Upload
+                </button>
+             )}
               
               <button
                 onClick={handleSaveToDatabase}

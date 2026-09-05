@@ -15,6 +15,7 @@ export default function TimetablesView() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [viewMode, setViewMode] = useState(savedFilters.viewMode || 'grid'); // 'grid' or 'list'
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [uploadModalMode, setUploadModalMode] = useState('upload');
 
   const [resourceList, setResourceList] = useState([]);
   const [facultyList, setFacultyList] = useState([]);
@@ -439,13 +440,22 @@ export default function TimetablesView() {
                   <p className="text-sm text-slate-600">
                     <strong>Edit Mode Active:</strong> {viewMode === 'grid' ? 'Click on any class in the grid to edit it directly, or click a Free slot to add a new class.' : 'You can click the Edit icon on any row below to update the Course, Section, Faculty, or Room.'} Changes are saved instantly.
                   </p>
-                  <button
-                    onClick={() => setIsUploadModalOpen(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-lg text-sm font-medium transition-colors shrink-0"
-                  >
-                    <Upload size={16} />
-                    Auto-Extract PDF/Image
-                  </button>
+                  <div className="flex gap-2 shrink-0">
+                    <button
+                      onClick={() => { setUploadModalMode('manual'); setIsUploadModalOpen(true); }}
+                      className="flex items-center gap-2 px-4 py-2 bg-slate-50 text-slate-700 hover:bg-slate-100 rounded-lg text-sm font-medium transition-colors border border-line"
+                    >
+                      <List size={16} />
+                      Manual Bulk Entry
+                    </button>
+                    <button
+                      onClick={() => { setUploadModalMode('upload'); setIsUploadModalOpen(true); }}
+                      className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-lg text-sm font-medium transition-colors"
+                    >
+                      <Upload size={16} />
+                      Auto-Extract PDF/Image
+                    </button>
+                  </div>
                 </div>
               )}
               
@@ -518,6 +528,7 @@ export default function TimetablesView() {
       <TimetableUploadModal 
         isOpen={isUploadModalOpen} 
         onClose={() => setIsUploadModalOpen(false)} 
+        initialMode={uploadModalMode}
         contextFilters={{
           departmentId: selectedDepartment,
           studentYear: selectedStudentYear,
