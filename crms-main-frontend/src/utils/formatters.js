@@ -14,6 +14,8 @@
 export function fmtTime(val) {
   if (val === null || val === undefined || val === '') return '—';
 
+  let h, m;
+
   // Handle plain time strings like "09:00:00" or "9:30"
   if (typeof val === 'string') {
     const trimmed = val.trim();
@@ -22,20 +24,31 @@ export function fmtTime(val) {
     // Matches "HH:MM" or "HH:MM:SS" (without full date prefix)
     const timeMatch = trimmed.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
     if (timeMatch) {
-      const hours = timeMatch[1].padStart(2, '0');
-      const minutes = timeMatch[2];
-      return `${hours}:${minutes}`;
+      h = parseInt(timeMatch[1], 10);
+      m = timeMatch[2];
     }
   }
 
   // Handle ISO strings, Date instances, or numeric timestamps
-  try {
-    const d = val instanceof Date ? val : new Date(val);
-    if (isNaN(d.getTime())) return '—';
-    return d.toISOString().slice(11, 16);
-  } catch {
-    return '—';
+  if (h === undefined) {
+    try {
+      const d = val instanceof Date ? val : new Date(val);
+      if (isNaN(d.getTime())) return '—';
+      h = d.getUTCHours();
+      m = d.getUTCMinutes().toString().padStart(2, '0');
+    } catch {
+      return '—';
+    }
   }
+
+  if (h === undefined || isNaN(h)) return '—';
+
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12;
+  if (h === 0) h = 12;
+  
+  const paddedH = h.toString().padStart(2, '0');
+  return `${paddedH}:${m} ${ampm}`;
 }
 
 /**

@@ -145,134 +145,193 @@ export default function FullWeekTimetableGrid({
           </tr>
         </thead>
         <tbody className="divide-y divide-line">
-          {displayDays.map(day => (
-            <tr key={day} className="hover:bg-paper/50 transition-colors">
-              <td className="px-4 py-4 border-r border-line font-semibold text-navy bg-paper/20 sticky left-0 z-10 backdrop-blur-md">
-                {day}
-              </td>
-              {activeTimeSlots.map((slot, idx) => {
-                const classesForSlotRaw = getClassesForSlot(day, slot.start, slot.end);
-                
-                const groupedClasses = [];
-                const aggregatedDisplay = {
-                  courseShortNames: [],
-                  resourceNames: [],
-                  facultyNames: []
-                };
+          {displayDays.map(day => {
+            const daySlots = [];
+            let skipUntil = 0;
 
-                classesForSlotRaw.forEach(c => {
-                  const existing = groupedClasses.find(g => g.courseCode === c.courseCode && g.section === c.section);
-                  if (existing) {
-                    if (c.resource?.resourceName && !existing.resourceNames.includes(c.resource.resourceName)) {
-                      existing.resourceNames.push(c.resource.resourceName);
-                    }
-                    if (c.facultyName && !existing.facultyNames.includes(c.facultyName)) {
-                      existing.facultyNames.push(c.facultyName);
-                    }
+            const getDisplayNames = (classesRaw) => {
+              if (classesRaw.length === 0) return '';
+              const shortNames = classesRaw.map(c => c.courseShortName || c.courseCode).filter(Boolean);
+              return Array.from(new Set(shortNames)).sort().join(' / ');
+            };
+
+            for (let i = 0; i < activeTimeSlots.length; i++) {
+              if (i < skipUntil) continue;
+              const slot = activeTimeSlots[i];
+              
+              if (slot.isLunch) {
+                daySlots.push({ ...slot, idx: i, colSpan: 1, isLunch: true, classesRaw: [] });
+                continue;
+              }
+
+              const classesRaw = getClassesForSlot(day, slot.start, slot.end);
+              const displayNames = getDisplayNames(classesRaw);
+              const hasClasses = classesRaw.length > 0;
+
+              let colSpan = 1;
+              let j = i + 1;
+              let endSlot = slot.end;
+
+              if (hasClasses) {
+                while (j < activeTimeSlots.length) {
+                  const nextSlot = activeTimeSlots[j];
+                  if (nextSlot.isLunch) break;
+                  
+                  const nextClassesRaw = getClassesForSlot(day, nextSlot.start, nextSlot.end);
+                  const nextDisplayNames = getDisplayNames(nextClassesRaw);
+                  
+                  if (nextClassesRaw.length > 0 && nextDisplayNames === displayNames) {
+                    colSpan++;
+                    endSlot = nextSlot.end;
+                    j++;
                   } else {
-                    groupedClasses.push({
-                      ...c,
-                      resourceNames: c.resource?.resourceName ? [c.resource.resourceName] : [],
-                      facultyNames: c.facultyName ? [c.facultyName] : []
-                    });
+                    break;
+                  }
+                }
+              }
+
+              daySlots.push({
+                ...slot,
+                idx: i,
+                colSpan,
+                hasClasses,
+                classesRaw,
+                displayNames,
+                mergedStart: slot.start,
+                mergedEnd: endSlot
+              });
+              
+              skipUntil = j;
+            }
+
+            return (
+              <tr key={day} className="hover:bg-paper/50 transition-colors">
+                <td className="px-4 py-4 border-r border-line font-semibold text-navy bg-paper/20 sticky left-0 z-10 backdrop-blur-md">
+                  {day}
+                </td>
+                {daySlots.map((slotData) => {
+                  if (slotData.isLunch) {
+                    return (
+                      <td key={slotData.idx} colSpan={slotData.colSpan} className="border-r border-line p-2 text-center align-middle h-full bg-slate-50/80">
+                        <div className="flex items-center justify-center h-full w-full text-slate-500 font-medium text-xs py-4">
+                          Lunch
+                        </div>
+                      </td>
+                    );
                   }
 
-                  const shortName = c.courseShortName || c.courseCode;
-                  if (shortName && !aggregatedDisplay.courseShortNames.includes(shortName)) {
-                    aggregatedDisplay.courseShortNames.push(shortName);
-                  }
-                  if (c.resource?.resourceName && !aggregatedDisplay.resourceNames.includes(c.resource.resourceName)) {
-                    aggregatedDisplay.resourceNames.push(c.resource.resourceName);
-                  }
-                  if (c.facultyName && !aggregatedDisplay.facultyNames.includes(c.facultyName)) {
-                    aggregatedDisplay.facultyNames.push(c.facultyName);
-                  }
-                });
+                  const { idx, colSpan, hasClasses, classesRaw, mergedStart, mergedEnd } = slotData;
 
-                const hasClasses = classesForSlotRaw.length > 0;
-                const baseClass = hasClasses ? classesForSlotRaw[0] : null;
-                
-                if (slot.isLunch) {
+                  const groupedClasses = [];
+                  const aggregatedDisplay = {
+                    courseShortNames: [],
+                    resourceNames: [],
+                    facultyNames: []
+                  };
+
+                  classesRaw.forEach(c => {
+                    const existing = groupedClasses.find(g => g.courseCode === c.courseCode && g.section === c.section);
+                    if (existing) {
+                      if (c.resource?.resourceName && !existing.resourceNames.includes(c.resource.resourceName)) {
+                        existing.resourceNames.push(c.resource.resourceName);
+                      }
+                      if (c.facultyName && !existing.facultyNames.includes(c.facultyName)) {
+                        existing.facultyNames.push(c.facultyName);
+                      }
+                    } else {
+                      groupedClasses.push({
+                        ...c,
+                        resourceNames: c.resource?.resourceName ? [c.resource.resourceName] : [],
+                        facultyNames: c.facultyName ? [c.facultyName] : []
+                      });
+                    }
+
+                    const shortName = c.courseShortName || c.courseCode;
+                    if (shortName && !aggregatedDisplay.courseShortNames.includes(shortName)) {
+                      aggregatedDisplay.courseShortNames.push(shortName);
+                    }
+                    if (c.resource?.resourceName && !aggregatedDisplay.resourceNames.includes(c.resource.resourceName)) {
+                      aggregatedDisplay.resourceNames.push(c.resource.resourceName);
+                    }
+                    if (c.facultyName && !aggregatedDisplay.facultyNames.includes(c.facultyName)) {
+                      aggregatedDisplay.facultyNames.push(c.facultyName);
+                    }
+                  });
+
+                  const baseClass = hasClasses ? classesRaw[0] : null;
+
                   return (
-                    <td key={idx} className="border-r border-line p-2 text-center align-middle h-full bg-slate-50/80">
-                      <div className="flex items-center justify-center h-full w-full text-slate-500 font-medium text-xs py-4">
-                        Lunch
-                      </div>
+                    <td key={idx} colSpan={colSpan} className={`border-r border-line p-2 text-center align-middle h-full ${!hasClasses && !isEditMode ? 'bg-slate-50/50' : 'bg-white hover:bg-slate-50 cursor-pointer transition-colors'}`}
+                        onClick={() => {
+                          if (hasClasses || isEditMode) {
+                            setSelectedSlot({ day, start: mergedStart, end: mergedEnd, label: `${day} • ${fmtTimeSlot(`1970-01-01T${mergedStart}:00Z`, `1970-01-01T${mergedEnd}:00Z`)}` });
+                            if (!hasClasses && isEditMode) {
+                              setEditingId('new');
+                              setEditForm({
+                                courseCode: '', courseName: '', section: selectedSection || '', facultyName: selectedFaculty || '', resourceId: selectedResource || '',
+                                dayOfWeek: day, startTime: `${mergedStart}:00`, endTime: `${mergedEnd}:00`
+                              });
+                            }
+                          }
+                        }}>
+                      {hasClasses ? (
+                        <div className="flex flex-col items-center justify-center p-2 rounded-lg bg-indigo-50 border border-indigo-100 w-full h-[85px] overflow-hidden">
+                          <div className="font-bold text-indigo-900 text-[10px] text-center leading-tight line-clamp-2 mb-0.5">
+                            {aggregatedDisplay.courseShortNames.join(' / ')}
+                          </div>
+                          
+                          {viewMode === 'Classrooms' && (
+                            <>
+                              <div className="text-[9px] text-indigo-700 font-medium whitespace-nowrap">
+                                {baseClass.studentYear && `${baseClass.studentYear}${baseClass.studentYear === '1' ? 'st' : baseClass.studentYear === '2' ? 'nd' : baseClass.studentYear === '3' ? 'rd' : 'th'} Yr`} {baseClass.department?.branchCode} - {baseClass.section}
+                              </div>
+                              <div className="text-[9px] text-indigo-600/80 line-clamp-1">
+                                {aggregatedDisplay.facultyNames?.length > 0 ? aggregatedDisplay.facultyNames.join(' / ') : 'Unassigned'}
+                              </div>
+                            </>
+                          )}
+
+                          {viewMode === 'Sections' && (
+                            <>
+                              <div className="text-[9px] text-indigo-600/80 line-clamp-2 text-center px-1">
+                                {aggregatedDisplay.resourceNames?.length > 0 ? aggregatedDisplay.resourceNames.join(' / ') : 'No Room'} • {aggregatedDisplay.facultyNames?.length > 0 ? aggregatedDisplay.facultyNames.join(' / ') : 'Unassigned'}
+                              </div>
+                            </>
+                          )}
+
+                          {viewMode === 'Faculty' && (
+                            <>
+                              <div className="text-[9px] text-indigo-700 font-medium whitespace-nowrap">
+                                {baseClass.studentYear && `${baseClass.studentYear}${baseClass.studentYear === '1' ? 'st' : baseClass.studentYear === '2' ? 'nd' : baseClass.studentYear === '3' ? 'rd' : 'th'} Yr`} {baseClass.department?.branchCode} - {baseClass.section}
+                              </div>
+                              <div className="text-[9px] text-indigo-600/80 line-clamp-1">
+                                {aggregatedDisplay.resourceNames?.length > 0 ? aggregatedDisplay.resourceNames.join(' / ') : 'No Room'}
+                              </div>
+                            </>
+                          )}
+                          
+                          {!viewMode && (
+                            <>
+                              <div className="text-[9px] text-indigo-700 font-medium whitespace-nowrap">
+                                {baseClass.studentYear && `${baseClass.studentYear}${baseClass.studentYear === '1' ? 'st' : baseClass.studentYear === '2' ? 'nd' : baseClass.studentYear === '3' ? 'rd' : 'th'} Yr`} {baseClass.department?.branchCode} - {baseClass.section}
+                              </div>
+                              <div className="text-[9px] text-indigo-600/80 line-clamp-1 text-center px-1">
+                                {aggregatedDisplay.resourceNames?.length > 0 ? aggregatedDisplay.resourceNames.join(' / ') : 'No Room'} • {aggregatedDisplay.facultyNames?.length > 0 ? aggregatedDisplay.facultyNames.join(' / ') : 'Unassigned'}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      ) : (
+                        <div className={`flex items-center justify-center h-full w-full text-xs py-4 ${isEditMode ? 'text-indigo-400 font-medium hover:text-indigo-600' : 'text-slate-400 italic'}`}>
+                          {isEditMode ? '+ Add' : 'Free'}
+                        </div>
+                      )}
                     </td>
                   );
-                }
-
-                return (
-                  <td key={idx} className={`border-r border-line p-2 text-center align-middle h-full ${!hasClasses && !isEditMode ? 'bg-slate-50/50' : 'bg-white hover:bg-slate-50 cursor-pointer transition-colors'}`}
-                      onClick={() => {
-                        if (hasClasses || isEditMode) {
-                          setSelectedSlot({ day, start: slot.start, end: slot.end, label: `${day} • ${fmtTimeSlot(`1970-01-01T${slot.start}:00Z`, `1970-01-01T${slot.end}:00Z`)}` });
-                          if (!hasClasses && isEditMode) {
-                            setEditingId('new');
-                            setEditForm({
-                              courseCode: '', courseName: '', section: selectedSection || '', facultyName: selectedFaculty || '', resourceId: selectedResource || '',
-                              dayOfWeek: day, startTime: `${slot.start}:00`, endTime: `${slot.end}:00`
-                            });
-                          }
-                        }
-                      }}>
-                    {hasClasses ? (
-                      <div className="flex flex-col items-center justify-center p-2 rounded-lg bg-indigo-50 border border-indigo-100 w-full h-[85px] overflow-hidden">
-                        <div className="font-bold text-indigo-900 text-[10px] text-center leading-tight line-clamp-2 mb-0.5">
-                          {aggregatedDisplay.courseShortNames.join(' / ')}
-                        </div>
-                        
-                        {viewMode === 'Classrooms' && (
-                          <>
-                            <div className="text-[9px] text-indigo-700 font-medium whitespace-nowrap">
-                              {baseClass.studentYear && `${baseClass.studentYear}${baseClass.studentYear === '1' ? 'st' : baseClass.studentYear === '2' ? 'nd' : baseClass.studentYear === '3' ? 'rd' : 'th'} Yr`} {baseClass.department?.branchCode} - {baseClass.section}
-                            </div>
-                            <div className="text-[9px] text-indigo-600/80 line-clamp-1">
-                              {aggregatedDisplay.facultyNames?.length > 0 ? aggregatedDisplay.facultyNames.join(' / ') : 'Unassigned'}
-                            </div>
-                          </>
-                        )}
-
-                        {viewMode === 'Sections' && (
-                          <>
-                            <div className="text-[9px] text-indigo-600/80 line-clamp-2 text-center px-1">
-                              {aggregatedDisplay.resourceNames?.length > 0 ? aggregatedDisplay.resourceNames.join(' / ') : 'No Room'} • {aggregatedDisplay.facultyNames?.length > 0 ? aggregatedDisplay.facultyNames.join(' / ') : 'Unassigned'}
-                            </div>
-                          </>
-                        )}
-
-                        {viewMode === 'Faculty' && (
-                          <>
-                            <div className="text-[9px] text-indigo-700 font-medium whitespace-nowrap">
-                              {baseClass.studentYear && `${baseClass.studentYear}${baseClass.studentYear === '1' ? 'st' : baseClass.studentYear === '2' ? 'nd' : baseClass.studentYear === '3' ? 'rd' : 'th'} Yr`} {baseClass.department?.branchCode} - {baseClass.section}
-                            </div>
-                            <div className="text-[9px] text-indigo-600/80 line-clamp-1">
-                              {aggregatedDisplay.resourceNames?.length > 0 ? aggregatedDisplay.resourceNames.join(' / ') : 'No Room'}
-                            </div>
-                          </>
-                        )}
-                        
-                        {!viewMode && (
-                          <>
-                            <div className="text-[9px] text-indigo-700 font-medium whitespace-nowrap">
-                              {baseClass.studentYear && `${baseClass.studentYear}${baseClass.studentYear === '1' ? 'st' : baseClass.studentYear === '2' ? 'nd' : baseClass.studentYear === '3' ? 'rd' : 'th'} Yr`} {baseClass.department?.branchCode} - {baseClass.section}
-                            </div>
-                            <div className="text-[9px] text-indigo-600/80 line-clamp-1 text-center px-1">
-                              {aggregatedDisplay.resourceNames?.length > 0 ? aggregatedDisplay.resourceNames.join(' / ') : 'No Room'} • {aggregatedDisplay.facultyNames?.length > 0 ? aggregatedDisplay.facultyNames.join(' / ') : 'Unassigned'}
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    ) : (
-                      <div className={`flex items-center justify-center h-full w-full text-xs py-4 ${isEditMode ? 'text-indigo-400 font-medium hover:text-indigo-600' : 'text-slate-400 italic'}`}>
-                        {isEditMode ? '+ Add' : 'Free'}
-                      </div>
-                    )}
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
+                })}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
       

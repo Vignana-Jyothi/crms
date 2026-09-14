@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { resourcesApi, bookingsApi } from '../api/endpoints';
 import AvailabilityStrip from '../components/AvailabilityStrip';
-import { fmtTimeSlot } from '../utils/formatters';
+import { fmtTime, fmtTimeSlot } from '../utils/formatters';
 
 function todayStr() {
   const d = new Date();
@@ -135,7 +135,7 @@ export default function ResourceDetail() {
               className="w-full rounded border border-line px-3 py-2 text-sm bg-white"
             >
               <option value="">Select...</option>
-              {TIME_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
+              {TIME_OPTIONS.map(t => <option key={t} value={t}>{fmtTime(t)}</option>)}
             </select>
           </div>
           <div>
@@ -147,7 +147,7 @@ export default function ResourceDetail() {
               className="w-full rounded border border-line px-3 py-2 text-sm bg-white"
             >
               <option value="">Select...</option>
-              {TIME_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
+              {TIME_OPTIONS.map(t => <option key={t} value={t}>{fmtTime(t)}</option>)}
             </select>
           </div>
         </div>
@@ -170,13 +170,15 @@ export default function ResourceDetail() {
           </p>
         )}
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="mt-4 rounded bg-navy px-5 py-2.5 text-sm font-semibold text-white hover:bg-navy-dark disabled:opacity-60"
-        >
-          {submitting ? 'Submitting…' : 'Submit request'}
-        </button>
+        {!success && (
+          <button
+            type="submit"
+            disabled={submitting}
+            className="mt-4 rounded bg-navy px-5 py-2.5 text-sm font-semibold text-white hover:bg-navy-dark disabled:opacity-60"
+          >
+            {submitting ? 'Submitting…' : 'Submit request'}
+          </button>
+        )}
       </form>
     </div>
   );
