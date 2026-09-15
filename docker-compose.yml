@@ -24,7 +24,7 @@ services:
     env_file:
       - ./crms-backend/.env.docker
     ports:
-      - "4000:4000"
+      - "${BACKEND_PORT:-4000}:4000"
     depends_on:
       db:
         condition: service_healthy
@@ -36,7 +36,7 @@ services:
     container_name: crms-main-frontend
     restart: unless-stopped
     ports:
-      - "18432:80"
+      - "${MAIN_FRONTEND_PORT:-18432}:80"
     depends_on:
       - crms-backend
 
@@ -47,7 +47,7 @@ services:
     container_name: crms-admin-frontend
     restart: unless-stopped
     ports:
-      - "18433:80"
+      - "${ADMIN_FRONTEND_PORT:-18433}:80"
     depends_on:
       - crms-backend
 

@@ -46,4 +46,9 @@ jobs:
           # Note: We do NOT use --volumes here to avoid wiping out the database data
           docker system prune -f
           
+          # Export custom ports for the dev environment
+          export BACKEND_PORT=6565
+          export MAIN_FRONTEND_PORT=3535
+          export ADMIN_FRONTEND_PORT=3536
+          
           docker compose up -d --build
