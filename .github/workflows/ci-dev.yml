@@ -1,0 +1,37 @@
+name: CI/CD Pipeline (Dev)
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    name: Build & Deploy Dev Environment
+    # Use the self-hosted runner requested by the user for the dev environment
+    runs-on: dev-ai
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Because it's a self-hosted runner, we assume Docker is already installed.
+      # We just bring up the full stack using docker-compose.
+      - name: Deploy with Docker Compose
+        env:
+          DATABASE_URL: ${{ secrets.DEV_DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.DEV_JWT_SECRET }}
+          VITE_API_BASE_URL: ${{ secrets.DEV_VITE_API_BASE_URL }}
+        run: |
+          # Write environment variables to .env files so docker-compose can use them
+          echo "DATABASE_URL=$DATABASE_URL" > crms-backend/.env.docker
+          echo "JWT_ACCESS_SECRET=$JWT_SECRET" >> crms-backend/.env.docker
+          echo "JWT_REFRESH_SECRET=$JWT_SECRET" >> crms-backend/.env.docker
+          # Bring down any old containers, rebuild the images, and start the new ones
+          docker compose down
+          
+          # Clean up stopped containers and unused networks to prevent "all predefined address pools have been fully subnetted" error
+          # Note: We do NOT use --volumes here to avoid wiping out the database data
+          docker system prune -f
+          
+          docker compose up -d --build
