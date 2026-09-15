@@ -5,6 +5,7 @@ import { timetableApi } from '../../api/endpoints';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const TIME_SLOTS_STANDARD = [
+  { start: '09:00', end: '10:00' },
   { start: '10:00', end: '11:00' },
   { start: '11:00', end: '12:00' },
   { start: '12:00', end: '13:00' },
@@ -65,15 +66,19 @@ export default function FullWeekTimetableGrid({
       return d.getUTCHours() * 60 + d.getUTCMinutes();
     };
 
-    const s = toMins(startSlot);
-    const e = toMins(endSlot);
+    const sMins = toMins(startSlot);
+    const eMins = toMins(endSlot);
 
     return timetables.filter(t => {
       if (t.dayOfWeek !== day) return false;
-      const ts = toMins(t.startTime);
-      const te = toMins(t.endTime);
-      // overlap check: start < slotEnd AND end > slotStart
-      return ts < e && te > s;
+      const tStartMins = toMins(t.startTime);
+      const tEndMins = toMins(t.endTime);
+      
+      // A class is in this slot if its duration overlaps with the slot
+      // e.g., slot is 09:00-10:00 (540-600)
+      // class is 09:00-11:00 (540-660) -> overlaps!
+      // Math overlap condition: max(start1, start2) < min(end1, end2)
+      return Math.max(sMins, tStartMins) < Math.min(eMins, tEndMins);
     });
   };
 
@@ -84,7 +89,10 @@ export default function FullWeekTimetableGrid({
       courseName: timetable.courseName || '',
       section: timetable.section || '',
       facultyName: timetable.facultyName || '',
-      resourceId: timetable.resourceId || ''
+      resourceId: timetable.resourceId || '',
+      dayOfWeek: timetable.dayOfWeek,
+      startTime: timetable.startTime?.substring(11, 16) || '',
+      endTime: timetable.endTime?.substring(11, 16) || ''
     });
   };
 
@@ -97,49 +105,47 @@ export default function FullWeekTimetableGrid({
     setSaving(true);
     try {
       if (id === 'new') {
-        // Need to set missing context when creating a new record
-        const dataToCreate = {
-           ...editForm,
-           departmentId: selectedDepartment ? parseInt(selectedDepartment, 10) : undefined,
-           studentYear: selectedStudentYear || undefined,
-           academicYear: '2026-27',
+        const payload = {
+          ...editForm,
+          studentYear: selectedStudentYear || '1',
+          departmentId: selectedDepartment,
+          startTime: `1970-01-01T${editForm.startTime}:00Z`,
+          endTime: `1970-01-01T${editForm.endTime}:00Z`
         };
-        const created = await timetableApi.create(dataToCreate);
-        if (setTimetables) {
-          setTimetables(prev => [...prev, created]);
-        }
+        const newRecord = await timetableApi.create(payload);
+        setTimetables(prev => [...prev, newRecord]);
       } else {
-        const updated = await timetableApi.update(id, editForm);
-        if (setTimetables) {
-          setTimetables(prev => prev.map(t => (t.timetableId === id ? { ...t, ...updated } : t)));
-        }
+        const payload = {
+          ...editForm,
+          startTime: `1970-01-01T${editForm.startTime}:00Z`,
+          endTime: `1970-01-01T${editForm.endTime}:00Z`
+        };
+        const updated = await timetableApi.update(id, payload);
+        setTimetables(prev => prev.map(t => t.timetableId === id ? updated : t));
       }
       setEditingId(null);
-      
-      // If we just added the very first class to an empty slot, close the modal because
-      // the existing modal view doesn't auto-update nicely for purely new slots.
-      if (id === 'new' && getClassesForSlot(selectedSlot.day, selectedSlot.start, selectedSlot.end).length === 0) {
-         setSelectedSlot(null);
-      }
-    } catch (error) {
-      alert(error.response?.data?.error || 'Failed to update timetable');
+    } catch (err) {
+      console.error('Failed to save:', err);
+      alert('Failed to save changes. Please try again.');
     } finally {
       setSaving(false);
     }
   };
 
-  const derivedDay = selectedDate ? new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long' }) : selectedDay;
-  const displayDays = derivedDay && DAYS.includes(derivedDay) ? [derivedDay] : DAYS;
+  // Extract unique days present in the timetable or use default days
+  const displayDays = selectedDay && selectedDay !== 'All' ? [selectedDay] : DAYS;
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-line bg-white shadow-sm">
-      <table className="w-full text-left text-sm text-ink border-collapse table-fixed">
-        <thead className="bg-paper border-b border-line text-xs uppercase text-navy">
+    <div className="w-full overflow-x-auto bg-white rounded-xl shadow-sm border border-line">
+      <table className="w-full text-sm text-left">
+        <thead className="bg-slate-50 border-b border-line text-navy sticky top-0 z-20">
           <tr>
-            <th className="px-4 py-3 border-r border-line w-28 font-semibold bg-white/50 sticky left-0 z-10 backdrop-blur-md">Day \ Time</th>
-            {activeTimeSlots.map((slot, idx) => (
-              <th key={idx} className="px-2 py-3 min-w-[120px] lg:min-w-[140px] border-r border-line font-semibold text-center whitespace-nowrap overflow-hidden text-ellipsis">
-                {fmtTimeSlot(`1970-01-01T${slot.start}:00Z`, `1970-01-01T${slot.end}:00Z`)}
+            <th className="px-4 py-4 font-bold uppercase tracking-wider text-xs border-r border-line bg-slate-50 sticky left-0 z-30 shadow-[1px_0_0_0_#e2e8f0]">
+              Day \ Time
+            </th>
+            {activeTimeSlots.map((slot, i) => (
+              <th key={i} className="px-4 py-4 font-bold text-center border-r border-line min-w-[140px] whitespace-nowrap">
+                {slot.isLunch ? '' : fmtTimeSlot(`1970-01-01T${slot.start}:00Z`, `1970-01-01T${slot.end}:00Z`)}
               </th>
             ))}
           </tr>
@@ -151,7 +157,7 @@ export default function FullWeekTimetableGrid({
 
             const getDisplayNames = (classesRaw) => {
               if (classesRaw.length === 0) return '';
-              const shortNames = classesRaw.map(c => c.courseShortName || c.courseCode).filter(Boolean);
+              const shortNames = classesRaw.flatMap(c => (c.courseShortName || c.courseCode || '').split('/').map(s => s.trim())).filter(Boolean);
               return Array.from(new Set(shortNames)).sort().join(' / ');
             };
 
