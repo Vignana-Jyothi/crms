@@ -27,6 +27,18 @@ jobs:
           echo "DATABASE_URL=$DATABASE_URL" > crms-backend/.env.docker
           echo "JWT_ACCESS_SECRET=$JWT_SECRET" >> crms-backend/.env.docker
           echo "JWT_REFRESH_SECRET=$JWT_SECRET" >> crms-backend/.env.docker
+          
+          # Extract DB credentials to initialize fresh PostgreSQL volume
+          regex="^postgres(ql)?://([^:]+):([^@]+)@[^:]+(:[0-9]+)?/([^?]+)"
+          if [[ $DATABASE_URL =~ $regex ]]; then
+            echo "POSTGRES_USER=${BASH_REMATCH[2]}" >> crms-backend/.env.docker
+            echo "POSTGRES_PASSWORD=${BASH_REMATCH[3]}" >> crms-backend/.env.docker
+            echo "POSTGRES_DB=${BASH_REMATCH[5]}" >> crms-backend/.env.docker
+          else
+            echo "POSTGRES_USER=postgres" >> crms-backend/.env.docker
+            echo "POSTGRES_PASSWORD=postgres" >> crms-backend/.env.docker
+            echo "POSTGRES_DB=crms_db" >> crms-backend/.env.docker
+          fi
           # Bring down any old containers, rebuild the images, and start the new ones
           docker compose down
           
