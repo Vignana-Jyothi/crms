@@ -5,7 +5,6 @@ import { timetableApi } from '../../api/endpoints';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const TIME_SLOTS_STANDARD = [
-  { start: '09:00', end: '10:00' },
   { start: '10:00', end: '11:00' },
   { start: '11:00', end: '12:00' },
   { start: '12:00', end: '13:00' },
