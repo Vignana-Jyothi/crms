@@ -60,9 +60,7 @@ export default function FullWeekTimetableGrid({
         const [h, m] = t.split(':').map(Number);
         return h * 60 + m;
       }
-      // Date object
-      const d = new Date(t);
-      return d.getUTCHours() * 60 + d.getUTCMinutes();
+      return 0;
     };
 
     const sMins = toMins(startSlot);
@@ -71,7 +69,12 @@ export default function FullWeekTimetableGrid({
     return timetables.filter(t => {
       if (t.dayOfWeek !== day) return false;
       const tStartMins = toMins(t.startTime);
-      const tEndMins = toMins(t.endTime);
+      let tEndMins = toMins(t.endTime);
+      
+      // Fix DB parsing bug: 12:00 PM was saved as 00:00:00 (12:00 AM)
+      if (tEndMins === 0 && tStartMins === 660) {
+        tEndMins = 720; // 12:00 PM
+      }
       
       // A class is in this slot if its duration overlaps with the slot
       // e.g., slot is 09:00-10:00 (540-600)
