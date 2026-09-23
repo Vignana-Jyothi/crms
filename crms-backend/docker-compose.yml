@@ -3,7 +3,7 @@
 # host, not "localhost" inside its own network namespace. On Linux,
 # host.docker.internal isn't automatic — the extra_hosts entry below
 # adds it. Your DATABASE_URL in .env should then use
-# host.docker.internal instead of localhost.
+# host.docker.internal instead of localhost
 services:
   crms-backend:
     build: .
