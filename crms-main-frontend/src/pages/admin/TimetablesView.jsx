@@ -180,7 +180,7 @@ export default function TimetablesView() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2 mt-2 lg:mt-0">
-            <div className="flex flex-wrap items-center gap-1 bg-white p-1.5 rounded-xl border border-line shadow-sm">
+            <div className="flex flex-wrap items-center gap-1 bg-white p-1.5 rounded-xl border border-line shadow-sm mr-2">
               {['Classrooms', 'Sections', 'Faculty'].map(tab => (
                 <button
                   key={tab}
@@ -197,8 +197,37 @@ export default function TimetablesView() {
             </div>
 
             <button
-              onClick={() => { setIsEditMode(true); setActiveTab(''); }}
+              onClick={() => { 
+                if (isUploadModalOpen && uploadModalMode === 'manual') {
+                  setIsUploadModalOpen(false);
+                } else {
+                  setUploadModalMode('manual'); 
+                  setIsUploadModalOpen(true); 
+                  setViewMode('grid');
+                  setIsEditMode(false);
+                }
+              }}
               className={`flex items-center justify-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl text-sm font-medium transition-colors shadow-sm border ${
+                isUploadModalOpen && uploadModalMode === 'manual'
+                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  : 'bg-white text-slate-700 border-line hover:bg-slate-50'
+              }`}
+            >
+              <LayoutGrid size={18} />
+              <span className="hidden sm:inline">{isUploadModalOpen && uploadModalMode === 'manual' ? 'Cancel Bulk Entry' : 'Manual Bulk Entry'}</span>
+            </button>
+
+            <button
+              onClick={() => { setUploadModalMode('upload'); setIsUploadModalOpen(true); setIsEditMode(false); }}
+              className="flex items-center justify-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl text-sm font-medium transition-colors shadow-sm border bg-white text-slate-700 border-line hover:bg-slate-50"
+            >
+              <Upload size={18} />
+              <span className="hidden sm:inline">Auto-Extract PDF</span>
+            </button>
+
+            <button
+              onClick={() => { setIsEditMode(!isEditMode); setActiveTab(''); setIsUploadModalOpen(false); }}
+              className={`flex items-center justify-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl text-sm font-medium transition-colors shadow-sm border ml-2 ${
                 isEditMode
                   ? 'bg-indigo-600 text-white border-indigo-600'
                   : 'bg-white text-indigo-600 border-line hover:bg-indigo-50'
@@ -453,30 +482,6 @@ export default function TimetablesView() {
                   <p className="text-sm text-slate-600">
                     <strong>Edit Mode Active:</strong> {viewMode === 'grid' ? 'Click on any class in the grid to edit it directly, or click a Free slot to add a new class.' : 'You can click the Edit icon on any row below to update the Course, Section, Faculty, or Room.'} Changes are saved instantly.
                   </p>
-                  <div className="flex gap-2 shrink-0">
-                    <button
-                      onClick={() => { 
-                        if (isUploadModalOpen && uploadModalMode === 'manual') {
-                          setIsUploadModalOpen(false);
-                        } else {
-                          setUploadModalMode('manual'); 
-                          setIsUploadModalOpen(true); 
-                          setViewMode('grid');
-                        }
-                      }}
-                      className={`flex items-center gap-2 px-4 py-2 ${isUploadModalOpen && uploadModalMode === 'manual' ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border-line'} rounded-lg text-sm font-medium transition-colors border`}
-                    >
-                      <LayoutGrid size={16} />
-                      {isUploadModalOpen && uploadModalMode === 'manual' ? 'Cancel Bulk Entry' : 'Manual Bulk Entry'}
-                    </button>
-                    <button
-                      onClick={() => { setUploadModalMode('upload'); setIsUploadModalOpen(true); }}
-                      className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-lg text-sm font-medium transition-colors"
-                    >
-                      <Upload size={16} />
-                      Auto-Extract PDF/Image
-                    </button>
-                  </div>
                 </div>
               )}
               

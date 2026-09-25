@@ -97,10 +97,10 @@ export default function Dashboard() {
       endTimeParam = '13:00';
     } else if (filterType === 'Afternoon') {
       startTimeParam = '13:00';
-      endTimeParam = '17:00';
+      endTimeParam = '16:40';
     } else if (filterType === 'Whole') {
       startTimeParam = '09:00';
-      endTimeParam = '17:00';
+      endTimeParam = '16:40';
     } else if (filterType === 'Custom') {
       startTimeParam = customStart;
       endTimeParam = customEnd;
@@ -247,9 +247,9 @@ export default function Dashboard() {
             className="rounded border border-line px-3 py-2 text-sm bg-white font-medium w-full"
           >
             <option value="Now">Current Time</option>
-            <option value="Morning">Morning (09:00 - 13:00)</option>
-            <option value="Afternoon">Afternoon (13:00 - 17:00)</option>
-            <option value="Whole">Whole Day (09:00 - 17:00)</option>
+            <option value="Morning">Morning (09:00 AM - 01:00 PM)</option>
+            <option value="Afternoon">Afternoon (01:00 PM - 04:40 PM)</option>
+            <option value="Whole">Whole Day (09:00 AM - 04:40 PM)</option>
             <option value="Custom">Custom Slot</option>
           </select>
         </div>

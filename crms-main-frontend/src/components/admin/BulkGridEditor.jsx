@@ -51,29 +51,7 @@ export default function BulkGridEditor({
         departmentId: selectedDepartment,
         section: selectedSection
       }).then(data => {
-        const mapped = data.map(item => {
-          // The API returns startTime and endTime as ISO strings like "1970-01-01T10:00:00.000Z"
-          // We need to extract the HH:mm part for the grid to match them
-          const st = item.startTime ? item.startTime.substring(11, 16) : '';
-          const et = item.endTime ? item.endTime.substring(11, 16) : '';
-          
-          return {
-            timetableId: item.timetableId,
-            dayOfWeek: item.dayOfWeek,
-            startTime: st,
-            endTime: et,
-            courseCode: item.courseCode,
-            courseName: item.courseName || '',
-            courseType: item.courseType || '',
-            facultyName: item.facultyName || '',
-            resourceId: item.resourceId || '',
-            studentYear: item.studentYear || selectedStudentYear,
-            departmentId: item.departmentId || selectedDepartment,
-            section: item.section || selectedSection,
-            resource: item.resource || null
-          };
-        });
-        setLocalClasses(mapped);
+        setLocalClasses(data);
       }).catch(err => {
         console.error('Failed to load existing timetable', err);
       }).finally(() => {
@@ -86,7 +64,7 @@ export default function BulkGridEditor({
   
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [editForm, setEditForm] = useState({});
-  const [editingIndex, setEditingIndex] = useState(null); // index in localClasses array
+  const [editingId, setEditingId] = useState(null);
   
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -94,12 +72,35 @@ export default function BulkGridEditor({
   const isFirstYearView = selectedStudentYear === '1';
   const activeTimeSlots = isFirstYearView ? TIME_SLOTS_FIRST_YEAR : TIME_SLOTS_STANDARD;
 
+  // Use the exact same overlap logic as FullWeekTimetableGrid
   const getClassesForSlot = (day, startSlot, endSlot) => {
-    return localClasses.filter(c => {
-      if (c.dayOfWeek !== day) return false;
-      const cStart = c.startTime.substring(0, 5);
-      const cEnd = c.endTime.substring(0, 5);
-      return cStart === startSlot && cEnd === endSlot;
+    const toMins = (t) => {
+      if (!t) return 0;
+      if (typeof t === 'string') {
+        if (t.includes('T')) {
+          const d = new Date(t);
+          return d.getUTCHours() * 60 + d.getUTCMinutes();
+        }
+        const [h, m] = t.split(':').map(Number);
+        return h * 60 + m;
+      }
+      return 0;
+    };
+
+    const sMins = toMins(startSlot);
+    const eMins = toMins(endSlot);
+
+    return localClasses.filter(t => {
+      if (t.dayOfWeek !== day) return false;
+      const tStartMins = toMins(t.startTime);
+      let tEndMins = toMins(t.endTime);
+      
+      // Fix DB parsing bug: 12:00 PM was saved as 00:00:00 (12:00 AM)
+      if (tEndMins === 0 && tStartMins === 660) {
+        tEndMins = 720; // 12:00 PM
+      }
+      
+      return Math.max(sMins, tStartMins) < Math.min(eMins, tEndMins);
     });
   };
 
@@ -111,15 +112,18 @@ export default function BulkGridEditor({
 
     const newClass = {
       ...editForm,
+      // Create a fake unique ID if it's new so we can edit/delete it locally before batch save
+      timetableId: editingId === 'new' ? `temp-${Date.now()}` : editingId, 
       studentYear: selectedStudentYear,
       departmentId: selectedDepartment,
-      section: selectedSection, // Can be overridden in the cell if needed, but defaults to the top filter
+      section: editForm.section || selectedSection,
+      startTime: `1970-01-01T${editForm.startTime}:00Z`,
+      endTime: `1970-01-01T${editForm.endTime}:00Z`,
       resource: editForm.resourceId ? resources.find(r => r.resourceId === parseInt(editForm.resourceId)) : null
     };
 
-    if (editingIndex !== null && editingIndex !== 'new') {
-      const updated = [...localClasses];
-      updated[editingIndex] = newClass;
+    if (editingId !== 'new') {
+      const updated = localClasses.map(c => c.timetableId === editingId ? newClass : c);
       setLocalClasses(updated);
     } else {
       setLocalClasses([...localClasses, newClass]);
@@ -128,9 +132,8 @@ export default function BulkGridEditor({
     setSelectedSlot(null);
   };
 
-  const handleRemoveSlot = (idx) => {
-    const updated = [...localClasses];
-    updated.splice(idx, 1);
+  const handleRemoveSlot = (id) => {
+    const updated = localClasses.filter(c => c.timetableId !== id);
     setLocalClasses(updated);
   };
 
@@ -243,98 +246,148 @@ export default function BulkGridEditor({
             </div>
           )}
           
-          <table className="w-full border-collapse bg-white min-w-[1000px]">
-            <thead>
+          <table className="w-full text-sm text-left border-collapse bg-white min-w-[1000px]">
+            <thead className="bg-slate-50 border-b border-line text-navy sticky top-0 z-20">
               <tr>
-                <th className="bg-slate-50 border-b border-r border-line p-3 text-left w-24 sticky left-0 z-10 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  DAY \ TIME
+                <th className="px-4 py-4 font-bold uppercase tracking-wider text-xs border-r border-line bg-slate-50 sticky left-0 z-30 shadow-[1px_0_0_0_#e2e8f0]">
+                  Day \ Time
                 </th>
-                {activeTimeSlots.map((slot, idx) => (
-                  <th key={idx} className="bg-slate-50 border-b border-r border-line p-3 text-center min-w-[140px]">
-                    <div className="text-xs font-bold text-slate-700">{slot.start}-{slot.end}</div>
+                {activeTimeSlots.map((slot, i) => (
+                  <th key={i} className="px-4 py-4 font-bold text-center border-r border-line min-w-[140px] whitespace-nowrap">
+                    {slot.isLunch ? '' : fmtTimeSlot(`1970-01-01T${slot.start}:00Z`, `1970-01-01T${slot.end}:00Z`)}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody>
-              {DAYS.map((day) => (
-                <tr key={day} className="border-b border-line group">
-                  <td className="px-4 py-4 border-r border-line font-semibold text-navy bg-slate-50/50 sticky left-0 z-10">
-                    {day}
-                  </td>
-                  {activeTimeSlots.map((slot, idx) => {
-                    if (slot.isLunch) {
+            <tbody className="divide-y divide-line">
+              {DAYS.map((day) => {
+                const daySlots = [];
+                let skipUntil = 0;
+
+                const getDisplayNames = (classesRaw) => {
+                  if (classesRaw.length === 0) return '';
+                  const shortNames = classesRaw.flatMap(c => (c.courseShortName || c.courseCode || '').split('/').map(s => s.trim())).filter(Boolean);
+                  return Array.from(new Set(shortNames)).sort().join(' / ');
+                };
+
+                for (let i = 0; i < activeTimeSlots.length; i++) {
+                  if (i < skipUntil) continue;
+                  const slot = activeTimeSlots[i];
+                  
+                  if (slot.isLunch) {
+                    daySlots.push({ ...slot, idx: i, colSpan: 1, isLunch: true, classesRaw: [] });
+                    continue;
+                  }
+
+                  const classesRaw = getClassesForSlot(day, slot.start, slot.end);
+                  const displayNames = getDisplayNames(classesRaw);
+                  const hasClasses = classesRaw.length > 0;
+
+                  let colSpan = 1;
+                  let j = i + 1;
+                  let endSlot = slot.end;
+
+                  if (hasClasses) {
+                    while (j < activeTimeSlots.length) {
+                      const nextSlot = activeTimeSlots[j];
+                      if (nextSlot.isLunch) break;
+                      
+                      const nextClassesRaw = getClassesForSlot(day, nextSlot.start, nextSlot.end);
+                      const nextDisplayNames = getDisplayNames(nextClassesRaw);
+                      
+                      if (nextClassesRaw.length > 0 && nextDisplayNames === displayNames) {
+                        colSpan++;
+                        endSlot = nextSlot.end;
+                        j++;
+                      } else {
+                        break;
+                      }
+                    }
+                  }
+
+                  daySlots.push({
+                    ...slot,
+                    idx: i,
+                    colSpan,
+                    hasClasses,
+                    classesRaw,
+                    displayNames,
+                    mergedStart: slot.start,
+                    mergedEnd: endSlot
+                  });
+                  
+                  skipUntil = j;
+                }
+
+                return (
+                  <tr key={day} className="border-b border-line group">
+                    <td className="px-4 py-4 border-r border-line font-semibold text-navy bg-slate-50/50 sticky left-0 z-10">
+                      {day}
+                    </td>
+                    {daySlots.map((slotData) => {
+                      if (slotData.isLunch) {
+                        return (
+                          <td key={slotData.idx} colSpan={slotData.colSpan} className="border-r border-line p-2 text-center align-middle h-full bg-slate-50/80">
+                            <div className="flex items-center justify-center h-full w-full text-slate-400 font-medium text-xs py-4">
+                              Lunch
+                            </div>
+                          </td>
+                        );
+                      }
+
+                      const { idx, colSpan, hasClasses, classesRaw, mergedStart, mergedEnd } = slotData;
+
                       return (
-                        <td key={idx} className="border-r border-line p-2 text-center align-middle h-full bg-slate-50/80">
-                          <div className="flex items-center justify-center h-full w-full text-slate-400 font-medium text-xs py-4">
-                            Lunch
-                          </div>
+                        <td key={idx} colSpan={colSpan} className={`border-r border-line p-2 text-center align-top h-full ${!hasClasses ? 'bg-white hover:bg-indigo-50/50 cursor-pointer transition-colors' : 'bg-white'}`}
+                            onClick={() => {
+                              if (!hasClasses) {
+                                setSelectedSlot({ day, start: mergedStart, end: mergedEnd, label: `${day} • ${fmtTimeSlot(`1970-01-01T${mergedStart}:00Z`, `1970-01-01T${mergedEnd}:00Z`)}` });
+                                setEditingId('new');
+                                setEditForm({
+                                  courseCode: '', courseName: '', section: selectedSection, facultyName: '', resourceId: '',
+                                  dayOfWeek: day, startTime: `${mergedStart}`, endTime: `${mergedEnd}`
+                                });
+                              }
+                            }}>
+                          {hasClasses ? (
+                            <div className="flex flex-col gap-1.5 min-h-[85px] max-h-[250px] overflow-y-auto overflow-x-hidden custom-scrollbar pr-1">
+                              {classesRaw.map(c => {
+                                const shortName = c.courseShortName || c.courseName || c.courseCode;
+                                const resourceName = c.resource?.resourceName || (resources.find(r => r.resourceId === c.resourceId)?.resourceName) || c.resourceId;
+                                
+                                return (
+                                  <div key={c.timetableId} className="flex flex-col items-center justify-center p-2 rounded-lg bg-indigo-50 border border-indigo-100 w-full relative group/item text-center hover:border-indigo-400 transition-colors cursor-pointer"
+                                       onClick={(e) => {
+                                         e.stopPropagation();
+                                         setSelectedSlot({ day, start: mergedStart, end: mergedEnd, label: `${day} • ${fmtTimeSlot(`1970-01-01T${mergedStart}:00Z`, `1970-01-01T${mergedEnd}:00Z`)}` });
+                                         setEditingId(c.timetableId);
+                                         setEditForm({
+                                           ...c, 
+                                           startTime: c.startTime.length > 5 && c.startTime.includes('T') ? c.startTime.substring(11, 16) : c.startTime.substring(0,5),
+                                           endTime: c.endTime.length > 5 && c.endTime.includes('T') ? c.endTime.substring(11, 16) : c.endTime.substring(0,5)
+                                         });
+                                       }}>
+                                    <div className="font-bold text-indigo-900 text-[10px] text-center leading-tight line-clamp-2 mb-0.5">
+                                      {shortName}
+                                    </div>
+                                    <div className="text-[9px] text-indigo-600/80 line-clamp-2 text-center px-1">
+                                      {resourceName || 'No Room'} • {c.facultyName || 'Unassigned'}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-center h-full w-full text-xs py-4 text-indigo-400 font-medium hover:text-indigo-600">
+                              + Add
+                            </div>
+                          )}
                         </td>
                       );
-                    }
-
-                    const classesInSlot = getClassesForSlot(day, slot.start, slot.end);
-                    const hasClasses = classesInSlot.length > 0;
-
-                    return (
-                      <td key={idx} className={`border-r border-line p-2 text-center align-top h-full ${!hasClasses ? 'bg-white hover:bg-indigo-50/50 cursor-pointer transition-colors' : 'bg-white'}`}
-                          onClick={() => {
-                            if (!hasClasses) {
-                              setSelectedSlot({ day, start: slot.start, end: slot.end, label: `${day} • ${fmtTimeSlot(`1970-01-01T${slot.start}:00Z`, `1970-01-01T${slot.end}:00Z`)}` });
-                              setEditingIndex('new');
-                              setEditForm({
-                                courseCode: '', courseName: '', section: selectedSection, facultyName: '', resourceId: '',
-                                dayOfWeek: day, startTime: `${slot.start}:00`, endTime: `${slot.end}:00`
-                              });
-                            }
-                          }}>
-                        {hasClasses ? (
-                          <div className="flex flex-col gap-1.5 min-h-[85px] max-h-[250px] overflow-y-auto overflow-x-hidden custom-scrollbar pr-1">
-                            {(() => {
-                              const aggregatedDisplay = {
-                                courseShortNames: [],
-                                resourceNames: [],
-                                facultyNames: []
-                              };
-                              classesInSlot.forEach(c => {
-                                const shortName = c.courseShortName || c.courseName || c.courseCode;
-                                if (shortName && !aggregatedDisplay.courseShortNames.includes(shortName)) aggregatedDisplay.courseShortNames.push(shortName);
-                                const resourceName = c.resource?.resourceName || c.resourceId;
-                                if (resourceName && !aggregatedDisplay.resourceNames.includes(resourceName)) aggregatedDisplay.resourceNames.push(resourceName);
-                                if (c.facultyName && !aggregatedDisplay.facultyNames.includes(c.facultyName)) aggregatedDisplay.facultyNames.push(c.facultyName);
-                              });
-                              
-                              // Use the first class's index for editing
-                              const localIdx = localClasses.findIndex(lc => lc === classesInSlot[0]);
-
-                              return (
-                                <div className="flex flex-col items-center justify-center p-2 rounded-lg bg-indigo-50 border border-indigo-100 w-full relative group/item text-center hover:border-indigo-400 transition-colors cursor-pointer"
-                                     onClick={(e) => {
-                                       e.stopPropagation();
-                                       setSelectedSlot({ day, start: slot.start, end: slot.end, label: `${day} • ${fmtTimeSlot(`1970-01-01T${slot.start}:00Z`, `1970-01-01T${slot.end}:00Z`)}` });
-                                       setEditingIndex(localIdx);
-                                       setEditForm({...classesInSlot[0]});
-                                     }}>
-                                  <div className="font-bold text-indigo-900 text-[10px] text-center leading-tight line-clamp-2 mb-0.5">
-                                    {aggregatedDisplay.courseShortNames.join(' / ')}
-                                  </div>
-                                  <div className="text-[9px] text-indigo-600/80 line-clamp-2 text-center px-1">
-                                    {aggregatedDisplay.resourceNames?.length > 0 ? aggregatedDisplay.resourceNames.join(' / ') : 'No Room'} • {aggregatedDisplay.facultyNames?.length > 0 ? aggregatedDisplay.facultyNames.join(' / ') : 'Unassigned'}
-                                  </div>
-                                </div>
-                              );
-                            })()}
-                          </div>
-                        ) : (
-                          <div className="flex items-center justify-center h-full w-full text-xs py-4 text-indigo-400 font-medium hover:text-indigo-600">
-                            + Add
-                          </div>
-                        )}
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
+                    })}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -406,8 +459,8 @@ export default function BulkGridEditor({
                 </div>
 
                 <div className="flex justify-between items-center mt-6 pt-4 border-t border-line">
-                  {editingIndex !== 'new' && editingIndex !== null ? (
-                    <button onClick={() => { handleRemoveSlot(editingIndex); setSelectedSlot(null); }} className="px-3 py-1.5 rounded text-xs font-bold text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors">
+                  {editingId !== 'new' && editingId !== null ? (
+                    <button onClick={() => { handleRemoveSlot(editingId); setSelectedSlot(null); }} className="px-3 py-1.5 rounded text-xs font-bold text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors">
                       Delete
                     </button>
                   ) : <div></div>}

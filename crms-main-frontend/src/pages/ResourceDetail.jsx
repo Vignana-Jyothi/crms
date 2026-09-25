@@ -120,8 +120,8 @@ export default function ResourceDetail() {
           <h2 className="text-sm font-semibold text-ink">Request this resource</h2>
           <div className="flex gap-2">
             <button type="button" onClick={() => setForm(f => ({...f, startTime: '09:00', endTime: '13:00'}))} className="rounded bg-paper px-3 py-1.5 text-[11px] font-semibold text-navy hover:bg-paper/80 border border-line transition-colors">Morning</button>
-            <button type="button" onClick={() => setForm(f => ({...f, startTime: '13:00', endTime: '17:00'}))} className="rounded bg-paper px-3 py-1.5 text-[11px] font-semibold text-navy hover:bg-paper/80 border border-line transition-colors">Afternoon</button>
-            <button type="button" onClick={() => setForm(f => ({...f, startTime: '09:00', endTime: '17:00'}))} className="rounded bg-paper px-3 py-1.5 text-[11px] font-semibold text-navy hover:bg-paper/80 border border-line transition-colors">Whole Day</button>
+            <button type="button" onClick={() => setForm(f => ({...f, startTime: '13:00', endTime: '16:40'}))} className="rounded bg-paper px-3 py-1.5 text-[11px] font-semibold text-navy hover:bg-paper/80 border border-line transition-colors">Afternoon</button>
+            <button type="button" onClick={() => setForm(f => ({...f, startTime: '09:00', endTime: '16:40'}))} className="rounded bg-paper px-3 py-1.5 text-[11px] font-semibold text-navy hover:bg-paper/80 border border-line transition-colors">Whole Day</button>
           </div>
         </div>
 
