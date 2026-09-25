@@ -36,6 +36,17 @@ jobs:
           # Note: We do NOT use --volumes here to avoid wiping out the database data
           docker system prune -f
           
+          # Write environment variables to .env.docker
+          echo "DATABASE_URL=$DATABASE_URL" > crms-backend/.env.docker
+          echo "JWT_ACCESS_SECRET=$JWT_SECRET" >> crms-backend/.env.docker
+          echo "JWT_REFRESH_SECRET=$JWT_SECRET" >> crms-backend/.env.docker
+          echo "SMTP_HOST=$SMTP_HOST" >> crms-backend/.env.docker
+          echo "SMTP_PORT=$SMTP_PORT" >> crms-backend/.env.docker
+          echo "SMTP_SECURE=$SMTP_SECURE" >> crms-backend/.env.docker
+          echo "SMTP_USER=$SMTP_USER" >> crms-backend/.env.docker
+          echo "SMTP_PASS=$SMTP_PASS" >> crms-backend/.env.docker
+          echo "SMTP_FROM=$SMTP_FROM" >> crms-backend/.env.docker
+          
           # Export custom ports for the dev environment
           export BACKEND_PORT=6565
           export MAIN_FRONTEND_PORT=3535

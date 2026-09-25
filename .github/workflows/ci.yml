@@ -30,6 +30,15 @@ jobs:
           SMTP_FROM: ${{ secrets.SMTP_FROM }}
         run: |
           # Write environment variables to .env files so docker-compose can use them
+          echo "DATABASE_URL=$DATABASE_URL" > crms-backend/.env.docker
+          echo "JWT_ACCESS_SECRET=$JWT_SECRET" >> crms-backend/.env.docker
+          echo "JWT_REFRESH_SECRET=$JWT_SECRET" >> crms-backend/.env.docker
+          echo "SMTP_HOST=$SMTP_HOST" >> crms-backend/.env.docker
+          echo "SMTP_PORT=$SMTP_PORT" >> crms-backend/.env.docker
+          echo "SMTP_SECURE=$SMTP_SECURE" >> crms-backend/.env.docker
+          echo "SMTP_USER=$SMTP_USER" >> crms-backend/.env.docker
+          echo "SMTP_PASS=$SMTP_PASS" >> crms-backend/.env.docker
+          echo "SMTP_FROM=$SMTP_FROM" >> crms-backend/.env.docker
           # Bring down any old containers, rebuild the images, and start the new ones
           docker compose down
           
