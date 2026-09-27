@@ -3,6 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const compression = require('compression');
 
 const env = require('./config/env');
 const errorHandler = require('./middleware/errorHandler');
@@ -38,6 +39,7 @@ const corsOptions = {
 };
 
 app.use(helmet());
+app.use(compression());
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(morgan(env.nodeEnv === 'development' ? 'dev' : 'combined'));

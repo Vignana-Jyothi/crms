@@ -1,5 +1,6 @@
 const asyncHandler = require('../../utils/asyncHandler');
 const service = require('./timetable.service');
+const cache = require('../../utils/cache');
 
 const list = asyncHandler(async (req, res) => {
   res.json(await service.list(req.query));
@@ -10,15 +11,21 @@ const getById = asyncHandler(async (req, res) => {
 });
 
 const syncEduPrime = asyncHandler(async (req, res) => {
-  res.json(await service.syncEduPrime());
+  const result = await service.syncEduPrime();
+  cache.flushAll(); // Invalidate timetable cache
+  res.json(result);
 });
 
 const update = asyncHandler(async (req, res) => {
-  res.json(await service.update(req.params.timetableId, req.body));
+  const result = await service.update(req.params.timetableId, req.body);
+  cache.flushAll(); // Invalidate timetable cache
+  res.json(result);
 });
 
 const create = asyncHandler(async (req, res) => {
-  res.json(await service.create(req.body));
+  const result = await service.create(req.body);
+  cache.flushAll(); // Invalidate timetable cache
+  res.json(result);
 });
 
 const extractFromFile = asyncHandler(async (req, res) => {
@@ -38,7 +45,9 @@ const extractFromFile = asyncHandler(async (req, res) => {
 
 const batchCreate = asyncHandler(async (req, res) => {
   // Pass the array of timetable entries to the service
-  res.json(await service.batchCreate(req.body.entries));
+  const result = await service.batchCreate(req.body.entries);
+  cache.flushAll(); // Invalidate timetable cache
+  res.json(result);
 });
 
 module.exports = { list, getById, syncEduPrime, update, create, extractFromFile, batchCreate };

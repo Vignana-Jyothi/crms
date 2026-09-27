@@ -27,8 +27,10 @@ router.post(
   controller.batchCreate
 );
 
+const cacheMiddleware = require('../../middleware/cacheMiddleware');
+
 // GET /api/v1/timetable?departmentId=&resourceId=&dayOfWeek=&academicYear=
-router.get('/', controller.list);
+router.get('/', cacheMiddleware(300), controller.list);
 router.post('/sync', authorizeRole(ROLES.SUPER_ADMIN), controller.syncEduPrime);
 router.get('/:timetableId', validateRequest(timetableIdParamSchema), controller.getById);
 router.post(
