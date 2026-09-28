@@ -24,7 +24,7 @@ services:
     env_file:
       - ./crms-backend/.env.docker
     ports:
-      - "${BACKEND_PORT:-4000}:4000"
+      - "${BACKEND_PORT:-4005}:4000"
     depends_on:
       db:
         condition: service_healthy
