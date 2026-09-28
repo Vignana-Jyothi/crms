@@ -248,11 +248,40 @@ export default function TimetableUploadModal({ isOpen, onClose, contextFilters, 
           ) : (
             /* Preview State */
             <div className="space-y-4">
-              <div className="flex justify-between items-center mb-2">
-                 <h3 className="font-semibold text-navy">{initialMode === 'manual' ? 'Classes to Add' : 'Extracted Classes'} ({extractedData.length})</h3>
+              <div className="flex justify-between items-end mb-4 bg-slate-50 p-4 rounded-xl border border-line">
+                 <div>
+                   <h3 className="font-semibold text-navy mb-3">{initialMode === 'manual' ? 'Classes to Add' : 'Extracted Classes'} ({extractedData.length})</h3>
+                   <div className="flex items-center gap-3">
+                      <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Bulk Apply:</span>
+                      <div className="w-32">
+                        <SearchableSelect 
+                          value=""
+                          onChange={(val) => { if(val) setExtractedData(prev => prev.map(r => ({...r, studentYear: val}))) }}
+                          placeholder="Year..."
+                          options={[{ value: '1', label: '1st Year' }, { value: '2', label: '2nd Year' }, { value: '3', label: '3rd Year' }, { value: '4', label: '4th Year' }]}
+                        />
+                      </div>
+                      <div className="w-48">
+                        <SearchableSelect 
+                          value=""
+                          onChange={(val) => { if(val) setExtractedData(prev => prev.map(r => ({...r, departmentId: parseInt(val)}))) }}
+                          placeholder="Department..."
+                          options={departments.map(d => ({ value: String(d.departmentId), label: d.branchCode || d.departmentName }))}
+                        />
+                      </div>
+                      <div className="w-32">
+                          <input 
+                            type="text" 
+                            onChange={(e) => setExtractedData(prev => prev.map(r => ({...r, section: e.target.value})))}
+                            className="w-full p-2 border border-line rounded-lg bg-white text-sm"
+                            placeholder="Section..."
+                          />
+                      </div>
+                   </div>
+                 </div>
                  <button 
                     onClick={handleAddRow}
-                    className="text-sm text-primary font-medium hover:underline flex items-center gap-1"
+                    className="text-sm text-primary font-medium hover:underline flex items-center gap-1 bg-white px-3 py-1.5 rounded-lg border border-primary/20 shadow-sm"
                  >
                     + Add Row
                  </button>

@@ -160,8 +160,13 @@ async function parseTextToTimetable(rawOutput, context) {
               let faculty = '';
               let roomName = '';
               for (const [k, v] of Object.entries(rec)) {
-                if (k.toLowerCase().includes('faculty') || k.toLowerCase().includes('coordinator') || k.toLowerCase().includes('name of the')) faculty = v;
-                if (k.toLowerCase().includes('room') || k.toLowerCase().includes('class')) roomName = v;
+                const kLower = k.toLowerCase();
+                if (kLower.includes('faculty') || kLower.includes('coordinator') || (kLower.includes('name of the') && !kLower.includes('course') && !kLower.includes('subject'))) {
+                  faculty = v;
+                }
+                if (kLower.includes('room') || kLower.includes('class')) {
+                  roomName = v;
+                }
               }
               
               // Resolve room ID for this specific course if present
