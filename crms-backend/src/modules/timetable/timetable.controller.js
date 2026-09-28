@@ -39,7 +39,7 @@ const extractFromFile = asyncHandler(async (req, res) => {
     studentYear: req.body.studentYear,
     section: req.body.section
   };
-  const extractedData = extractionService.parseTextToTimetable(rawText, context);
+  const extractedData = await extractionService.parseTextToTimetable(rawText, context);
   res.json(extractedData);
 });
 

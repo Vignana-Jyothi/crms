@@ -3,6 +3,9 @@ const fs = require('fs/promises');
 const path = require('path');
 const os = require('os');
 const crypto = require('crypto');
+const { PrismaClient } = require('@prisma/client');
+
+const prisma = new PrismaClient();
 
 async function extractTextFromFile(file) {
   if (!file || !file.buffer) {
@@ -55,7 +58,7 @@ async function extractTextFromFile(file) {
   }
 }
 
-function parseTextToTimetable(rawOutput, context) {
+async function parseTextToTimetable(rawOutput, context) {
   let parsedJson;
   try {
     parsedJson = JSON.parse(rawOutput);
@@ -68,14 +71,80 @@ function parseTextToTimetable(rawOutput, context) {
   if (!parsedJson || parsedJson.length === 0) return finalRecords;
 
   for (const page of parsedJson) {
+    // 1. Resolve Global Section
     let metaSection = context.section || '';
     if (!metaSection && page.metadata) {
        for (const [k, v] of Object.entries(page.metadata)) {
          if (k.toLowerCase().includes('section')) {
-           metaSection = v === '--' ? '' : `Sec ${v}`;
+           // User preference: if blank, treat as one section
+           metaSection = v.trim() ? `Sec ${v.trim()}` : '';
            break;
          }
        }
+    }
+
+    // 2. Resolve Global Year
+    let metaYear = context.studentYear || '';
+    if (!metaYear && page.metadata) {
+      for (const [k, v] of Object.entries(page.metadata)) {
+        if (k.toLowerCase().includes('class') || k.toLowerCase().includes('year')) {
+          const valLower = v.toLowerCase();
+          if (valLower.includes('i ') || valLower.includes('1st') || valLower.includes('it')) metaYear = '1';
+          if (valLower.includes('ii ') || valLower.includes('2nd')) metaYear = '2';
+          if (valLower.includes('iii') || valLower.includes('3rd')) metaYear = '3';
+          if (valLower.includes('iv') || valLower.includes('4th')) metaYear = '4';
+        }
+      }
+    }
+
+    // 3. Resolve Global Department
+    let metaDepartmentId = context.departmentId || null;
+    if (!metaDepartmentId && page.metadata) {
+      for (const [k, v] of Object.entries(page.metadata)) {
+        if (k.toLowerCase().includes('branch') || k.toLowerCase().includes('department')) {
+          const val = v.trim();
+          if (val) {
+            // Find by exact name, or partial match
+            const dept = await prisma.department.findFirst({
+              where: {
+                OR: [
+                  { departmentName: { equals: val, mode: 'insensitive' } },
+                  { branchCode: { equals: val, mode: 'insensitive' } }
+                ]
+              }
+            });
+            if (dept) metaDepartmentId = dept.departmentId;
+            else {
+              // Fuzzy match fallback (e.g. "Computer Science and Business Systems" -> "CSBS")
+              const words = val.split(/\s+/);
+              const initials = words.map(w => w[0]).join('').toUpperCase();
+              const deptInitials = await prisma.department.findFirst({
+                where: { branchCode: { equals: initials, mode: 'insensitive' } }
+              });
+              if (deptInitials) metaDepartmentId = deptInitials.departmentId;
+            }
+          }
+        }
+      }
+    }
+
+    // 4. Resolve Global Classroom (Room No)
+    let globalRoomId = null;
+    if (page.metadata) {
+      for (const [k, v] of Object.entries(page.metadata)) {
+        if (k.toLowerCase().includes('room') || k.toLowerCase().includes('roon')) {
+          const val = v.trim();
+          if (val) {
+            const res = await prisma.resource.findFirst({
+              where: { 
+                resourceType: 'CLASSROOM',
+                resourceName: { equals: val, mode: 'insensitive' }
+              }
+            });
+            if (res) globalRoomId = res.resourceId;
+          }
+        }
+      }
     }
     
     // Map course tables (acronyms to faculty/resource)
@@ -86,13 +155,25 @@ function parseTextToTimetable(rawOutput, context) {
           for (const tbl of ct.tables) {
             for (const rec of tbl) {
               const code = rec['Course Code'] || '';
-              const name = rec['Name of the Course'] || rec['Course Name'] || '';
+              const name = rec['Name of the Course'] || rec['Course Name'] || rec['Subject'] || '';
               
               let faculty = '';
-              let room = '';
+              let roomName = '';
               for (const [k, v] of Object.entries(rec)) {
-                if (k.toLowerCase().includes('faculty') || k.toLowerCase().includes('coordinator')) faculty = v;
-                if (k.toLowerCase().includes('room')) room = v;
+                if (k.toLowerCase().includes('faculty') || k.toLowerCase().includes('coordinator') || k.toLowerCase().includes('name of the')) faculty = v;
+                if (k.toLowerCase().includes('room') || k.toLowerCase().includes('class')) roomName = v;
+              }
+              
+              // Resolve room ID for this specific course if present
+              let mappedRoomId = globalRoomId;
+              if (roomName && roomName.trim()) {
+                const res = await prisma.resource.findFirst({
+                  where: { 
+                    resourceType: 'CLASSROOM',
+                    resourceName: { equals: roomName.trim(), mode: 'insensitive' }
+                  }
+                });
+                if (res) mappedRoomId = res.resourceId;
               }
               
               if (name) {
@@ -100,9 +181,9 @@ function parseTextToTimetable(rawOutput, context) {
                 const acronymMatch = name.match(/\(([A-Za-z0-9\-\s]+)\)/);
                 if (acronymMatch) {
                   const acronym = acronymMatch[1].trim().toUpperCase();
-                  courseMap[acronym] = { courseName: name, facultyName: faculty, roomNo: room };
+                  courseMap[acronym] = { courseName: name, facultyName: faculty, roomId: mappedRoomId };
                 }
-                courseMap[name.toUpperCase()] = { courseName: name, facultyName: faculty, roomNo: room };
+                courseMap[name.toUpperCase()] = { courseName: name, facultyName: faculty, roomId: mappedRoomId };
               }
             }
           }
@@ -116,24 +197,33 @@ function parseTextToTimetable(rawOutput, context) {
         for (const [day, entries] of Object.entries(days)) {
           for (const entry of entries) {
             const subject = entry.subject;
+            if (subject.toLowerCase() === 'lunch') continue; // Skip lunch breaks
             
             // Try to find mapping for faculty/room
             let facultyName = '';
-            let resourceIdStr = '';
+            let resourceId = globalRoomId; // default to global room
             
+            // Attempt to match the exact acronym or subject from the course map
             if (entry.options && entry.options.length > 0) {
               for (const opt of entry.options) {
                 if (courseMap[opt.toUpperCase()]) {
-                  facultyName = courseMap[opt.toUpperCase()].facultyName;
-                  resourceIdStr = courseMap[opt.toUpperCase()].roomNo;
+                  facultyName = courseMap[opt.toUpperCase()].facultyName || facultyName;
+                  if (courseMap[opt.toUpperCase()].roomId) resourceId = courseMap[opt.toUpperCase()].roomId;
                   break;
                 }
               }
             }
             
             if (!facultyName && courseMap[subject.toUpperCase()]) {
-               facultyName = courseMap[subject.toUpperCase()].facultyName;
-               resourceIdStr = courseMap[subject.toUpperCase()].roomNo;
+               facultyName = courseMap[subject.toUpperCase()].facultyName || facultyName;
+               if (courseMap[subject.toUpperCase()].roomId) resourceId = courseMap[subject.toUpperCase()].roomId;
+            }
+
+            // Clean up faculty name (remove "Mr.", "Mrs.", "Dr." prefixes to help frontend match)
+            if (facultyName) {
+               // Many times frontend might match exact name without prefixes, or vice-versa
+               // We will pass it as-is for now, but ensure no trailing slashes.
+               facultyName = facultyName.split('/')[0].trim();
             }
 
             // Convert 12-hour "09:00 AM" to 24-hour "09:00" for input type="time"
@@ -161,10 +251,10 @@ function parseTextToTimetable(rawOutput, context) {
               endTime: convertTime(endTime),
               courseName: subject,
               section: metaSection,
-              departmentId: context.departmentId || null,
-              studentYear: context.studentYear || '',
+              departmentId: metaDepartmentId,
+              studentYear: metaYear,
               facultyName: facultyName,
-              resourceId: resourceIdStr
+              resourceId: resourceId
             });
           }
         }
