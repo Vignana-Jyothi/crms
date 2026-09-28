@@ -147,7 +147,7 @@ function parseTextToTimetable(rawText, context = {}) {
     dayOfWeek: 'Debug',
     startTime: '00:00',
     endTime: '00:00',
-    courseName: rawText.substring(0, 300) + (rawText.length > 300 ? '...' : ''),
+    courseName: rawText.replace(/\n/g, ' | ').substring(0, 300) + (rawText.length > 300 ? '...' : ''),
     departmentId: context.departmentId || null,
     studentYear: context.studentYear || '',
     section: context.section || '',
