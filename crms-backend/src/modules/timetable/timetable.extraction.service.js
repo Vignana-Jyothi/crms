@@ -162,18 +162,28 @@ async function parseTextToTimetable(rawOutput, context) {
         if (ct.tables) {
           for (const tbl of ct.tables) {
             for (const rec of tbl) {
-              const code = rec['Course Code'] || '';
-              const name = rec['Name of the Course'] || rec['Course Name'] || rec['Subject'] || '';
-              
+              let name = '';
+              let code = '';
               let faculty = '';
               let roomName = '';
               for (const [k, v] of Object.entries(rec)) {
                 const kLower = k.toLowerCase();
+                
+                // Faculty matching
                 if (kLower.includes('faculty') || kLower.includes('coordinator') || (kLower.includes('name of the') && !kLower.includes('course') && !kLower.includes('subject'))) {
                   faculty = v;
                 }
-                if (kLower.includes('room') || kLower.includes('class')) {
+                // Room matching
+                else if (kLower.includes('room') || kLower.includes('class')) {
                   roomName = v;
+                }
+                // Course Code matching
+                else if (kLower.includes('code')) {
+                  code = v;
+                }
+                // Course Name matching
+                else if (kLower.includes('name') || kLower.includes('title') || kLower.includes('subject') || kLower.includes('course')) {
+                  name = v;
                 }
               }
 
