@@ -23,7 +23,8 @@ async function extractTextFromFile(file) {
       // Use PSM 6 (Assume a single uniform block of text) to prevent column-wise reading of tables
       const worker = await Tesseract.createWorker('eng');
       await worker.setParameters({
-        tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
+        tessedit_pageseg_mode: '4',
+        preserve_interword_spaces: '1',
       });
       const { data: { text } } = await worker.recognize(file.buffer);
       await worker.terminate();
@@ -60,7 +61,7 @@ function parseTextToTimetable(rawText, context = {}) {
   const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
   // Check if it matches the VNR specific format
-  const isVnrFormat = rawText.match(/Branch:/i) || rawText.match(/Section:/i) || rawText.match(/Course Code/i);
+  const isVnrFormat = rawText.match(/Branch/i) || rawText.match(/Section/i) || rawText.match(/Course/i) || rawText.match(/Timetable/i) || rawText.match(/VIGNANA/i);
 
   if (isVnrFormat) {
     const finalRecords = [];
