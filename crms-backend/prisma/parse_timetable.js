@@ -53,6 +53,7 @@ async function main() {
 
     let branchStr = branchMatch[1].trim();
     if (branchStr === 'EVL' || branchStr === 'EIE') branchStr = 'ECE'; // Map sub-branches
+    if (branchStr === 'CSBS') branchStr = 'CSE'; // Map CSBS to CSE
     
     let dept = depts.find(d => branchStr.includes(d.branchCode));
     if (!dept && branchStr.includes('CSE')) dept = depts.find(d => d.branchCode === 'CSE');
@@ -129,6 +130,7 @@ async function main() {
           courseCode: map.courseCode || token,
           section: `${branchStr} - Sec ${section}`,
           academicYear: '2026-27',
+          studentYear: '1',
           facultyName: map.facultyName || null // Null if no faculty mapped
         });
         slotIdx++;

@@ -146,8 +146,17 @@ export default function TimetablesView() {
 
   const availableSections = sectionsData
     .filter(s => {
-      if (selectedStudentYear && s.studentYear !== selectedStudentYear) return false;
-      if (selectedDepartment && s.departmentId !== parseInt(selectedDepartment)) return false;
+      // If the DB has null studentYear (legacy data), don't filter it out
+      if (selectedStudentYear && s.studentYear && s.studentYear !== selectedStudentYear) return false;
+      
+      // Allow CSBS to show under CSE even if its departmentId was null in legacy DB
+      if (selectedDepartment && s.departmentId !== parseInt(selectedDepartment)) {
+        const isCSE = parseInt(selectedDepartment) === departments.find(d => d.branchCode === 'CSE')?.departmentId;
+        const isLegacyCSBS = s.section && s.section.toUpperCase().includes('CSBS') && !s.departmentId;
+        if (!(isCSE && isLegacyCSBS)) {
+          return false;
+        }
+      }
       return true;
     })
     .map(s => s.section)
@@ -310,11 +319,11 @@ export default function TimetablesView() {
               />
               <SearchableSelect
                 value={selectedSection}
-                onChange={setSelectedSection}
-                placeholder="Select Section..."
+                onChange={val => setSelectedSection(val ? val.toUpperCase() : '')}
+                placeholder="Select or Type Section..."
                 disabled={!selectedStudentYear || !selectedDepartment}
+                allowCreate={true}
                 options={[
-                  { value: '', label: 'Select Section...' },
                   ...availableSections.map(s => ({ value: s, label: s }))
                 ]}
                 className="min-w-[150px]"
@@ -384,10 +393,10 @@ export default function TimetablesView() {
               />
               <SearchableSelect
                 value={selectedSection}
-                onChange={setSelectedSection}
-                placeholder="All Sections"
+                onChange={val => setSelectedSection(val ? val.toUpperCase() : '')}
+                placeholder="Select or Type Section"
+                allowCreate={true}
                 options={[
-                  { value: '', label: 'All Sections' },
                   ...availableSections.map(s => ({ value: s, label: s }))
                 ]}
                 className="min-w-[120px]"
