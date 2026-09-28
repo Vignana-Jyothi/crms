@@ -380,22 +380,34 @@ export default function TimetableUploadModal({ isOpen, onClose, contextFilters, 
                         </td>
                         <td className="px-3 py-2 min-w-[180px]">
                           <SearchableSelect 
-                            value={row.facultyName || ''}
-                            onChange={(val) => handleRowChange(index, 'facultyName', val)}
+                            value={row.facultyName || (row.rawFaculty ? `raw:${row.rawFaculty}` : '')}
+                            onChange={(val) => {
+                               if (val.startsWith('raw:')) return;
+                               handleRowChange(index, 'facultyName', val);
+                            }}
                             placeholder="Faculty..."
                             options={[
                               { value: '', label: 'Faculty...' },
+                              ...(row.rawFaculty && !facultyList.find(f => f.name === row.facultyName) 
+                                ? [{ value: `raw:${row.rawFaculty}`, label: `? ${row.rawFaculty}` }] 
+                                : []),
                               ...facultyList.map(f => ({ value: (f.name || f).toString(), label: (f.label || f).toString() }))
                             ]}
                           />
                         </td>
                         <td className="px-3 py-2 min-w-[180px]">
                           <SearchableSelect 
-                            value={row.resourceId ? String(row.resourceId) : ''}
-                            onChange={(val) => handleRowChange(index, 'resourceId', val ? parseInt(val) : '')}
+                            value={row.resourceId ? String(row.resourceId) : (row.rawClassroom ? `raw:${row.rawClassroom}` : '')}
+                            onChange={(val) => {
+                               if (val.startsWith('raw:')) return;
+                               handleRowChange(index, 'resourceId', val ? parseInt(val) : '');
+                            }}
                             placeholder="No Room"
                             options={[
                               { value: '', label: 'No Room' },
+                              ...(row.rawClassroom && !row.resourceId 
+                                ? [{ value: `raw:${row.rawClassroom}`, label: `? ${row.rawClassroom}` }] 
+                                : []),
                               ...resources.map(r => ({ value: String(r.resourceId), label: r.resourceName }))
                             ]}
                           />

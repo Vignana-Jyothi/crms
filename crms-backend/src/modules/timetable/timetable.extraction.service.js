@@ -193,7 +193,9 @@ async function parseTextToTimetable(rawOutput, context) {
         departmentId: metaDepartmentId,
         studentYear: metaYear,
         facultyName: facultyName,
-        resourceId: resourceId
+        resourceId: resourceId,
+        rawClassroom: row['Classroom'] || '',
+        rawFaculty: row['Faculty'] || ''
       });
     }
   }
