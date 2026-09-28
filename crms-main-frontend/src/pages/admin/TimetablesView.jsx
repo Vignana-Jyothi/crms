@@ -205,34 +205,37 @@ export default function TimetablesView() {
               ))}
             </div>
 
-            <button
-              onClick={() => { 
-                if (isUploadModalOpen && uploadModalMode === 'manual') {
-                  setIsUploadModalOpen(false);
-                } else {
-                  setUploadModalMode('manual'); 
-                  setIsUploadModalOpen(true); 
-                  setViewMode('grid');
-                  setIsEditMode(false);
-                }
-              }}
-              className={`flex items-center justify-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl text-sm font-medium transition-colors shadow-sm border ${
-                isUploadModalOpen && uploadModalMode === 'manual'
-                  ? 'bg-indigo-600 text-white border-indigo-600'
-                  : 'bg-white text-slate-700 border-line hover:bg-slate-50'
-              }`}
-            >
-              <LayoutGrid size={18} />
-              <span className="hidden sm:inline">{isUploadModalOpen && uploadModalMode === 'manual' ? 'Cancel Bulk Entry' : 'Manual Bulk Entry'}</span>
-            </button>
+            {isEditMode && (
+              <>
+                <button
+                  onClick={() => { 
+                    if (isUploadModalOpen && uploadModalMode === 'manual') {
+                      setIsUploadModalOpen(false);
+                    } else {
+                      setUploadModalMode('manual'); 
+                      setIsUploadModalOpen(true); 
+                      setViewMode('grid');
+                    }
+                  }}
+                  className={`flex items-center justify-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl text-sm font-medium transition-colors shadow-sm border ${
+                    isUploadModalOpen && uploadModalMode === 'manual'
+                      ? 'bg-indigo-600 text-white border-indigo-600'
+                      : 'bg-white text-slate-700 border-line hover:bg-slate-50'
+                  }`}
+                >
+                  <LayoutGrid size={18} />
+                  <span className="hidden sm:inline">{isUploadModalOpen && uploadModalMode === 'manual' ? 'Cancel Bulk Entry' : 'Manual Bulk Entry'}</span>
+                </button>
 
-            <button
-              onClick={() => { setUploadModalMode('upload'); setIsUploadModalOpen(true); setIsEditMode(false); }}
-              className="flex items-center justify-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl text-sm font-medium transition-colors shadow-sm border bg-white text-slate-700 border-line hover:bg-slate-50"
-            >
-              <Upload size={18} />
-              <span className="hidden sm:inline">Auto-Extract PDF</span>
-            </button>
+                <button
+                  onClick={() => { setUploadModalMode('upload'); setIsUploadModalOpen(true); }}
+                  className="flex items-center justify-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl text-sm font-medium transition-colors shadow-sm border bg-white text-slate-700 border-line hover:bg-slate-50"
+                >
+                  <Upload size={18} />
+                  <span className="hidden sm:inline">Auto-Extract PDF</span>
+                </button>
+              </>
+            )}
 
             <button
               onClick={() => { setIsEditMode(!isEditMode); setActiveTab(''); setIsUploadModalOpen(false); }}
