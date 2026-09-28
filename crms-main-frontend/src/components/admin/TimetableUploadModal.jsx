@@ -39,9 +39,9 @@ export default function TimetableUploadModal({ isOpen, onClose, contextFilters, 
     setError('');
     if (!selectedFile) return;
     
-    const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
-    if (!validTypes.includes(selectedFile.type)) {
-      setError('Please upload a PDF or Image (PNG, JPG) file.');
+    const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'text/csv'];
+    if (!validTypes.includes(selectedFile.type) && !selectedFile.name.toLowerCase().endsWith('.csv')) {
+      setError('Please upload a PDF, Image (PNG, JPG), or CSV file.');
       return;
     }
     
