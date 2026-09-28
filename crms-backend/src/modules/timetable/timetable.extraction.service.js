@@ -35,12 +35,13 @@ async function extractTextFromFile(file) {
           const errStr = (stderr || error.message || "Unknown error").substring(0, 500).replace(/\n/g, ' | ');
           resolve(JSON.stringify([{
             page: 1,
-            metadata: { Section: 'Debug' },
-            timetables: [{
-              columns: [{period: 1, start: "00:00", end: "00:00", is_break: false}],
-              days: { "Monday": [{periods: [1], start: "00:00", end: "00:00", subject: `PYTHON ERROR: ${errStr}`}] }
-            }],
-            course_tables: []
+            rows: [{
+              "Day": "Monday",
+              "Start Time": "00:00",
+              "End Time": "00:00",
+              "Subject": `PYTHON ERROR: ${errStr}`,
+              "Year": "", "Dept": "", "Section": "", "Faculty": "", "Classroom": ""
+            }]
           }]));
         } else {
           resolve(stdout);
@@ -61,7 +62,12 @@ async function extractTextFromFile(file) {
 async function parseTextToTimetable(rawOutput, context) {
   let parsedJson;
   try {
-    parsedJson = JSON.parse(rawOutput);
+    const jsonMatch = rawOutput.match(/\[\s*\{.*\}\s*\]/s);
+    if (jsonMatch) {
+      parsedJson = JSON.parse(jsonMatch[0]);
+    } else {
+      parsedJson = JSON.parse(rawOutput);
+    }
   } catch (err) {
     console.error("Failed to parse Python JSON output:", err);
     return [];
