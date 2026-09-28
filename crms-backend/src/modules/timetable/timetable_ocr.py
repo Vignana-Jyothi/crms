@@ -832,7 +832,7 @@ def write_xlsx(results, path):
                 ws.cell(1, j, f"{lab}\n{c['start']} - {c['end']}".strip(" -"))
             ws.cell(1, 1, "Day")
             for c in ws[1]:
-                c.font, c.fill, c.alignment, c.border = wrap, box
+                c.font, c.fill, c.alignment, c.border = bold, fill, wrap, box
             col_of = {c["_c0"]: j for j, c in enumerate(cols, 2)}
             brk = [j for j, c in enumerate(cols, 2) if c["is_break"]]
             for ri, (day, entries) in enumerate(tt["days"].items(), 2):
