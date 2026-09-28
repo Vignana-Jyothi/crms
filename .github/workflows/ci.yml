@@ -46,4 +46,6 @@ jobs:
           # Note: We do NOT use --volumes here to avoid wiping out the database data
           docker system prune -f
           
-          docker compose up -d --build
+          # Build images without cache to prevent "failed to prepare extraction snapshot" cache corruption bugs
+          docker compose build --no-cache
+          docker compose up -d
