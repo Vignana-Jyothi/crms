@@ -63,14 +63,22 @@ async function parseTextToTimetable(rawOutput, context) {
   let parsedJson;
   try {
     let jsonStr = rawOutput;
-    // Strip known python script log lines printed to stdout
-    jsonStr = jsonStr.replace(/^\[\.\.\].*$/gm, '');
-    jsonStr = jsonStr.replace(/^\[skip\].*$/gm, '');
-    jsonStr = jsonStr.replace(/^\s*page \d+:.*$/gm, '');
-    jsonStr = jsonStr.replace(/^\s*\[check\].*$/gm, '');
-    jsonStr = jsonStr.replace(/^\[ok\].*$/gm, '');
     
-    parsedJson = JSON.parse(jsonStr.trim());
+    // The python script might print warnings (e.g. from OpenCV or Tesseract) at the top,
+    // and status messages like "[..] filename.pdf" or "[ok] filename.json" at the ends.
+    // Since the actual JSON output is a list of objects, we can extract it cleanly:
+    
+    // 1. Strip everything before the first `[` that is followed by `{`
+    jsonStr = jsonStr.replace(/^.*?(\[\s*\{)/s, '$1');
+    
+    // 2. Strip everything after the last `]` that is preceded by `}`
+    // We use match and substring here because replacing from the end with regex can be tricky
+    const lastBracketMatch = jsonStr.match(/\}\s*\](?![^]*\}\s*\])/); 
+    if (lastBracketMatch) {
+      jsonStr = jsonStr.substring(0, lastBracketMatch.index + lastBracketMatch[0].length);
+    }
+
+    parsedJson = JSON.parse(jsonStr);
   } catch (err) {
     console.error("Failed to parse Python JSON output:", err);
     console.error("Raw output was:", rawOutput.substring(0, 500));
