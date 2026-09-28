@@ -112,10 +112,7 @@ async function parseTextToTimetable(rawOutput, context) {
       // 1. Resolve Section
       let metaSection = context.section || '';
       if (!metaSection && row['Section']) {
-        metaSection = row['Section'].trim() === 'A' ? '' : `Sec ${row['Section'].trim()}`;
-        if (!metaSection && row['Section'].trim() !== 'A') {
-            metaSection = `Sec ${row['Section'].trim()}`;
-        }
+        metaSection = row['Section'].trim();
       }
 
       // 2. Resolve Year
