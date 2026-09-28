@@ -62,14 +62,18 @@ async function extractTextFromFile(file) {
 async function parseTextToTimetable(rawOutput, context) {
   let parsedJson;
   try {
-    const jsonMatch = rawOutput.match(/\[\s*\{.*\}\s*\]/s);
-    if (jsonMatch) {
-      parsedJson = JSON.parse(jsonMatch[0]);
-    } else {
-      parsedJson = JSON.parse(rawOutput);
-    }
+    let jsonStr = rawOutput;
+    // Strip known python script log lines printed to stdout
+    jsonStr = jsonStr.replace(/^\[\.\.\].*$/gm, '');
+    jsonStr = jsonStr.replace(/^\[skip\].*$/gm, '');
+    jsonStr = jsonStr.replace(/^\s*page \d+:.*$/gm, '');
+    jsonStr = jsonStr.replace(/^\s*\[check\].*$/gm, '');
+    jsonStr = jsonStr.replace(/^\[ok\].*$/gm, '');
+    
+    parsedJson = JSON.parse(jsonStr.trim());
   } catch (err) {
     console.error("Failed to parse Python JSON output:", err);
+    console.error("Raw output was:", rawOutput.substring(0, 500));
     return [];
   }
 
