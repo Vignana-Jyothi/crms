@@ -1,0 +1,34 @@
+Day,Start Time,End Time,Subject,Year,Dept,Section,Faculty,Classroom
+Monday,10:00,11:00,DBMS,2,CSBS,A,Dr. M. Madhu Bala,E105
+Monday,11:00,12:00,COA,2,CSBS,A,Mrs. K. Dharani,E105
+Monday,12:00,13:00,SE,2,CSBS,A,Mr. P. Rama Krishna,E105
+Monday,13:40,14:40,MENTORING,2,CSBS,A,,
+Monday,14:40,15:40,ECA/CCA,2,CSBS,A,,
+Monday,15:40,16:40,ECA/CCA,2,CSBS,A,,
+Tuesday,10:00,11:00,COA,2,CSBS,A,Mrs. K. Dharani,E105
+Tuesday,11:00,12:00,DBMS,2,CSBS,A,Dr. M. Madhu Bala,E105
+Tuesday,12:00,13:00,OOPS,2,CSBS,A,Mr. V. Vijaya Bhasker Reddy,E105
+Tuesday,13:40,14:40,SE,2,CSBS,A,Mr. P. Rama Krishna,E105
+Tuesday,14:40,15:40,IC,2,CSBS,A,Ms. Sana,E105
+Tuesday,15:40,16:40,IC,2,CSBS,A,Ms. Sana,E105
+Wednesday,10:00,11:00,SE,2,CSBS,A,Mr. P. Rama Krishna,E105
+Wednesday,11:00,12:00,DBMS,2,CSBS,A,Dr. M. Madhu Bala,E105
+Wednesday,12:00,13:00,MR & MM,2,CSBS,A,Dr. K. Madhavi,E105
+Wednesday,13:40,15:40,OOPS LAB / DBMS LAB,2,CSBS,A,Mr. V. Vijaya Bhasker Reddy / Dr. S. Nagini / Dr. Madhu Bala / Dr. N. V. Sailaja,E130 / E102 / E131 / E102
+Wednesday,15:40,16:40,SPORTS,2,CSBS,A,,
+Thursday,10:00,11:00,MR & MM,2,CSBS,A,Dr. K. Madhavi,E105
+Thursday,11:00,13:00,DBMS LAB / SDM LAB,2,CSBS,A,Dr. Madhu Bala / Dr. N. V. Sailaja / Mr. P. Rama Krishna / Mr. M. Sandeep,E131 / E102 / E101 / E130
+Thursday,13:40,14:40,OOPS,2,CSBS,A,Mr. V. Vijaya Bhasker Reddy,E105
+Thursday,14:40,15:40,DT,2,CSBS,A,Mrs. P. Prasanna,E105
+Thursday,15:40,16:40,DT,2,CSBS,A,Mrs. P. Prasanna,E105
+Friday,10:00,11:00,OOPS,2,CSBS,A,Mr. V. Vijaya Bhasker Reddy,E105
+Friday,11:00,12:00,COA,2,CSBS,A,Mrs. K. Dharani,E105
+Friday,12:00,13:00,MR & MM,2,CSBS,A,Dr. K. Madhavi,E105
+Friday,13:40,15:40,SDM LAB / OOPS LAB,2,CSBS,A,Mr. P. Rama Krishna / Mr. M. Sandeep / Mr. V. Vijaya Bhasker Reddy / Dr. S. Nagini,E101 / E130 / E130 / E102
+Friday,15:40,16:40,LIBRARY,2,CSBS,A,,
+Saturday,10:00,11:00,SE,2,CSBS,A,Mr. P. Rama Krishna,E105
+Saturday,11:00,12:00,OOPS,2,CSBS,A,Mr. V. Vijaya Bhasker Reddy,E105
+Saturday,12:00,13:00,DBMS,2,CSBS,A,Dr. M. Madhu Bala,E105
+Saturday,13:40,14:40,COA,2,CSBS,A,Mrs. K. Dharani,E105
+Saturday,14:40,15:40,DT,2,CSBS,A,Mrs. P. Prasanna,E105
+Saturday,15:40,16:40,SPORTS,2,CSBS,A,,

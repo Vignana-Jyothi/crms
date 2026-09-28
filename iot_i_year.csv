@@ -1,0 +1,31 @@
+Day,Start Time,End Time,Subject,Year,Dept,Section,Faculty,Classroom
+Monday,09:00,10:00,MAC,1,IOT,A,Dr. T Kusuma,E-240
+Monday,10:00,11:00,PPS,1,IOT,A,Mr. K Kishan Babu,E-240
+Monday,11:00,12:00,AEP,1,IOT,A,Dr. B Ashok,E-240
+Monday,12:40,14:40,ELCS Lab,1,IOT,A,Dr. S kanchana / Dr. Waheeda Shafia,A-117/118
+Monday,14:40,15:40,SPORTS,1,IOT,A,,
+Tuesday,09:00,10:00,ESE,1,IOT,A,Dr. S Kanchana,E-240
+Tuesday,10:00,11:00,AEP,1,IOT,A,Dr. B Ashok,E-240
+Tuesday,11:00,12:00,MAC,1,IOT,A,Dr. T Kusuma,E-240
+Tuesday,12:40,14:40,AEP Lab / PPS Lab,1,IOT,A,Dr. B Ashok / Dr. K S Rudramamba / Mr. K Krishna Babu / Ms. K. Prathyusha,A-314 / E-303
+Tuesday,14:40,15:40,CVA-L1,1,IOT,A,,
+Wednesday,09:00,10:00,PPS,1,IOT,A,Mr. K Kishan Babu,E-240
+Wednesday,10:00,11:00,AEP,1,IOT,A,Dr. B Ashok,E-240
+Wednesday,11:00,12:00,IOT,1,IOT,A,Dr. Manjula Sree,E-240
+Wednesday,12:40,13:40,ESE,1,IOT,A,Dr. S Kanchana,E-240
+Wednesday,13:40,14:40,ECA,1,IOT,A,,
+Wednesday,14:40,15:40,CCA,1,IOT,A,,
+Thursday,09:00,11:00,ITW,1,IOT,A,Ms. K. Pratyusha / Ms. K. Akhila / Ms. R. Sudha,B-314/315
+Thursday,11:00,12:00,ESE,1,IOT,A,Dr. S Kanchana,E-240
+Thursday,12:40,13:40,MAC,1,IOT,A,Dr. T Kusuma,E-240
+Thursday,13:40,15:40,LIBRARY,1,IOT,A,,
+Friday,09:00,11:00,PPS Lab / AEP Lab,1,IOT,A,Mr. K Krishna Babu / Ms. K. Prathyusha / Dr. B Ashok / Dr. K S Rudramamba,E-303 / A-314
+Friday,11:00,12:00,IOT,1,IOT,A,Dr. Manjula Sree,E-240
+Friday,12:40,13:40,PPS,1,IOT,A,Mr. K Kishan Babu,E-240
+Friday,13:40,14:40,LIBRARY,1,IOT,A,,
+Friday,14:40,15:40,SPORTS,1,IOT,A,,
+Saturday,09:00,10:00,IOT,1,IOT,A,Dr. Manjula Sree,E-240
+Saturday,10:00,11:00,MAC,1,IOT,A,Dr. T Kusuma,E-240
+Saturday,11:00,12:00,PPS,1,IOT,A,Mr. K Kishan Babu,E-240
+Saturday,12:40,13:40,AEP,1,IOT,A,Dr. B Ashok,E-240
+Saturday,13:40,15:40,MTP,1,IOT,A,,

@@ -210,7 +210,7 @@ export default function TimetableUploadModal({ isOpen, onClose, contextFilters, 
                       type="file" 
                       className="hidden" 
                       ref={fileInputRef}
-                      accept="application/pdf,image/png,image/jpeg,image/webp"
+                      accept="application/pdf,image/png,image/jpeg,image/webp,text/csv,.csv"
                       onChange={(e) => {
                         if (e.target.files && e.target.files[0]) {
                           onFileSelect(e.target.files[0]);
