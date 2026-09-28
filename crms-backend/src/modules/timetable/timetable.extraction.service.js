@@ -170,6 +170,20 @@ function parseTextToTimetable(rawOutput, context) {
         }
       }
     }
+    
+    // Add a debug row to see what python parsed for the metadata and course table
+    finalRecords.push({
+      id: `debug-${Date.now()}`,
+      dayOfWeek: 'Debug',
+      startTime: '00:00',
+      endTime: '00:00',
+      courseName: `Meta: ${JSON.stringify(page.metadata || {})}`,
+      facultyName: `Courses: ${JSON.stringify(page.course_tables || [])}`.substring(0, 150),
+      section: '',
+      departmentId: null,
+      studentYear: '',
+      resourceId: ''
+    });
   }
   
   return finalRecords;
