@@ -137,7 +137,8 @@ async function parseTextToTimetable(rawOutput, context) {
               OR: [
                 { resourceName: { equals: formattedRoom, mode: 'insensitive' } },
                 { resourceId: { equals: formattedRoom, mode: 'insensitive' } },
-                { resourceName: { equals: val, mode: 'insensitive' } }
+                { resourceName: { equals: val, mode: 'insensitive' } },
+                { resourceId: { equals: val, mode: 'insensitive' } }
               ]
             }
           });
@@ -145,10 +146,26 @@ async function parseTextToTimetable(rawOutput, context) {
         }
       }
 
-      // 5. Clean Faculty Name
+      // 5. Clean and Map Faculty Name
       let facultyName = '';
       if (row['Faculty']) {
-        facultyName = row['Faculty'].split('/')[0].trim();
+        const val = row['Faculty'].split('/')[0].trim();
+        
+        // Fetch the global faculty list dynamically from the repository
+        const facultyList = await require('../masterData/masterData.repository').listFaculty();
+        const facultyNames = facultyList.map(f => f.name);
+
+        const exactMatch = facultyNames.find(f => f.toLowerCase() === val.toLowerCase());
+        if (exactMatch) {
+          facultyName = exactMatch;
+        } else {
+          // Substring match to handle "M. Rakesh" vs "Mr. M. Rakesh"
+          const subMatch = facultyNames.find(f => 
+             f.toLowerCase().includes(val.toLowerCase()) || 
+             val.toLowerCase().includes(f.toLowerCase())
+          );
+          facultyName = subMatch ? subMatch : val;
+        }
       }
 
       // 6. Convert Time
