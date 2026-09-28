@@ -140,48 +140,19 @@ function parseTextToTimetable(rawText, context = {}) {
     if (finalRecords.length > 0) return finalRecords;
   }
 
-  // Basic heuristic fallback
-  const extractedSlots = [];
-  const timeRegex = /(\d{1,2}:\d{2})\s*(?:-|to)\s*(\d{1,2}:\d{2})/i;
-  let currentDay = 'Monday';
-  
-  for (let i = 0; i < linesArr.length; i++) {
-    const line = linesArr[i];
-    const foundDay = DAYS.find(d => line.toLowerCase().includes(d.toLowerCase()));
-    if (foundDay) currentDay = foundDay;
-    
-    const timeMatch = line.match(timeRegex);
-    if (timeMatch) {
-      const startTime = timeMatch[1];
-      const endTime = timeMatch[2];
-      let courseName = line.replace(timeMatch[0], '').replace(currentDay, '').trim();
-      courseName = courseName.replace(/[^a-zA-Z0-9\s-]/g, '').trim();
-      
-      if (courseName.length < 3 && i + 1 < linesArr.length) {
-         const nextLine = linesArr[i+1].trim();
-         if (!nextLine.match(timeRegex) && !DAYS.find(d => nextLine.toLowerCase().includes(d.toLowerCase()))) {
-            courseName = nextLine.replace(/[^a-zA-Z0-9\s-]/g, '').trim();
-         }
-      }
-
-      if (courseName) {
-        extractedSlots.push({
-          id: `temp-${Date.now()}-${Math.random()}`,
-          dayOfWeek: currentDay,
-          startTime,
-          endTime,
-          courseName,
-          departmentId: context.departmentId || null,
-          studentYear: context.studentYear || '',
-          section: context.section || '',
-          facultyName: '',
-          resourceId: ''
-        });
-      }
-    }
-  }
-
-  return extractedSlots;
+  // Debug heuristic: return the raw text so we can see exactly what Tesseract saw
+  return [{
+    id: `temp-${Date.now()}`,
+    dayOfWeek: 'Debug',
+    startTime: '00:00',
+    endTime: '00:00',
+    courseName: rawText.substring(0, 300) + (rawText.length > 300 ? '...' : ''),
+    departmentId: context.departmentId || null,
+    studentYear: context.studentYear || '',
+    section: context.section || '',
+    facultyName: 'RAW OCR OUTPUT',
+    resourceId: ''
+  }];
 }
 
 module.exports = {
