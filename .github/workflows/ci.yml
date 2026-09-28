@@ -8,7 +8,7 @@ on:
 jobs:
   deploy:
     name: Build & Deploy
-    # Use the self-hosted runner explicitly requested by the user
+    # Use the self-hosted runner explicitly requested by the user.
     runs-on: gamma
 
     steps:
