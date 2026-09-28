@@ -13,7 +13,24 @@ async function extractTextFromFile(file) {
   }
 
   const tempDir = os.tmpdir();
-  const fileExt = file.originalname ? path.extname(file.originalname) : '.png';
+  const fileExt = file.originalname ? path.extname(file.originalname).toLowerCase() : '.png';
+  
+  if (fileExt === '.csv') {
+    const content = file.buffer.toString('utf-8');
+    const lines = content.split(/\r?\n/).filter(line => line.trim());
+    if (lines.length > 0) {
+      const headers = lines[0].split(',').map(h => h.trim());
+      const rows = lines.slice(1).map(line => {
+        const split = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+        const rowObj = {};
+        headers.forEach((h, i) => { rowObj[h] = split[i] ? split[i].replace(/^"|"$/g, '').trim() : ''; });
+        return rowObj;
+      });
+      return JSON.stringify([{ page: 1, rows }]);
+    }
+    return JSON.stringify([{ page: 1, rows: [] }]);
+  }
+
   const tempFilePath = path.join(tempDir, `${crypto.randomUUID()}${fileExt}`);
   
   try {

@@ -1,0 +1,120 @@
+Day,Start Time,End Time,Subject,Year,Dept,Section,Faculty,Classroom
+Monday,10:00,13:00,CN&SE LAB,2,IOT,A,Mr. V. Kishore,E203/303
+Monday,10:00,13:00,CN&SE LAB,2,IOT,A,Mr. U. Veeresh,E203/303
+Monday,13:40,14:40,SIMA,2,IOT,A,Dr. B. Naga Malleswari,E339
+Monday,14:40,15:40,SE,2,IOT,A,Mr. U. Veeresh,E339
+Monday,15:40,16:40,IPR,2,IOT,A,Ms. Manjusha Nambiar,E339
+Tuesday,10:00,11:00,SIMA,2,IOT,A,Dr. B. Naga Malleswari,E339
+Tuesday,11:00,12:00,SD,2,IOT,A,Dr. D. Sri Laxmi,E339
+Tuesday,12:00,13:00,CN,2,IOT,A,Mr. V. Kishore,E339
+Tuesday,13:40,14:40,DT,2,IOT,A,Dr. Vijayachandra,APJ Hall
+Tuesday,13:40,14:40,DT,2,IOT,A,Gnana Prakash T,APJ Hall
+Tuesday,13:40,14:40,DT,2,IOT,A,Ms. K. Prathyusha,APJ Hall
+Tuesday,14:40,16:40,DT LAB,2,IOT,A,Dr. Vijayachandra,APJ Hall
+Tuesday,14:40,16:40,DT LAB,2,IOT,A,Gnana Prakash T,APJ Hall
+Tuesday,14:40,16:40,DT LAB,2,IOT,A,Ms. K. Prathyusha,APJ Hall
+Wednesday,10:00,11:00,CN,2,IOT,A,Mr. V. Kishore,E339
+Wednesday,11:00,12:00,COM,2,IOT,A,Dr. B.B. Shabarinath,E339
+Wednesday,12:00,13:00,SD,2,IOT,A,Dr. D. Sri Laxmi,E339
+Wednesday,13:40,16:40,SD LAB,2,IOT,A,Dr. D. Sri Laxmi,E230/231
+Wednesday,13:40,16:40,SD LAB,2,IOT,A,Ms. K. Akhila Tejaswini,E230/231
+Thursday,10:00,11:00,SE,2,IOT,A,Mr. U. Veeresh,E339
+Thursday,11:00,12:00,IPR,2,IOT,A,Ms. Manjusha Nambiar,E339
+Thursday,12:00,13:00,COM,2,IOT,A,Dr. B.B. Shabarinath,E339
+Thursday,13:40,16:40,DV LAB,2,IOT,A,Ms. B. Bhagya Sree,E201/202
+Thursday,13:40,16:40,DV LAB,2,IOT,A,Ms. V. Manjula,E201/202
+Friday,10:00,11:00,COM,2,IOT,A,Dr. B.B. Shabarinath,E339
+Friday,11:00,12:00,SE,2,IOT,A,Mr. U. Veeresh,E339
+Friday,12:00,13:00,SD,2,IOT,A,Dr. D. Sri Laxmi,E339
+Friday,13:40,14:40,CN,2,IOT,A,Mr. V. Kishore,E339
+Friday,14:40,15:40,SPORTS,2,IOT,A,,
+Friday,15:40,16:40,ECA,2,IOT,A,,
+Friday,15:40,16:40,CCA,2,IOT,A,,
+Saturday,10:00,11:00,SD,2,IOT,A,Dr. D. Sri Laxmi,E339
+Saturday,11:00,12:00,CN,2,IOT,A,Mr. V. Kishore,E339
+Saturday,12:00,13:00,SIMA,2,IOT,A,Dr. B. Naga Malleswari,E339
+Saturday,13:40,14:40,COM,2,IOT,A,Dr. B.B. Shabarinath,E339
+Saturday,14:40,15:40,SE,2,IOT,A,Mr. U. Veeresh,E339
+Saturday,15:40,16:40,MENTORING,2,IOT,A,,
+Monday,10:00,11:00,ESD,3,IOT,A,Mr. JVA Bala Krishna,E340
+Monday,11:00,12:00,MLNN,3,IOT,A,Mr. Shaik Mabasha,E340
+Monday,12:00,13:00,PMOB,3,IOT,A,Ms. Sri Pavani,E340
+Monday,13:40,14:40,CC,3,IOT,A,Mr. D. Bhupesh,E340
+Monday,14:40,16:40,SUMMER INTERNSHIP,3,IOT,A,Ms. K. Anusha,E340
+Tuesday,10:00,11:00,MLNN,3,IOT,A,Mr. Shaik Mabasha,E340
+Tuesday,11:00,13:00,OE-II,3,IOT,A,,
+Tuesday,13:40,16:40,ESD LAB,3,IOT,A,Mr. JVA Bala Krishna,E230/231
+Tuesday,13:40,16:40,ESD LAB,3,IOT,A,Ms. K. Akhila Tejaswini,E230/231
+Wednesday,10:00,11:00,CC,3,IOT,A,Mr. D. Bhupesh,E340
+Wednesday,11:00,13:00,ANCIENT WISDOM,3,IOT,A,Dr. Sailaja Simma,KS Audi
+Wednesday,11:00,13:00,ANCIENT WISDOM,3,IOT,A,Ms. P. Sujatha,KS Audi
+Wednesday,13:40,16:40,MLN LAB,3,IOT,A,Mr. Shaik Mabasha,E303/306
+Wednesday,13:40,16:40,MLN LAB,3,IOT,A,Mr. D. Bhupesh,E303/306
+Thursday,10:00,11:00,PMOB,3,IOT,A,Ms. Sri Pavani,E340
+Thursday,11:00,12:00,MLNN,3,IOT,A,Mr. Shaik Mabasha,E340
+Thursday,12:00,13:00,CC,3,IOT,A,Mr. D. Bhupesh,E340
+Thursday,13:40,15:40,ESD,3,IOT,A,Mr. JVA Bala Krishna,E340
+Thursday,15:40,16:40,OE-II,3,IOT,A,,
+Friday,10:00,13:00,ACS LAB,3,IOT,A,Dr. Sudha Devi,B403/405
+Friday,10:00,13:00,ACS LAB,3,IOT,A,Mr. K. Ashok,B403/405
+Friday,13:40,14:40,ESD,3,IOT,A,Mr. JVA Bala Krishna,E340
+Friday,14:40,15:40,CC,3,IOT,A,Mr. D. Bhupesh,E340
+Friday,15:40,16:40,MENTORING,3,IOT,A,,
+Saturday,10:00,11:00,MLNN,3,IOT,A,Mr. Shaik Mabasha,E340
+Saturday,11:00,13:00,SUMMER INTERNSHIP,3,IOT,A,Ms. K. Anusha,E340
+Saturday,13:40,14:40,PMOB,3,IOT,A,Ms. Sri Pavani,E340
+Saturday,14:40,15:40,SPORTS,3,IOT,A,,
+Saturday,15:40,16:40,ECA,3,IOT,A,,
+Saturday,15:40,16:40,CCA,3,IOT,A,,
+Monday,10:00,13:00,MAJOR PROJECT PHASE-II,4,IOT,A,Ms. Y. Prasanthi,E238
+Monday,13:40,16:40,MAJOR PROJECT PHASE-II,4,IOT,A,Ms. Y. Prasanthi,E238
+Tuesday,10:00,13:00,MAJOR PROJECT PHASE-II,4,IOT,A,Ms. Y. Prasanthi,E238
+Tuesday,13:40,16:40,MAJOR PROJECT PHASE-II,4,IOT,A,Ms. Y. Prasanthi,E238
+Wednesday,10:00,11:00,PE-VI,4,IOT,A,Mr. Aditya,E238
+Wednesday,11:00,13:00,OE-IV,4,IOT,A,,
+Wednesday,13:40,14:40,MENTORING,4,IOT,A,,
+Wednesday,14:40,15:40,ECA,4,IOT,A,,
+Wednesday,15:40,16:40,SELF LEARNING,4,IOT,A,,
+Thursday,10:00,12:00,PE-V,4,IOT,A,Ms. K. Akhila Tejaswini,E238
+Thursday,12:00,13:00,PE-VI,4,IOT,A,Mr. Aditya,E238
+Thursday,13:40,14:40,CCA,4,IOT,A,,
+Thursday,14:40,15:40,SPORTS,4,IOT,A,,
+Thursday,15:40,16:40,LIBRARY,4,IOT,A,,
+Friday,10:00,11:00,PE-V,4,IOT,A,Ms. K. Akhila Tejaswini,E238
+Friday,11:00,12:00,PE-VI,4,IOT,A,Mr. Aditya,E238
+Friday,12:00,13:00,OE-IV,4,IOT,A,,
+Friday,13:40,16:40,MAJOR PROJECT PHASE-II,4,IOT,A,Ms. Y. Prasanthi,E238
+Saturday,10:00,13:00,MAJOR PROJECT PHASE-II,4,IOT,A,Ms. Y. Prasanthi,E238
+Saturday,13:40,16:40,MAJOR PROJECT PHASE-II,4,IOT,A,Ms. Y. Prasanthi,E238
+Monday,09:00,12:00,ED,1,IOT,A,Dr. V. V. Durga Sahithi,E216/215
+Monday,12:40,15:40,EC LAB,1,IOT,A,Ms. S. Pratyusha,P320
+Monday,12:40,15:40,EC LAB,1,IOT,A,Dr. S. Appa Rao,P320
+Monday,12:40,15:40,DS LAB,1,IOT,A,Dr. Sayanthi Chatterjee,E217
+Monday,12:40,15:40,DS LAB,1,IOT,A,Ms. P. Lakshmi Prasanna,E217
+Tuesday,09:00,12:00,ED,1,IOT,A,Sri. P. Prasad Kumar,E216/215
+Tuesday,12:40,13:40,ODELTVC,1,IOT,A,Dr. G. Gangadhar,E240
+Tuesday,13:40,14:40,CFE,1,IOT,A,Ms. S. Pratyusha,E240
+Tuesday,14:40,15:40,ES,1,IOT,A,Dr. Likha Chandran,E240
+Wednesday,09:00,10:00,BEEE,1,IOT,A,Ms. R. Sudha,E240
+Wednesday,10:00,12:00,DS,1,IOT,A,Dr. Sayanthi Chatterjee,E238/239
+Wednesday,12:40,15:40,DS LAB,1,IOT,A,Dr. Sayanthi Chatterjee,E217
+Wednesday,12:40,15:40,DS LAB,1,IOT,A,Ms. P. Lakshmi Prasanna,E217
+Wednesday,12:40,15:40,BEEE LAB,1,IOT,A,Ms. R. Sudha,P014
+Wednesday,12:40,15:40,BEEE LAB,1,IOT,A,Dr. J. Bhavani,P014
+Thursday,09:00,12:00,BEEE LAB,1,IOT,A,Ms. R. Sudha,P014
+Thursday,09:00,12:00,BEEE LAB,1,IOT,A,Mrs. G. Anjali Devi,P014
+Thursday,09:00,12:00,EC LAB,1,IOT,A,Ms. S. Pratyusha,P320
+Thursday,09:00,12:00,EC LAB,1,IOT,A,Dr. Likha Chandran,P320
+Thursday,12:40,13:40,ODELTVC,1,IOT,A,Dr. G. Gangadhar,E240
+Thursday,13:40,14:40,DS,1,IOT,A,Dr. Sayanthi Chatterjee,E238/239
+Thursday,14:40,15:40,BEEE,1,IOT,A,Ms. R. Sudha,E240
+Friday,09:00,10:00,CFE,1,IOT,A,Ms. S. Pratyusha,E240
+Friday,10:00,11:00,ODELTVC,1,IOT,A,Dr. G. Gangadhar,E240
+Friday,11:00,12:00,BEEE,1,IOT,A,Ms. R. Sudha,E240
+Friday,12:40,15:40,PP LAB,1,IOT,A,Ms. K. B. Anusha,B314/315
+Friday,12:40,15:40,PP LAB,1,IOT,A,Ms. D. Sowmya,B314/315
+Friday,12:40,15:40,PP LAB,1,IOT,A,Ms. P. Sujatha,B314/315
+Saturday,09:00,10:00,ES,1,IOT,A,Dr. Likha Chandran,E240
+Saturday,10:00,11:00,CFE,1,IOT,A,Ms. S. Pratyusha,E240
+Saturday,11:00,12:00,ODELTVC,1,IOT,A,Dr. G. Gangadhar,E240
+Saturday,12:40,15:40,EW,1,IOT,A,,C008
