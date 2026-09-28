@@ -2,7 +2,7 @@ const { exec } = require('child_process');
 const fs = require('fs/promises');
 const path = require('path');
 const os = require('os');
-const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 
 async function extractTextFromFile(file) {
   if (!file || !file.buffer) {
@@ -11,7 +11,7 @@ async function extractTextFromFile(file) {
 
   const tempDir = os.tmpdir();
   const fileExt = file.originalname ? path.extname(file.originalname) : '.png';
-  const tempFilePath = path.join(tempDir, `${uuidv4()}${fileExt}`);
+  const tempFilePath = path.join(tempDir, `${crypto.randomUUID()}${fileExt}`);
   
   try {
     await fs.writeFile(tempFilePath, file.buffer);
@@ -28,7 +28,17 @@ async function extractTextFromFile(file) {
         if (error) {
           console.error("Python script error:", error);
           console.error("stderr:", stderr);
-          reject(new Error(`Extraction failed: ${stderr || error.message}`));
+          // Return a mock JSON so the error is visible in the UI grid
+          const errStr = (stderr || error.message || "Unknown error").substring(0, 500).replace(/\n/g, ' | ');
+          resolve(JSON.stringify([{
+            page: 1,
+            metadata: { Section: 'Debug' },
+            timetables: [{
+              columns: [{period: 1, start: "00:00", end: "00:00", is_break: false}],
+              days: { "Monday": [{periods: [1], start: "00:00", end: "00:00", subject: `PYTHON ERROR: ${errStr}`}] }
+            }],
+            course_tables: []
+          }]));
         } else {
           resolve(stdout);
         }
