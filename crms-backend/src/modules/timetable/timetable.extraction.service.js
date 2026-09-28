@@ -135,10 +135,18 @@ async function parseTextToTimetable(rawOutput, context) {
         if (k.toLowerCase().includes('room') || k.toLowerCase().includes('roon')) {
           const val = v.trim();
           if (val) {
+            let formattedRoom = val;
+            let m = formattedRoom.match(/^([a-zA-Z])\s*(\d+.*)$/);
+            if (m) formattedRoom = `${m[1].toUpperCase()} ${m[2]}`;
+
             const res = await prisma.resource.findFirst({
               where: { 
                 resourceType: { typeName: 'CLASSROOM' },
-                resourceName: { equals: val, mode: 'insensitive' }
+                OR: [
+                  { resourceName: { equals: formattedRoom, mode: 'insensitive' } },
+                  { resourceId: { equals: formattedRoom, mode: 'insensitive' } },
+                  { resourceName: { equals: val, mode: 'insensitive' } }
+                ]
               }
             });
             if (res) globalRoomId = res.resourceId;
@@ -168,14 +176,26 @@ async function parseTextToTimetable(rawOutput, context) {
                   roomName = v;
                 }
               }
+
+              // Compute initials of the course name for fallback matching
+              let clean = name.replace(/\([^)]*\)/g, '').trim();
+              let initials = clean.split(/[\s\-_]+/).map(w => w[0]).join('').toUpperCase();
               
               // Resolve room ID for this specific course if present
               let mappedRoomId = globalRoomId;
               if (roomName && roomName.trim()) {
+                let formattedRoom = roomName.trim();
+                let m = formattedRoom.match(/^([a-zA-Z])\s*(\d+.*)$/);
+                if (m) formattedRoom = `${m[1].toUpperCase()} ${m[2]}`;
+
                 const res = await prisma.resource.findFirst({
                   where: { 
                     resourceType: { typeName: 'CLASSROOM' },
-                    resourceName: { equals: roomName.trim(), mode: 'insensitive' }
+                    OR: [
+                      { resourceName: { equals: formattedRoom, mode: 'insensitive' } },
+                      { resourceId: { equals: formattedRoom, mode: 'insensitive' } },
+                      { resourceName: { equals: roomName.trim(), mode: 'insensitive' } }
+                    ]
                   }
                 });
                 if (res) mappedRoomId = res.resourceId;
@@ -189,6 +209,9 @@ async function parseTextToTimetable(rawOutput, context) {
                   courseMap[acronym] = { courseName: name, facultyName: faculty, roomId: mappedRoomId };
                 }
                 courseMap[name.toUpperCase()] = { courseName: name, facultyName: faculty, roomId: mappedRoomId };
+                if (initials && initials.length > 1) {
+                  courseMap[initials] = { courseName: name, facultyName: faculty, roomId: mappedRoomId };
+                }
               }
             }
           }
