@@ -38,7 +38,7 @@ const listFaculty = async () => {
       
       // Ignore if it's just a title or a single letter
       const lower = name.toLowerCase().replace(/[^a-z]/g, '');
-      if (['dr', 'mr', 'ms', 'prof', 'w', 'f', 't', 's', 'th', 'm'].includes(lower) || name.length <= 2) {
+      if (['dr', 'mr', 'mrs', 'ms', 'prof', 'w', 'f', 't', 's', 'th', 'm'].includes(lower) || name.length <= 2) {
         continue;
       }
       

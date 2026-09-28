@@ -577,8 +577,7 @@ def _rows_to_cells(rows, merged=None):
 def _split_blocks(cells):
     """Split a sheet into blocks separated by fully blank rows."""
     occ = sorted({r for c in cells for r in range(c["r0"], c["r1"])})
-    blocks, cur, prev = None, set(), None
-    blocks = []
+    blocks, cur, prev = [], set(), None
     for r in occ:
         if prev is not None and r > prev + 1:
             blocks.append(cur)
@@ -681,14 +680,26 @@ def _detect_year_dept_section(meta, opts, warn):
     return yr, dept, sec, room
 
 
+def _looks_like_room(v):
+    """E105 / E131(wed)/ E102(thus) - even with OCR digit confusions (E1O5, E13i)."""
+    return bool(re.match(r"^[A-Z\u00a3\u20ac]\s?[0-9iIlLoOsS]{2,3}\s*([\(\{\[][A-Za-z]{2,5}[\)\}\]])?\s*(/|$)", v.strip())
+                and len(v) < 45 and not re.search(r"[a-z]{6,}", v))
+
+
+def _split_faculty(text):
+    parts = re.split(r"\s*/\s*|\s*;\s*|\s+and\s+|\s*&\s*", text or "")
+    return [re.sub(r"\s+", " ", p).strip(" ,.") if not re.search(r"\.$", p.strip()) else p.strip()
+            for p in parts if p.strip(" ,.")]
+
+
 def _classify_record(rec):
     info, rest = {}, []
     for k, v in rec.items():
-        if re.match(r"(?i)(mr|mrs|ms|dr|prof)\b", v):
+        if re.match(r"(?i)(mr|mrs|ms|dr|prof|smt|sri)\b[\s.,]", v + " "):
             info["faculty"] = v
         elif re.fullmatch(r"\d{2}[A-Z0-9]{5,8}", v.replace(" ", ""), re.I):
             info["code"] = v
-        elif "room" in k.lower():
+        elif "room" in k.lower() or _looks_like_room(v):
             info["room"] = v
         else:
             rest.append(v)
@@ -753,23 +764,33 @@ def build_rows(res, opts, warn):
                         info = idx.get(_norm(o))
                         subj.append(o)
                         if info:
-                            facs.append(info.get("faculty", ""))
+                            facs.append(_split_faculty(info.get("faculty", "")))
                             rooms.append(_room_for_day(info.get("room", ""), day, default_room))
-                        elif o.upper() in acts or _norm(o) in {_norm(a) for a in acts}:
-                            facs.append("")
-                            rooms.append("")  # sports / library / ECA / CCA ... have no room
+                            if not info.get("faculty"):
+                                warn.append(f"{o}: faculty not found in course table")
+                            if not rooms[-1]:
+                                warn.append(f"{day} {o}: no classroom found for this day")
                         else:
-                            facs.append("")
+                            facs.append([])
                             rooms.append("")
-                            warn.append(f"{day} {st}: no course match for '{o}' (faculty/room left blank)")
-                    variants = ([(o, f, r) for o, f, r in zip(subj, facs, rooms)] if opts.split_options
-                                else [(" / ".join(subj), " / ".join(f for f in facs if f),
-                                       " / ".join(r for r in rooms if r))])
+                            if _norm(o) not in {_norm(a) for a in acts}:
+                                warn.append(f"{day} {st}: no course match for '{o}' (faculty/room left blank)")
+                    if opts.merge_options:  # single row, names joined with ' / '
+                        variants = [(" / ".join(subj), " / ".join(f for fl in facs for f in fl),
+                                     " / ".join(r for r in rooms if r))]
+                    else:                   # one row per subject option and per faculty (default)
+                        variants = [(o, f, r) for o, fl, r in zip(subj, facs, rooms) for f in (fl or [""])]
                     for sb, fc, rm in variants:
                         rows.append({"Day": day, "Start Time": _hhmm(s0) if s0 is not None else st,
                                      "End Time": _hhmm(e0) if e0 is not None else en, "Subject": sb,
                                      "Year": year, "Dept": dept, "Section": sec, "Faculty": fc, "Classroom": rm})
-    return rows
+    seen, out = set(), []
+    for r in rows:
+        key = tuple(r.values())
+        if key not in seen:
+            seen.add(key)
+            out.append(r)
+    return out
 
 
 # --------------------------------------------------------------------------- writers
@@ -888,7 +909,8 @@ def main():
     ap.add_argument("--section", help="force section (default: header value; blank or '--' => A)")
     ap.add_argument("--room", help="default classroom when a course has none (default: header 'Room No')")
     ap.add_argument("--year-fmt", choices=["num", "roman"], default="num", help="Year column format: 2 or II")
-    ap.add_argument("--split-options", action="store_true", help="'A / B' cells -> one row per option")
+    ap.add_argument("--merge-options", action="store_true",
+                    help="keep 'A / B' cells as ONE row (default: one row per subject and per faculty)")
     ap.add_argument("--per-period", action="store_true", help="lab blocks spanning periods -> one row per period")
     ap.add_argument("--print", action="store_true", help="print the JSON result to stdout")
     opts = ap.parse_args()
@@ -916,7 +938,7 @@ def main():
         for r in clean_res:
             print(f"     page {r['page']}: {len(r['timetables'])} timetable(s), "
                   f"{sum(len(t) for c in r['course_tables'] for t in c['tables'])} course rows, "
-                  f"{len(r['metadata'])} metadata fields, {len(r.get('rows', []))} upload rows")
+                  f"{len(r['metadata'])} metadata fields, {len(r['rows'])} upload rows")
         for w in dict.fromkeys(warnings):
             print(f"     [check] {w}")
         if opts.print:
