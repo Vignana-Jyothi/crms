@@ -10,8 +10,18 @@ RUN npx prisma generate
 
 FROM node:20-bookworm-slim
 
-RUN apt-get update -y && apt-get install -y --no-install-recommends openssl ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y && apt-get install -y --no-install-recommends \
+    openssl ca-certificates \
+    python3 python3-pip python3-venv \
+    tesseract-ocr tesseract-ocr-eng \
+    libgl1 libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
+
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+RUN pip install --no-cache-dir opencv-python-headless pytesseract numpy openpyxl pdfplumber pypdfium2
 
 COPY package*.json ./
 RUN npm install --omit=dev

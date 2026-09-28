@@ -1,159 +1,168 @@
-const Tesseract = require('tesseract.js');
-const pdfParse = require('pdf-parse');
+const { exec } = require('child_process');
+const fs = require('fs/promises');
+const path = require('path');
+const os = require('os');
+const { v4: uuidv4 } = require('uuid');
 
-/**
- * Extracts text from an uploaded file (Image or PDF).
- * @param {Object} file - The file object from multer (req.file)
- * @returns {Promise<string>} The extracted raw text
- */
 async function extractTextFromFile(file) {
   if (!file || !file.buffer) {
     throw new Error('No file provided for extraction.');
   }
 
-  const mimeType = file.mimetype;
-
+  const tempDir = os.tmpdir();
+  const fileExt = file.originalname ? path.extname(file.originalname) : '.png';
+  const tempFilePath = path.join(tempDir, `${uuidv4()}${fileExt}`);
+  
   try {
-    if (mimeType === 'application/pdf') {
-      // PDF processing
-      const data = await pdfParse(file.buffer);
-      return data.text;
-    } else if (mimeType.startsWith('image/')) {
-      // Image processing with Tesseract
-      // Use PSM 6 (Assume a single uniform block of text) to prevent column-wise reading of tables
-      const worker = await Tesseract.createWorker('eng');
-      await worker.setParameters({
-        tessedit_pageseg_mode: '4',
-        preserve_interword_spaces: '1',
+    await fs.writeFile(tempFilePath, file.buffer);
+    
+    // Path to the python script
+    const scriptPath = path.join(__dirname, 'timetable_ocr.py');
+    // If we're inside the docker container, use the venv python
+    const pythonPath = process.env.PATH && process.env.PATH.includes('/opt/venv/bin') ? 'python3' : '/opt/venv/bin/python3';
+    
+    const command = `${pythonPath} "${scriptPath}" "${tempFilePath}" --print`;
+    
+    const output = await new Promise((resolve, reject) => {
+      exec(command, { maxBuffer: 1024 * 1024 * 10 }, (error, stdout, stderr) => {
+        if (error) {
+          console.error("Python script error:", error);
+          console.error("stderr:", stderr);
+          reject(new Error(`Extraction failed: ${stderr || error.message}`));
+        } else {
+          resolve(stdout);
+        }
       });
-      const { data: { text } } = await worker.recognize(file.buffer);
-      await worker.terminate();
-      return text;
-    } else {
-      throw new Error('Unsupported file type. Please upload a PDF or Image.');
+    });
+
+    return output;
+  } finally {
+    try {
+      await fs.unlink(tempFilePath);
+    } catch (e) {
+      // ignore unlink errors
     }
-  } catch (error) {
-    console.error('Extraction error:', error);
-    throw new Error(`Failed to extract text from file: ${error.message}`);
   }
 }
 
-/**
- * Parses raw text into a structured JSON format representing timetable slots.
- * NOTE: Since open-source OCR text is unstructured, this heuristic attempts to find
- * valid days, times, and block assignments. It is expected to not be 100% accurate.
- * @param {string} rawText
- * @param {Object} context - Optional context (departmentId, studentYear)
- * @returns {Array} Array of structured timetable entries
- */
-function parseTextToTimetable(rawText, context = {}) {
-  const linesArr = rawText.split('\n').map(l => l.trim()).filter(Boolean);
-  
-  const TIME_SLOTS = [
-    { startTime: '09:00', endTime: '10:00' }, // 1
-    { startTime: '10:00', endTime: '11:00' }, // 2
-    { startTime: '11:00', endTime: '12:00' }, // 3
-    { startTime: '12:40', endTime: '13:40' }, // 4
-    { startTime: '13:40', endTime: '14:40' }, // 5
-    { startTime: '14:40', endTime: '15:40' }, // 6
-  ];
-
-  const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
-  // Check if it matches the VNR specific format
-  const isVnrFormat = rawText.match(/Branch/i) || rawText.match(/Section/i) || rawText.match(/Course/i) || rawText.match(/Timetable/i) || rawText.match(/VIGNANA/i);
-
-  if (isVnrFormat) {
-    const finalRecords = [];
-    const sectionMatch = rawText.match(/Section:\s*([A-Za-z0-9\-]+)/i);
-    const roomMatch = rawText.match(/Class Room No:\s*([A-Z0-9\-]+)/i);
-    const defaultRoom = roomMatch ? roomMatch[1].trim() : null;
-
-    // Extract course mapping
-    const mappings = {};
-    let inMappingTable = false;
-    for (const line of linesArr) {
-      if (line.includes('Course Code') && line.includes('Name of the Course')) {
-        inMappingTable = true;
-        continue;
-      }
-      if (inMappingTable) {
-        const abbrevMatch = line.match(/^([0-9A-Z]{10})\s+(.+?)\(([^)]+)\)/i);
-        if (abbrevMatch) {
-          const code = abbrevMatch[1];
-          let abbrev = abbrevMatch[3].trim().toUpperCase();
-          const facultyMatch = line.match(/(Dr\.|Mr\.|Mrs\.|Ms\.|Sri\.)\s*([A-Za-z\s\.\/]+?)(?=\s+(Seminar|Library|Sports|CCA|CVA|MTP|OTHER|Co-Curricular|$))/i);
-          let facultyName = facultyMatch ? facultyMatch[0].trim() : null;
-          const roomMapMatch = line.match(/\b([A-Z]-\d{3})\b/);
-          let roomNo = roomMapMatch ? roomMapMatch[1] : defaultRoom;
-          mappings[abbrev] = { courseCode: code, facultyName, roomNo };
-        }
-      }
-    }
-
-    for (const day of DAYS) {
-      const dayLineIndex = linesArr.findIndex(l => l.toUpperCase().includes(day.toUpperCase()));
-      if (dayLineIndex === -1) continue;
-
-      let dayLine = linesArr[dayLineIndex];
-      let tokensStr = dayLine.substring(dayLine.toUpperCase().indexOf(day.toUpperCase()) + day.length).trim();
-      
-      // If Tesseract put the subjects on the next line, grab the next line
-      if (tokensStr.length < 5 && dayLineIndex + 1 < linesArr.length) {
-        const nextLine = linesArr[dayLineIndex + 1];
-        if (!DAYS.some(d => nextLine.toUpperCase().includes(d.toUpperCase()))) {
-          tokensStr = nextLine.trim();
-        }
-      }
-
-      let tokens = tokensStr.split(/\s+/).filter(t => !['L','U','N','C','H','*','Lab'].includes(t) && t !== '/');
-
-      let slotIdx = 0;
-      for (let i = 0; i < tokens.length; i++) {
-        if (slotIdx >= 6) break;
-        let token = tokens[i].toUpperCase();
-        // Skip purely numeric tokens or random OCR noise
-        if (token.length < 2 && !token.match(/[A-Z]/)) continue;
-        
-        let cleanToken = token.replace(/[\*\/]/g, '').replace('LAB', '').trim();
-        let map = mappings[cleanToken] || {};
-
-        let resId = map.roomNo || defaultRoom || '';
-        if (resId && resId !== 'UNKNOWN') {
-          resId = resId.replace('-', ' ');
-        }
-
-        finalRecords.push({
-          id: `extracted-${Date.now()}-${Math.random()}`,
-          dayOfWeek: day,
-          startTime: TIME_SLOTS[slotIdx].startTime,
-          endTime: TIME_SLOTS[slotIdx].endTime,
-          courseName: map.courseCode || token,
-          section: context.section || (sectionMatch ? `Sec ${sectionMatch[1].trim()}` : ''),
-          departmentId: context.departmentId || null,
-          studentYear: context.studentYear || '',
-          facultyName: map.facultyName || '',
-          resourceId: resId || ''
-        });
-        slotIdx++;
-      }
-    }
-    if (finalRecords.length > 0) return finalRecords;
+function parseTextToTimetable(rawOutput, context) {
+  let parsedJson;
+  try {
+    parsedJson = JSON.parse(rawOutput);
+  } catch (err) {
+    console.error("Failed to parse Python JSON output:", err);
+    return [];
   }
 
-  // Debug heuristic: return the raw text so we can see exactly what Tesseract saw
-  return [{
-    id: `temp-${Date.now()}`,
-    dayOfWeek: 'Debug',
-    startTime: '00:00',
-    endTime: '00:00',
-    courseName: rawText.replace(/\n/g, ' | ').substring(0, 300) + (rawText.length > 300 ? '...' : ''),
-    departmentId: context.departmentId || null,
-    studentYear: context.studentYear || '',
-    section: context.section || '',
-    facultyName: 'RAW OCR OUTPUT',
-    resourceId: ''
-  }];
+  const finalRecords = [];
+  if (!parsedJson || parsedJson.length === 0) return finalRecords;
+
+  for (const page of parsedJson) {
+    let metaSection = context.section || '';
+    if (!metaSection && page.metadata) {
+       for (const [k, v] of Object.entries(page.metadata)) {
+         if (k.toLowerCase().includes('section')) {
+           metaSection = v === '--' ? '' : `Sec ${v}`;
+           break;
+         }
+       }
+    }
+    
+    // Map course tables (acronyms to faculty/resource)
+    const courseMap = {};
+    if (page.course_tables) {
+      for (const ct of page.course_tables) {
+        if (ct.tables) {
+          for (const tbl of ct.tables) {
+            for (const rec of tbl) {
+              const code = rec['Course Code'] || '';
+              const name = rec['Name of the Course'] || rec['Course Name'] || '';
+              
+              let faculty = '';
+              let room = '';
+              for (const [k, v] of Object.entries(rec)) {
+                if (k.toLowerCase().includes('faculty') || k.toLowerCase().includes('coordinator')) faculty = v;
+                if (k.toLowerCase().includes('room')) room = v;
+              }
+              
+              if (name) {
+                // If the name has an acronym like (DBMS), use that
+                const acronymMatch = name.match(/\(([A-Za-z0-9\-\s]+)\)/);
+                if (acronymMatch) {
+                  const acronym = acronymMatch[1].trim().toUpperCase();
+                  courseMap[acronym] = { courseName: name, facultyName: faculty, roomNo: room };
+                }
+                courseMap[name.toUpperCase()] = { courseName: name, facultyName: faculty, roomNo: room };
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    if (page.timetables) {
+      for (const tt of page.timetables) {
+        const days = tt.days || {};
+        for (const [day, entries] of Object.entries(days)) {
+          for (const entry of entries) {
+            const subject = entry.subject;
+            
+            // Try to find mapping for faculty/room
+            let facultyName = '';
+            let resourceIdStr = '';
+            
+            if (entry.options && entry.options.length > 0) {
+              for (const opt of entry.options) {
+                if (courseMap[opt.toUpperCase()]) {
+                  facultyName = courseMap[opt.toUpperCase()].facultyName;
+                  resourceIdStr = courseMap[opt.toUpperCase()].roomNo;
+                  break;
+                }
+              }
+            }
+            
+            if (!facultyName && courseMap[subject.toUpperCase()]) {
+               facultyName = courseMap[subject.toUpperCase()].facultyName;
+               resourceIdStr = courseMap[subject.toUpperCase()].roomNo;
+            }
+
+            // Convert 12-hour "09:00 AM" to 24-hour "09:00" for input type="time"
+            let startTime = entry.start;
+            let endTime = entry.end;
+            
+            const convertTime = (timeStr) => {
+              if (!timeStr) return '';
+              const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+              if (match) {
+                let h = parseInt(match[1], 10);
+                const m = match[2];
+                const ampm = match[3].toUpperCase();
+                if (ampm === 'PM' && h < 12) h += 12;
+                if (ampm === 'AM' && h === 12) h = 0;
+                return `${h.toString().padStart(2, '0')}:${m}`;
+              }
+              return timeStr;
+            };
+
+            finalRecords.push({
+              id: `extracted-${Date.now()}-${Math.random()}`,
+              dayOfWeek: day,
+              startTime: convertTime(startTime),
+              endTime: convertTime(endTime),
+              courseName: subject,
+              section: metaSection,
+              departmentId: context.departmentId || null,
+              studentYear: context.studentYear || '',
+              facultyName: facultyName,
+              resourceId: resourceIdStr
+            });
+          }
+        }
+      }
+    }
+  }
+  
+  return finalRecords;
 }
 
 module.exports = {
