@@ -168,22 +168,23 @@ async function parseTextToTimetable(rawOutput, context) {
               let roomName = '';
               for (const [k, v] of Object.entries(rec)) {
                 const kLower = k.toLowerCase();
+                const strV = v ? String(v) : '';
                 
                 // Faculty matching
                 if (kLower.includes('faculty') || kLower.includes('coordinator') || (kLower.includes('name of the') && !kLower.includes('course') && !kLower.includes('subject'))) {
-                  faculty = v;
+                  faculty = strV;
                 }
                 // Room matching
                 else if (kLower.includes('room') || kLower.includes('class')) {
-                  roomName = v;
+                  roomName = strV;
                 }
                 // Course Code matching
                 else if (kLower.includes('code')) {
-                  code = v;
+                  code = strV;
                 }
                 // Course Name matching
                 else if (kLower.includes('name') || kLower.includes('title') || kLower.includes('subject') || kLower.includes('course')) {
-                  name = v;
+                  name = strV;
                 }
               }
 
