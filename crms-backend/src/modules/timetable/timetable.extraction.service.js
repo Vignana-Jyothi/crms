@@ -20,11 +20,13 @@ async function extractTextFromFile(file) {
       return data.text;
     } else if (mimeType.startsWith('image/')) {
       // Image processing with Tesseract
-      const { data: { text } } = await Tesseract.recognize(
-        file.buffer,
-        'eng',
-        { logger: m => console.log(m) }
-      );
+      // Use PSM 6 (Assume a single uniform block of text) to prevent column-wise reading of tables
+      const worker = await Tesseract.createWorker('eng');
+      await worker.setParameters({
+        tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
+      });
+      const { data: { text } } = await worker.recognize(file.buffer);
+      await worker.terminate();
       return text;
     } else {
       throw new Error('Unsupported file type. Please upload a PDF or Image.');
@@ -62,7 +64,7 @@ function parseTextToTimetable(rawText, context = {}) {
 
   if (isVnrFormat) {
     const finalRecords = [];
-    const sectionMatch = rawText.match(/Section:\s*([A-Za-z0-9])/i);
+    const sectionMatch = rawText.match(/Section:\s*([A-Za-z0-9\-]+)/i);
     const roomMatch = rawText.match(/Class Room No:\s*([A-Z0-9\-]+)/i);
     const defaultRoom = roomMatch ? roomMatch[1].trim() : null;
 
@@ -89,16 +91,29 @@ function parseTextToTimetable(rawText, context = {}) {
     }
 
     for (const day of DAYS) {
-      const dayLineIndex = linesArr.findIndex(l => l.startsWith(day));
+      const dayLineIndex = linesArr.findIndex(l => l.toUpperCase().includes(day.toUpperCase()));
       if (dayLineIndex === -1) continue;
 
-      const dayLine = linesArr[dayLineIndex];
-      let tokens = dayLine.substring(day.length).trim().split(/\s+/).filter(t => !['L','U','N','C','H','*','Lab'].includes(t) && t !== '/');
+      let dayLine = linesArr[dayLineIndex];
+      let tokensStr = dayLine.substring(dayLine.toUpperCase().indexOf(day.toUpperCase()) + day.length).trim();
+      
+      // If Tesseract put the subjects on the next line, grab the next line
+      if (tokensStr.length < 5 && dayLineIndex + 1 < linesArr.length) {
+        const nextLine = linesArr[dayLineIndex + 1];
+        if (!DAYS.some(d => nextLine.toUpperCase().includes(d.toUpperCase()))) {
+          tokensStr = nextLine.trim();
+        }
+      }
+
+      let tokens = tokensStr.split(/\s+/).filter(t => !['L','U','N','C','H','*','Lab'].includes(t) && t !== '/');
 
       let slotIdx = 0;
       for (let i = 0; i < tokens.length; i++) {
         if (slotIdx >= 6) break;
         let token = tokens[i].toUpperCase();
+        // Skip purely numeric tokens or random OCR noise
+        if (token.length < 2 && !token.match(/[A-Z]/)) continue;
+        
         let cleanToken = token.replace(/[\*\/]/g, '').replace('LAB', '').trim();
         let map = mappings[cleanToken] || {};
 
@@ -113,7 +128,7 @@ function parseTextToTimetable(rawText, context = {}) {
           startTime: TIME_SLOTS[slotIdx].startTime,
           endTime: TIME_SLOTS[slotIdx].endTime,
           courseName: map.courseCode || token,
-          section: sectionMatch ? context.section || `Sec ${sectionMatch[1].trim()}` : context.section || '',
+          section: context.section || (sectionMatch ? `Sec ${sectionMatch[1].trim()}` : ''),
           departmentId: context.departmentId || null,
           studentYear: context.studentYear || '',
           facultyName: map.facultyName || '',
