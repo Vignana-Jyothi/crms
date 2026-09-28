@@ -4,7 +4,7 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends openssl ca-c
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 COPY prisma ./prisma
 RUN npx prisma generate
 
@@ -14,7 +14,7 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends openssl ca-c
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci --omit=dev
+RUN npm install --omit=dev
 COPY --from=prisma-build /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=prisma-build /app/node_modules/@prisma/client ./node_modules/@prisma/client
 COPY prisma ./prisma
