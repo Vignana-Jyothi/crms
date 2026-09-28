@@ -125,24 +125,28 @@ async function parseTextToTimetable(rawOutput, context) {
       // 4. Resolve Classroom (Room No)
       let resourceId = null;
       if (row['Classroom']) {
-        const val = row['Classroom'].trim();
+        // If it extracted "E130 / E131", take the first one for mapping
+        const val = row['Classroom'].split('/')[0].trim();
         if (val) {
-          let formattedRoom = val;
-          let m = formattedRoom.match(/^([a-zA-Z])\s*(\d+.*)$/);
-          if (m) formattedRoom = `${m[1].toUpperCase()} ${m[2]}`;
+          const normalize = (s) => (s || '').replace(/[-\s]/g, '').toLowerCase();
+          const normVal = normalize(val);
 
-          const res = await prisma.resource.findFirst({
-            where: { 
-              resourceType: { typeName: { equals: 'Classroom', mode: 'insensitive' } },
-              OR: [
-                { resourceName: { equals: formattedRoom, mode: 'insensitive' } },
-                { resourceId: { equals: formattedRoom, mode: 'insensitive' } },
-                { resourceName: { equals: val, mode: 'insensitive' } },
-                { resourceId: { equals: val, mode: 'insensitive' } }
-              ]
+          const resourcesList = await prisma.resource.findMany({
+            where: {
+              resourceType: {
+                typeName: { in: ['Classroom', 'Lab', 'Laboratory'], mode: 'insensitive' }
+              }
             }
           });
-          if (res) resourceId = res.resourceId;
+
+          const match = resourcesList.find(r => 
+            normalize(r.resourceId) === normVal || 
+            normalize(r.resourceName) === normVal
+          );
+
+          if (match) {
+            resourceId = match.resourceId;
+          }
         }
       }
 
