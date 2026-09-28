@@ -133,7 +133,7 @@ async function parseTextToTimetable(rawOutput, context) {
 
           const res = await prisma.resource.findFirst({
             where: { 
-              resourceType: { typeName: 'CLASSROOM' },
+              resourceType: { typeName: { equals: 'Classroom', mode: 'insensitive' } },
               OR: [
                 { resourceName: { equals: formattedRoom, mode: 'insensitive' } },
                 { resourceId: { equals: formattedRoom, mode: 'insensitive' } },
