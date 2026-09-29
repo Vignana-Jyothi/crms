@@ -225,7 +225,7 @@ export default function TimetableUploadModal({ isOpen, onClose, contextFilters, 
                 <button
                   onClick={handleExtract}
                   disabled={!file || isExtracting}
-                  className="flex-1 flex items-center justify-center gap-2 bg-primary text-white py-3 rounded-xl font-medium shadow-md shadow-primary/20 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="flex-1 flex items-center justify-center gap-2 bg-navy text-white py-3 rounded-xl font-medium shadow-md shadow-navy/20 hover:bg-navy-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
                   {isExtracting ? (
                     <><Loader2 size={18} className="animate-spin" /> Extracting Data...</>
@@ -233,16 +233,6 @@ export default function TimetableUploadModal({ isOpen, onClose, contextFilters, 
                     <>Extract Timetable</>
                   )}
                 </button>
-              </div>
-              
-              {/* Context Notice */}
-              <div className="w-full text-center text-xs text-slate-500 bg-white p-3 border border-line rounded-lg">
-                <p><strong>Note:</strong> Classes will be automatically assigned to the current filters:</p>
-                <div className="flex justify-center gap-4 mt-1 font-medium text-navy">
-                  <span>Year: {contextFilters.studentYear || 'Any'}</span>
-                  <span>Dept ID: {contextFilters.departmentId || 'Any'}</span>
-                  <span>Section: {contextFilters.section || 'Any'}</span>
-                </div>
               </div>
             </div>
           ) : (
