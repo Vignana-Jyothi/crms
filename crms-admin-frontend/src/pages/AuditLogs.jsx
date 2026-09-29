@@ -35,8 +35,9 @@ export default function AuditLogs() {
       const matchDetails = safeString(l.details).includes(q);
       const matchEntity = safeString(l.entityId).includes(q) || safeString(l.entityType).includes(q);
       const matchAction = safeString(l.action).includes(q);
+      const matchTimestamp = safeString(fmtDateTime(l.timestamp)).includes(q);
       
-      if (!matchUser && !matchDetails && !matchEntity && !matchAction) return false;
+      if (!matchUser && !matchDetails && !matchEntity && !matchAction && !matchTimestamp) return false;
     }
     return true;
   });
