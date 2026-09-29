@@ -10,6 +10,8 @@ RUN npx prisma generate
 
 FROM node:20-bookworm-slim
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update -y && apt-get install -y --no-install-recommends \
     openssl ca-certificates \
     python3 python3-pip python3-venv \
