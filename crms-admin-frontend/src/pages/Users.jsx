@@ -257,11 +257,14 @@ export default function Users() {
 
           {error && <p className="mt-4 rounded bg-brick-light px-3 py-2 text-sm text-brick">{error}</p>}
 
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             type="submit"
             disabled={submitting}
-            className="mt-4 rounded bg-navy px-4 py-2 text-sm font-semibold text-white hover:bg-navy-dark disabled:opacity-60"
+            className="mt-4 rounded bg-navy px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-navy-dark hover:shadow-md transition-all disabled:opacity-60"
           >
+            {submitting ? 'Creating…' : 'Create user'}
           </motion.button>
         </motion.form>
       )}

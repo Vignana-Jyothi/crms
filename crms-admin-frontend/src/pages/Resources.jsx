@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { masterDataApi, resourcesApi } from '../api/endpoints';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const EMPTY_FORM = {
   resourceId: '',
@@ -169,17 +170,21 @@ export default function Resources() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="rounded border border-line px-3 py-2 text-sm w-64"
           />
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => {
               setShowForm((s) => !s);
               setError('');
             }}
-            className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white hover:bg-navy-dark whitespace-nowrap"
+            className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-navy-dark hover:shadow-md transition-all whitespace-nowrap"
           >
             {showForm ? 'Cancel' : '+ Add resource'}
-          </button>
+          </motion.button>
         </div>
       </div>
+
+      <AnimatePresence>
 
       {actionAlert && (
         <div
@@ -196,8 +201,18 @@ export default function Resources() {
         </div>
       )}
 
+      </AnimatePresence>
+
+      <AnimatePresence>
       {showForm && (
-        <form onSubmit={handleSubmit} className="mt-6 rounded-lg border border-line bg-white p-5">
+        <motion.form 
+          initial={{ opacity: 0, height: 0, y: -20 }}
+          animate={{ opacity: 1, height: 'auto', y: 0 }}
+          exit={{ opacity: 0, height: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+          onSubmit={handleSubmit} 
+          className="mt-6 rounded-lg border border-line bg-white p-5 shadow-md overflow-hidden"
+        >
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
             <input
               required
@@ -267,18 +282,26 @@ export default function Resources() {
 
           {error && <p className="mt-4 rounded bg-brick-light px-3 py-2 text-sm text-brick">{error}</p>}
 
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             type="submit"
             disabled={submitting}
-            className="mt-4 rounded bg-navy px-4 py-2 text-sm font-semibold text-white hover:bg-navy-dark disabled:opacity-60"
+            className="mt-4 rounded bg-navy px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-navy-dark hover:shadow-md transition-all disabled:opacity-60"
           >
             {submitting ? 'Saving…' : 'Save resource'}
-          </button>
-        </form>
+          </motion.button>
+        </motion.form>
       )}
+      </AnimatePresence>
 
       {/* Inventory Table with Block, Floor, and Capacity */}
-      <div className="mt-6 overflow-hidden rounded-lg border border-line bg-white shadow-sm">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.4 }}
+        className="mt-6 overflow-hidden rounded-lg border border-line bg-white shadow-md hover:shadow-lg transition-shadow duration-300"
+      >
         <table className="w-full text-left text-sm">
           <thead className="border-b border-line bg-paper text-xs uppercase tracking-wide text-ink/50">
             <tr>
@@ -294,9 +317,17 @@ export default function Resources() {
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
-            {filteredResources.map((r) => (
-              <tr key={r.resourceId} className="hover:bg-paper/30">
-                <td className="px-4 py-3 font-mono text-xs text-ink/50">{r.resourceId}</td>
+            <AnimatePresence>
+            {filteredResources.map((r, i) => (
+              <motion.tr 
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2, delay: i * 0.02 }}
+                key={r.resourceId} 
+                className="hover:bg-paper/50 transition-colors duration-150 group"
+              >
+                <td className="px-4 py-3 font-mono text-xs text-ink/50 transition-transform group-hover:translate-x-1 duration-200">{r.resourceId}</td>
                 <td className="px-4 py-3 font-medium text-ink">{r.resourceName}</td>
                 <td className="px-4 py-3 text-ink/70">{r.resourceType?.typeName || '—'}</td>
                 <td className="px-4 py-3 text-ink/70">{r.department?.departmentName || 'Institute (Shared)'}</td>
@@ -324,8 +355,9 @@ export default function Resources() {
                     </button>
                   </div>
                 </td>
-              </tr>
+              </motion.tr>
             ))}
+            </AnimatePresence>
             {filteredResources.length === 0 && (
               <tr>
                 <td colSpan={9} className="px-4 py-10 text-center text-sm text-ink/50">
@@ -335,12 +367,23 @@ export default function Resources() {
             )}
           </tbody>
         </table>
-      </div>
+      </motion.div>
 
       {/* Edit Resource Modal */}
+      <AnimatePresence>
       {editingResource && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/40 backdrop-blur-sm p-4">
-          <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-2xl border border-line">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-navy/40 backdrop-blur-sm p-4"
+        >
+          <motion.div 
+            initial={{ scale: 0.9, y: 20 }}
+            animate={{ scale: 1, y: 0 }}
+            exit={{ scale: 0.9, y: 20 }}
+            className="w-full max-w-lg rounded-xl bg-white p-6 shadow-2xl border border-line"
+          >
             <h3 className="font-display text-lg font-semibold text-navy">
               Edit Resource: {editingResource.resourceId}
             </h3>
@@ -452,9 +495,10 @@ export default function Resources() {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
+      </AnimatePresence>
     </div>
   );
 }
