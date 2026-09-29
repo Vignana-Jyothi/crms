@@ -43,9 +43,70 @@ export default function FullWeekTimetableGrid({
   const [editForm, setEditForm] = useState({});
   const [saving, setSaving] = useState(false);
   
-  // Determine if this view is predominantly 1st year
   const isFirstYearView = selectedStudentYear === '1' || (timetables.length > 0 && timetables.every(t => t.studentYear === '1'));
-  const activeTimeSlots = isFirstYearView ? TIME_SLOTS_FIRST_YEAR : TIME_SLOTS_STANDARD;
+  
+  const toMins = (t) => {
+    if (!t) return 0;
+    if (typeof t === 'string') {
+      if (t.includes('T')) {
+        const d = new Date(t);
+        return d.getUTCHours() * 60 + d.getUTCMinutes();
+      }
+      const [h, m] = t.split(':').map(Number);
+      return h * 60 + m;
+    }
+    return 0;
+  };
+  
+  const fromMins = (m) => {
+    const h = Math.floor(m / 60);
+    const mins = m % 60;
+    return `${String(h).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+  };
+
+  const baseSlots = isFirstYearView ? TIME_SLOTS_FIRST_YEAR : TIME_SLOTS_STANDARD;
+  const timeBoundaries = new Set();
+  
+  baseSlots.forEach(s => {
+    timeBoundaries.add(toMins(s.start));
+    timeBoundaries.add(toMins(s.end));
+  });
+
+  timetables.forEach(t => {
+    const s = toMins(t.startTime);
+    let e = toMins(t.endTime);
+    if (e === 0 && s === 660) e = 720;
+    if (s && e) {
+      timeBoundaries.add(s);
+      timeBoundaries.add(e);
+    }
+  });
+
+  const sortedBoundaries = Array.from(timeBoundaries).sort((a, b) => a - b);
+  const activeTimeSlots = [];
+  
+  for (let i = 0; i < sortedBoundaries.length - 1; i++) {
+    const startMins = sortedBoundaries[i];
+    const endMins = sortedBoundaries[i+1];
+    
+    const isStandardLunch = startMins >= 780 && endMins <= 820;
+    const isFirstYearLunch = startMins >= 720 && endMins <= 760;
+    
+    const hasClassOverlap = timetables.some(t => {
+      const s = toMins(t.startTime);
+      let e = toMins(t.endTime);
+      if (e === 0 && s === 660) e = 720;
+      return Math.max(startMins, s) < Math.min(endMins, e);
+    });
+
+    const isLunch = !hasClassOverlap && ((!isFirstYearView && isStandardLunch) || (isFirstYearView && isFirstYearLunch));
+
+    activeTimeSlots.push({
+      start: fromMins(startMins),
+      end: fromMins(endMins),
+      isLunch
+    });
+  }
 
   // Helper to find all classes for a specific day and time slot
   const getClassesForSlot = (day, startSlot, endSlot) => {

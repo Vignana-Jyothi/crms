@@ -339,9 +339,11 @@ export default function Dashboard() {
         
         <button
           onClick={() => {
-            setFilters({ resourceTypeId: '', departmentId: '', blockId: '', minCapacity: '', search: '', availability: 'All' });
+            setFilters({ resourceTypeId: '', departmentId: '', blockId: '', minCapacity: '', search: '', availability: 'Free' });
             setSelectedDate(todayStr());
             setFilterType('Whole');
+            setCustomStart('');
+            setCustomEnd('');
           }}
           className="flex items-center justify-center gap-1.5 rounded px-3 py-2 text-sm font-medium text-navy/60 hover:text-navy hover:bg-black/5 transition-colors w-full sm:col-span-2 lg:col-span-1 xl:col-span-1"
         >
