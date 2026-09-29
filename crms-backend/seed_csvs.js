@@ -10,7 +10,7 @@ async function run() {
     console.log("Starting direct database injection...");
     
     for (const file of files) {
-        const filePath = path.join(__dirname, '..', file);
+        const filePath = path.join(__dirname, file);
         if (!fs.existsSync(filePath)) {
             console.log(`Skipping ${file} - file not found.`);
             continue;
