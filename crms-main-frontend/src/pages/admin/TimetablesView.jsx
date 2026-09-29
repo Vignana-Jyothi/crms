@@ -413,7 +413,8 @@ export default function TimetablesView() {
               <SearchableSelect
                 value={selectedFaculty}
                 onChange={setSelectedFaculty}
-                placeholder="All Faculty"
+                placeholder="Select or Type Faculty"
+                allowCreate={true}
                 options={[
                   { value: '', label: 'All Faculty' },
                   ...facultyList.map(f => ({ value: (f.name || f).toString(), label: (f.label || f).toString() }))
