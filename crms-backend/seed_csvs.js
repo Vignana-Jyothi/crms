@@ -11,8 +11,6 @@ async function run() {
     
     const { PrismaClient } = require('@prisma/client');
     const prisma = new PrismaClient();
-    console.log("Wiping existing timetable records...");
-    await prisma.timetable.deleteMany({});
     
     for (const file of files) {
         const filePath = path.join(__dirname, file);
