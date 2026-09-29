@@ -68,15 +68,15 @@ export default function Sidebar({ isOpen, setIsOpen }) {
 
   return (
     <>
-      {/* Mobile Overlay */}
+      {/* Mobile/Desktop Overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 z-40 bg-navy/50 backdrop-blur-sm md:hidden transition-opacity"
+          className="fixed inset-0 z-40 bg-navy/50 backdrop-blur-sm lg:hidden transition-opacity"
           onClick={() => setIsOpen(false)}
         />
       )}
       <aside 
-        className={`fixed inset-y-0 left-0 z-50 flex h-screen w-64 shrink-0 flex-col overflow-y-auto border-r border-line bg-navy text-white transform transition-transform duration-300 md:relative md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed inset-y-0 left-0 z-50 flex h-screen w-64 shrink-0 flex-col overflow-y-auto border-r border-line bg-navy text-white transform transition-transform duration-300 lg:relative ${isOpen ? 'translate-x-0' : '-translate-x-full lg:hidden'}`}
       >
         <div className="border-b border-white/10 px-5 py-5 flex items-center justify-between">
           <div>
@@ -90,9 +90,10 @@ export default function Sidebar({ isOpen, setIsOpen }) {
               )}
             </div>
           </div>
-          <button onClick={() => setIsOpen(false)} className="md:hidden text-white/50 hover:text-white p-1">
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          {/* Close button visible on both mobile and desktop when sidebar is open */}
+          <button onClick={() => setIsOpen(false)} className="text-white/50 hover:text-white p-1 rounded hover:bg-white/10 transition-colors">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
         </div>

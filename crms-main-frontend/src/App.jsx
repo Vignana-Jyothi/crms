@@ -22,15 +22,16 @@ import AuditLogs from './pages/admin/AuditLogs';
 
 function MainShell({ children }) {
   const { user } = useAuth();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  // Default to open on desktop, closed on mobile
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 768);
   
   if (!user) return children; // login page fallback
   return (
     <div className="flex h-screen relative overflow-hidden bg-paper">
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
       <main className="flex-1 flex flex-col min-w-0 bg-paper overflow-y-auto">
-        {/* Mobile Header */}
-        <div className="md:hidden flex items-center justify-between bg-navy text-white px-4 py-3 shrink-0 sticky top-0 z-10">
+        {/* Header - shown on mobile always, shown on desktop only when sidebar is closed */}
+        <div className={`${isSidebarOpen ? 'md:hidden' : ''} flex items-center justify-between bg-navy text-white px-4 py-3 shrink-0 sticky top-0 z-10`}>
           <span className="font-display font-semibold">CRMS</span>
           <button onClick={() => setIsSidebarOpen(true)} className="p-1 hover:text-white/80">
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
