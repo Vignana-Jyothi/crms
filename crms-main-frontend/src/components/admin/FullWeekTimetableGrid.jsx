@@ -99,7 +99,7 @@ export default function FullWeekTimetableGrid({
       return Math.max(startMins, s) < Math.min(endMins, e);
     });
 
-    const isLunch = !hasClassOverlap && ((!isFirstYearView && isStandardLunch) || (isFirstYearView && isFirstYearLunch));
+    const isLunch = !hasClassOverlap && (isStandardLunch || isFirstYearLunch);
 
     activeTimeSlots.push({
       start: fromMins(startMins),
@@ -330,8 +330,8 @@ export default function FullWeekTimetableGrid({
                   const baseClass = hasClasses ? classesRaw[0] : null;
 
                   const isCellLunch = !isEditMode && (
-                    (!isFirstYearView && mergedStart === '13:00' && mergedEnd === '13:40') || 
-                    (isFirstYearView && mergedStart === '12:00' && mergedEnd === '12:40')
+                    (mergedStart === '13:00' && mergedEnd === '13:40') || 
+                    (mergedStart === '12:00' && mergedEnd === '12:40')
                   );
 
                   return (
