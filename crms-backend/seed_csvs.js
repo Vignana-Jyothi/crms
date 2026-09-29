@@ -34,8 +34,15 @@ async function run() {
             console.log(`\nParsing ${file}... (${rows.length} rows)`);
             const extractedData = await parseTextToTimetable(rawJson, {});
             
-            console.log(`Saving ${extractedData.length} validated records to the database...`);
-            await batchCreate(extractedData);
+            // Strip out raw UI fields that aren't in the database schema
+            const cleanData = extractedData.map(row => {
+                delete row.rawClassroom;
+                delete row.rawFaculty;
+                return row;
+            });
+            
+            console.log(`Saving ${cleanData.length} validated records to the database...`);
+            await batchCreate(cleanData);
             
             console.log(`Success: injected ${extractedData.length} records from ${file}`);
             total += extractedData.length;
