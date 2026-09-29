@@ -11,6 +11,7 @@ async function run() {
     
     for (const file of files) {
         const filePath = path.join(__dirname, file);
+        console.log(`Checking path: ${filePath}`);
         if (!fs.existsSync(filePath)) {
             console.log(`Skipping ${file} - file not found.`);
             continue;
