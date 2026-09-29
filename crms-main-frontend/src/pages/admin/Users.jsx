@@ -62,6 +62,7 @@ export default function Users() {
     } finally {
       setSubmitting(false);
     }
+  }
 
   async function handleUpdateUser(e) {
     e.preventDefault();
