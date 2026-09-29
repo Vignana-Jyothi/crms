@@ -336,6 +336,20 @@ export default function Dashboard() {
             </option>
           ))}
         </select>
+        
+        <button
+          onClick={() => {
+            setFilters({ resourceTypeId: '', departmentId: '', blockId: '', minCapacity: '', search: '', availability: 'All' });
+            setSelectedDate(todayStr());
+            setFilterType('Whole');
+          }}
+          className="flex items-center justify-center gap-1.5 rounded px-3 py-2 text-sm font-medium text-navy/60 hover:text-navy hover:bg-black/5 transition-colors w-full sm:col-span-2 lg:col-span-1 xl:col-span-1"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          Clear filters
+        </button>
         </div>
       </div>
 
