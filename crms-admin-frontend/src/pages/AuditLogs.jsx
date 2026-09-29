@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { auditApi } from '../api/endpoints';
 import { fmtDateTime } from '../utils/formatters';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AuditLogs() {
   const [logs, setLogs] = useState([]);
@@ -129,9 +130,22 @@ export default function AuditLogs() {
       {loading ? (
         <p className="mt-6 text-sm text-ink/50">Loading…</p>
       ) : (
-        <ul className="mt-6 divide-y divide-line rounded-lg border border-line bg-white shadow-sm">
-          {filteredLogs.map((l) => (
-            <li key={l.auditId} className="flex items-start gap-4 px-4 py-3 text-sm hover:bg-paper/30">
+        <motion.ul 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="mt-6 divide-y divide-line rounded-lg border border-line bg-white shadow-md hover:shadow-lg transition-shadow duration-300"
+        >
+          <AnimatePresence>
+          {filteredLogs.map((l, i) => (
+            <motion.li 
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2, delay: i * 0.01 }}
+              key={l.auditId} 
+              className="flex items-start gap-4 px-4 py-3 text-sm hover:bg-paper/50 transition-colors duration-150 group"
+            >
               <span className="w-40 shrink-0 font-mono text-xs text-ink/40">
                 {fmtDateTime(l.timestamp)}
               </span>
@@ -153,12 +167,13 @@ export default function AuditLogs() {
                 {l.entityId}
                 {l.details ? ` — ${l.details}` : ''}
               </span>
-            </li>
+            </motion.li>
           ))}
+          </AnimatePresence>
           {filteredLogs.length === 0 && (
             <li className="px-4 py-10 text-center text-sm text-ink/50">No audit activity matches filters.</li>
           )}
-        </ul>
+        </motion.ul>
       )}
     </div>
   );

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { masterDataApi, resourcesApi, timetableApi } from '../../api/endpoints';
 import FullWeekTimetableGrid from '../../components/admin/FullWeekTimetableGrid';
 import EditableTimetableGrid from '../../components/admin/EditableTimetableGrid';
@@ -434,8 +435,14 @@ export default function TimetablesView() {
           </div>
 
           {/* Clear Filters Button */}
+          <AnimatePresence>
           {(selectedStudentYear || selectedDepartment || selectedSection || selectedFaculty || selectedDay || selectedResource || selectedBlock || selectedDate) && (
-            <button
+            <motion.button
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => {
                 setSelectedStudentYear('');
                 setSelectedDepartment('');
@@ -449,8 +456,9 @@ export default function TimetablesView() {
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors shrink-0 border border-red-200 mt-2 xl:mt-0"
             >
               <X size={14} /> Clear
-            </button>
+            </motion.button>
           )}
+          </AnimatePresence>
 
           {/* View Mode Toggle (Grid/List) */}
           <div className="flex bg-slate-100 p-1 rounded-lg w-full xl:w-auto justify-center shrink-0 mt-2 xl:mt-0 xl:ml-auto">
