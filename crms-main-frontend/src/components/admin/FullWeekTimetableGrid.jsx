@@ -330,10 +330,33 @@ export default function FullWeekTimetableGrid({
 
                   const baseClass = hasClasses ? classesRaw[0] : null;
 
-                  const isCellLunch = !isEditMode && (
-                    (mergedStart === '13:00' && mergedEnd === '13:40') || 
-                    (mergedStart === '12:00' && mergedEnd === '12:40')
-                  );
+                  const firstYearClasses = timetables.filter(t => t.studentYear === '1').length;
+                  const seniorClasses = timetables.length - firstYearClasses;
+                  const primaryLunchStart = firstYearClasses >= seniorClasses ? '12:00' : '13:00';
+                  
+                  const is1200Busy = timetables.some(t => {
+                    if (t.dayOfWeek !== day) return false;
+                    const s = toMins(t.startTime);
+                    let e = toMins(t.endTime);
+                    if (e === 0 && s === 660) e = 720;
+                    return Math.max(720, s) < Math.min(760, e);
+                  });
+                  const is1300Busy = timetables.some(t => {
+                    if (t.dayOfWeek !== day) return false;
+                    const s = toMins(t.startTime);
+                    let e = toMins(t.endTime);
+                    if (e === 0 && s === 660) e = 720;
+                    return Math.max(780, s) < Math.min(820, e);
+                  });
+                  
+                  let dayLunchStart = primaryLunchStart;
+                  if (primaryLunchStart === '12:00' && is1200Busy && !is1300Busy) {
+                    dayLunchStart = '13:00';
+                  } else if (primaryLunchStart === '13:00' && is1300Busy && !is1200Busy) {
+                    dayLunchStart = '12:00';
+                  }
+
+                  const isCellLunch = !isEditMode && mergedStart === dayLunchStart;
 
                   return (
                     <td key={idx} colSpan={colSpan} className={`border-r border-line p-2 text-center align-middle h-full ${!hasClasses && !isEditMode ? (isCellLunch ? 'bg-slate-50/80' : 'bg-slate-50/50') : 'bg-white hover:bg-slate-50 cursor-pointer transition-colors'}`}
