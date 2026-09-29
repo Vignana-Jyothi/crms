@@ -76,20 +76,15 @@ export default function Sidebar({ isOpen, setIsOpen }) {
         />
       )}
       <aside 
-        className={`fixed inset-y-0 left-0 z-50 flex h-full w-64 shrink-0 flex-col overflow-y-auto border-r border-white/10 bg-indigo-950/70 backdrop-blur-2xl text-white transform transition-transform duration-300 md:relative md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed inset-y-0 left-0 z-50 flex h-screen w-64 shrink-0 flex-col overflow-y-auto border-r border-line bg-navy text-white transform transition-transform duration-300 md:relative md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        <div className="px-6 py-8 flex items-center justify-between">
+        <div className="border-b border-white/10 px-5 py-5 flex items-center justify-between">
           <div>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-violet-400 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-              </div>
-              <p className="font-display text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">CRMS</p>
-            </div>
-            <div className="mt-3 flex flex-col gap-1">
-              <p className="text-xs font-medium text-indigo-200/80 uppercase tracking-wider">{user?.role?.roleName || user?.role}</p>
+            <p className="font-display text-xl font-bold tracking-wide">CRMS</p>
+            <div className="mt-1 flex flex-col gap-1">
+              <p className="text-xs text-white/50">{user?.role?.roleName || user?.role}</p>
               {(user?.department?.departmentName || (typeof user?.department === 'string' && user?.department)) && (
-                <span className="inline-block self-start rounded-full bg-white/10 border border-white/5 px-2.5 py-0.5 text-[10px] font-semibold text-white tracking-wide mt-1">
+                <span className="inline-block self-start rounded bg-white/10 px-1.5 py-0.5 text-[11px] font-medium text-white/80">
                   {user?.department?.departmentName || user?.department}
                 </span>
               )}
@@ -102,10 +97,10 @@ export default function Sidebar({ isOpen, setIsOpen }) {
           </button>
         </div>
 
-      <nav className="flex-1 space-y-1.5 px-4 py-2">
+      <nav className="flex-1 space-y-1 px-3 py-4">
         {visibleNav.map((l, idx) => {
           if (l.type === 'divider') {
-            return <div key={`div-${idx}`} className="my-6 border-t border-white/5 mx-2" />;
+            return <div key={`div-${idx}`} className="my-4 border-t border-white/10 mx-2" />;
           }
           return (
             <NavLink
@@ -113,19 +108,17 @@ export default function Sidebar({ isOpen, setIsOpen }) {
               to={l.to}
               end={l.exact}
               className={({ isActive }) =>
-                `group flex items-center justify-between rounded-xl px-3 py-3 text-sm font-medium transition-all duration-300 ${
-                  isActive ? 'bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/25 scale-[1.02]' : 'text-indigo-100/70 hover:bg-white/10 hover:text-white hover:scale-[1.01]'
+                `group flex items-center justify-between rounded-md px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                  isActive ? 'bg-white/15 text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
                 }`
               }
             >
-              <div className="flex items-center gap-3.5">
-                <div className={`transition-transform duration-300 ${l.isActive ? 'scale-110' : 'group-hover:scale-110'}`}>
-                  {l.icon}
-                </div>
-                <span className="tracking-wide">{l.label}</span>
+              <div className="flex items-center gap-3">
+                {l.icon}
+                <span>{l.label}</span>
               </div>
               {l.badge && pendingCount > 0 && (
-                <span className="rounded-full bg-emerald-500 px-2 py-0.5 text-[11px] font-bold text-white shadow-sm shadow-emerald-500/30">
+                <span className="rounded-full bg-amber px-2 py-0.5 text-xs font-semibold text-navy-dark shadow-sm">
                   {pendingCount}
                 </span>
               )}
@@ -134,15 +127,15 @@ export default function Sidebar({ isOpen, setIsOpen }) {
         })}
       </nav>
 
-      <div className="p-4 mx-4 mb-4 mt-auto rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
-        <p className="truncate text-sm font-semibold text-white">{user?.name}</p>
-        <p className="truncate text-xs text-indigo-200/60 mb-3">{user?.email}</p>
+      <div className="border-t border-white/10 px-5 py-4">
+        <p className="truncate text-sm font-medium text-white/90">{user?.name}</p>
+        <p className="truncate text-xs text-white/50 mb-3">{user?.email}</p>
         <button
           onClick={() => {
             logout();
             navigate('/login');
           }}
-          className="w-full rounded-lg bg-white/10 px-3 py-2 text-xs font-semibold text-white hover:bg-rose-500 hover:text-white transition-colors duration-300"
+          className="text-xs font-medium text-brick hover:text-brick-light transition-colors"
         >
           Sign out
         </button>

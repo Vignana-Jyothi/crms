@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { auditApi } from '../../api/endpoints';
 import { fmtDateTime } from '../../utils/formatters';
-import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AuditLogs() {
   const [logs, setLogs] = useState([]);
@@ -30,35 +29,25 @@ export default function AuditLogs() {
   const filteredLogs = logs.filter((l) => {
     if (searchTerm.trim()) {
       const q = searchTerm.toLowerCase();
-      const safeString = (val) => (val ? String(val).toLowerCase() : '');
-      const matchUser = safeString(l.user?.name).includes(q) || safeString(l.userId).includes(q);
-      const matchDetails = safeString(l.details).includes(q);
-      const matchEntity = safeString(l.entityId).includes(q) || safeString(l.entityType).includes(q);
-      const matchAction = safeString(l.action).includes(q);
-      const matchTimestamp = safeString(fmtDateTime(l.timestamp)).includes(q);
-      
-      if (!matchUser && !matchDetails && !matchEntity && !matchAction && !matchTimestamp) return false;
+      const matchUser = l.user?.name?.toLowerCase().includes(q) || String(l.userId).includes(q);
+      const matchDetails = l.details?.toLowerCase().includes(q);
+      const matchEntity = l.entityId?.toLowerCase?.().includes(q) || String(l.entityId).includes(q);
+      if (!matchUser && !matchDetails && !matchEntity) return false;
     }
     return true;
   });
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6">
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
-      >
-        <h1 className="text-4xl font-display font-bold text-ink drop-shadow-sm">Audit logs</h1>
-        <p className="mt-2 text-ink/70 text-sm font-medium">Who changed what, and when — most recent first.</p>
-      </motion.div>
+    <div className="p-4 md:p-8 max-w-7xl mx-auto">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-display text-2xl font-semibold text-navy">Audit logs</h1>
+          <p className="mt-1 text-sm text-ink/60">Who changed what, and when — most recent first.</p>
+        </div>
+      </div>
 
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.98 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.1 }}
-        className="flex flex-col md:flex-row items-start md:items-end gap-4 rounded-2xl bg-white/60 backdrop-blur-xl border border-white/40 p-5 shadow-xl shadow-indigo-900/5"
-      >
+      {/* Filter Controls */}
+      <div className="mt-6 flex flex-wrap items-center gap-3 rounded-lg border border-line bg-white p-4">
         <div>
           <label className="block text-xs font-semibold text-ink/70 mb-1">Search</label>
           <input
@@ -123,7 +112,7 @@ export default function AuditLogs() {
             </button>
           </div>
         )}
-      </motion.div>
+      </div>
 
       {error && (
         <div className="mt-4 flex items-center justify-between rounded-lg border border-brick/40 bg-brick-light p-4 text-sm text-brick">
@@ -135,25 +124,13 @@ export default function AuditLogs() {
       )}
 
       {loading ? (
-        <p className="mt-6 text-sm font-medium text-ink/50 animate-pulse">Loading audit logs…</p>
+        <p className="mt-6 text-sm text-ink/50">Loading…</p>
       ) : (
         <>
-          <div className="mt-6 hidden md:block overflow-x-auto pb-4">
-            <motion.ul 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.4 }}
-              className="min-w-[800px] divide-y divide-white/20 rounded-2xl border border-white/40 bg-white/70 backdrop-blur-xl shadow-xl shadow-indigo-900/5 overflow-hidden"
-            >
-            <AnimatePresence>
-            {filteredLogs.map((l, i) => (
-              <motion.li 
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 + i * 0.02 }}
-                key={l.auditId} 
-                className="flex items-start gap-4 px-5 py-4 text-sm hover:bg-white/50 transition-colors duration-200 group"
-              >
+          <div className="mt-6 hidden md:block overflow-x-auto">
+            <ul className="min-w-[800px] divide-y divide-line rounded-lg border border-line bg-white shadow-sm">
+            {filteredLogs.map((l) => (
+              <li key={l.auditId} className="flex items-start gap-4 px-4 py-3 text-sm hover:bg-paper/30">
                 <span className="w-40 shrink-0 font-mono text-xs text-ink/40">
                   {fmtDateTime(l.timestamp)}
                 </span>
@@ -164,7 +141,7 @@ export default function AuditLogs() {
                   )}
                 </span>
                 <span className="w-44 shrink-0">
-                  <span className="inline-block rounded-full bg-gradient-to-r from-indigo-100 to-violet-100 border border-indigo-200/50 px-2.5 py-1 text-[11px] font-bold text-indigo-700 shadow-sm">
+                  <span className="inline-block rounded bg-navy/5 px-2 py-0.5 text-xs font-medium text-navy">
                     {l.action}
                   </span>
                 </span>
@@ -175,13 +152,12 @@ export default function AuditLogs() {
                   {l.entityId}
                   {l.details ? ` — ${l.details}` : ''}
                 </span>
-              </motion.li>
+              </li>
             ))}
-            </AnimatePresence>
             {filteredLogs.length === 0 && (
-              <li className="px-5 py-12 text-center text-sm font-medium text-ink/50">No audit activity matches filters.</li>
+              <li className="px-4 py-10 text-center text-sm text-ink/50">No audit activity matches filters.</li>
             )}
-          </motion.ul>
+          </ul>
         </div>
 
         {/* Mobile Card View */}
