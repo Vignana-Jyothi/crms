@@ -24,4 +24,7 @@ const updateStatus = (userId, status) =>
 
 const create = (data) => prisma.user.create({ data, select: SAFE_SELECT });
 
-module.exports = { list, findById, updateRole, updateStatus, create };
+const update = (userId, data) => 
+  prisma.user.update({ where: { userId }, data, select: SAFE_SELECT });
+
+module.exports = { list, findById, updateRole, updateStatus, create, update };

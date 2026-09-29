@@ -436,7 +436,9 @@ export default function TimetablesView() {
 
           {/* Clear Filters Button */}
           <AnimatePresence>
-          {(selectedStudentYear || selectedDepartment || selectedSection || selectedFaculty || selectedDay || selectedResource || selectedBlock || selectedDate) && (
+          {((activeTab === 'Classrooms' && (selectedResource || selectedBlock || selectedDay || selectedDate)) ||
+            (activeTab === 'Sections' && (selectedStudentYear || selectedDepartment || selectedSection || selectedDay || selectedDate)) ||
+            (activeTab === 'Faculty' && (selectedFaculty || selectedDay || selectedDate))) && (
             <motion.button
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -444,14 +446,22 @@ export default function TimetablesView() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => {
-                setSelectedStudentYear('');
-                setSelectedDepartment('');
-                setSelectedSection('');
-                setSelectedFaculty('');
-                setSelectedDay('');
-                setSelectedResource('');
-                setSelectedBlock('');
-                setSelectedDate('');
+                if (activeTab === 'Classrooms') {
+                  setSelectedResource('');
+                  setSelectedBlock('');
+                  setSelectedDay('');
+                  setSelectedDate('');
+                } else if (activeTab === 'Sections') {
+                  setSelectedStudentYear('');
+                  setSelectedDepartment('');
+                  setSelectedSection('');
+                  setSelectedDay('');
+                  setSelectedDate('');
+                } else if (activeTab === 'Faculty') {
+                  setSelectedFaculty('');
+                  setSelectedDay('');
+                  setSelectedDate('');
+                }
               }}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors shrink-0 border border-red-200 mt-2 xl:mt-0"
             >

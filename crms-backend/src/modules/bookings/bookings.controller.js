@@ -11,14 +11,19 @@ const create = asyncHandler(async (req, res) => {
 // their department's; Institute Admin/Super Admin see everything
 // (via query params, no special-casing needed in the service).
 const list = asyncHandler(async (req, res) => {
-  const filters = { status: req.query.status, resourceId: req.query.resourceId };
+  const filters = { 
+    status: req.query.status, 
+    resourceId: req.query.resourceId,
+    departmentId: req.query.departmentId
+  };
 
   if (req.auth.roleId === ROLES.REQUESTER) {
     filters.requesterUserId = req.auth.userId;
   } else if (req.auth.roleId === ROLES.DEPARTMENT_ADMIN) {
+    // Force department admin to only see their own department's bookings
     filters.departmentId = req.auth.departmentId;
   }
-  // Institute Admin / Super Admin: no extra filter -> sees all.
+  // Institute Admin / Super Admin: can pass any departmentId via query params
 
   res.json(await service.list(filters));
 });

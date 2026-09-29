@@ -20,6 +20,8 @@ export const usersApi = {
     client.patch(`/users/${userId}/role`, { roleId, departmentId }).then((r) => r.data),
   updateStatus: (userId, status) =>
     client.patch(`/users/${userId}/status`, { status }).then((r) => r.data),
+  update: (userId, data) => 
+    client.put(`/users/${userId}`, data).then((r) => r.data),
 };
 
 export const masterDataApi = {

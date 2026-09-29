@@ -151,4 +151,26 @@ router.patch(
   })
 );
 
+// Super Admin can update user details
+router.put(
+  '/:userId',
+  authorizeRole(ROLES.SUPER_ADMIN),
+  asyncHandler(async (req, res) => {
+    const { name, email, phone, roomNo, notes } = req.body;
+    const updated = await repo.update(Number(req.params.userId), {
+      name, email, phone, roomNo, notes
+    });
+    
+    await auditService.log({
+      userId: req.auth.userId,
+      action: 'UPDATE_USER',
+      entityType: 'user',
+      entityId: req.params.userId,
+      details: `name -> ${name}, email -> ${email}`,
+    });
+    
+    res.json(updated);
+  })
+);
+
 module.exports = router;

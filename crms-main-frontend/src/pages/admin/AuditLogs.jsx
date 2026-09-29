@@ -30,9 +30,12 @@ export default function AuditLogs() {
     if (searchTerm.trim()) {
       const q = searchTerm.toLowerCase();
       const matchUser = l.user?.name?.toLowerCase().includes(q) || String(l.userId).includes(q);
-      const matchDetails = l.details?.toLowerCase().includes(q);
+      const cleanedDetails = (l.details || '').replace('::ffff:', '');
+      const matchDetails = cleanedDetails.toLowerCase().includes(q);
       const matchEntity = l.entityId?.toLowerCase?.().includes(q) || String(l.entityId).includes(q);
-      if (!matchUser && !matchDetails && !matchEntity) return false;
+      const matchDate = fmtDateTime(l.timestamp).toLowerCase().includes(q);
+      
+      if (!matchUser && !matchDetails && !matchEntity && !matchDate) return false;
     }
     return true;
   });
@@ -150,7 +153,7 @@ export default function AuditLogs() {
                     [{l.entityType}]
                   </span>
                   {l.entityId}
-                  {l.details ? ` — ${l.details}` : ''}
+                  {l.details ? ` — ${l.details.replace('::ffff:', '')}` : ''}
                 </span>
               </li>
             ))}
@@ -183,7 +186,7 @@ export default function AuditLogs() {
                   [{l.entityType}]
                 </span>
                 {l.entityId}
-                {l.details ? ` — ${l.details}` : ''}
+                {l.details ? ` — ${l.details.replace('::ffff:', '')}` : ''}
               </div>
             </div>
           ))}

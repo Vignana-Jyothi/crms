@@ -13,6 +13,8 @@ export default function Users() {
   const [actionAlert, setActionAlert] = useState(null); // { type: 'success' | 'error', message: string }
   const [submitting, setSubmitting] = useState(false);
   const [tempPasswordFor, setTempPasswordFor] = useState(null);
+  const [editUser, setEditUser] = useState(null);
+  const [editForm, setEditForm] = useState(EMPTY_FORM);
 
   // Password Reset Modal State
   const [resetPasswordUser, setResetPasswordUser] = useState(null);
@@ -57,6 +59,27 @@ export default function Users() {
       refresh();
     } catch (err) {
       setError(err.response?.data?.error || 'Could not create user.');
+    } finally {
+      setSubmitting(false);
+    }
+
+  async function handleUpdateUser(e) {
+    e.preventDefault();
+    setError('');
+    setActionAlert(null);
+    setSubmitting(true);
+    try {
+      await usersApi.update(editUser.userId, {
+        name: editForm.name,
+        email: editForm.email,
+        phone: editForm.phone
+      });
+      setEditUser(null);
+      setEditForm(EMPTY_FORM);
+      setActionAlert({ type: 'success', message: 'User updated successfully.' });
+      refresh();
+    } catch (err) {
+      setError(err.response?.data?.error || 'Could not update user.');
     } finally {
       setSubmitting(false);
     }
@@ -301,6 +324,15 @@ export default function Users() {
                   <div className="flex items-center justify-end gap-3">
                     <button
                       onClick={() => {
+                        setEditUser(u);
+                        setEditForm({ name: u.name, email: u.email || '', phone: u.phone, roleId: u.roleId, departmentId: u.departmentId });
+                      }}
+                      className="text-xs font-semibold text-navy hover:underline"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => {
                         setResetPasswordUser(u);
                         setNewPassword('');
                         setConfirmPassword('');
@@ -372,6 +404,15 @@ export default function Users() {
               </div>
 
               <div className="mt-2 pt-3 border-t border-line flex justify-end gap-3">
+                <button
+                  onClick={() => {
+                    setEditUser(u);
+                    setEditForm({ name: u.name, email: u.email || '', phone: u.phone, roleId: u.roleId, departmentId: u.departmentId });
+                  }}
+                  className="text-xs font-semibold text-navy hover:underline"
+                >
+                  Edit
+                </button>
                 <button
                   onClick={() => {
                     setResetPasswordUser(u);
@@ -462,6 +503,68 @@ export default function Users() {
                   className="rounded-lg bg-navy px-4 py-2 text-xs font-semibold text-white hover:bg-navy-dark disabled:opacity-50"
                 >
                   {resetPasswordSubmitting ? 'Resetting…' : 'Set Password'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* Edit User Modal */}
+      {editUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/40 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl border border-line">
+            <h3 className="font-display text-lg font-semibold text-navy">
+              Edit User: {editUser.name}
+            </h3>
+
+            <form onSubmit={handleUpdateUser} className="mt-4 space-y-3">
+              <div>
+                <label className="block text-xs font-semibold text-ink/70 mb-1">Name</label>
+                <input
+                  type="text"
+                  required
+                  value={editForm.name}
+                  onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
+                  className="w-full rounded border border-line p-2 text-xs focus:border-navy focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-ink/70 mb-1">Email</label>
+                <input
+                  type="email"
+                  value={editForm.email}
+                  onChange={(e) => setEditForm((f) => ({ ...f, email: e.target.value }))}
+                  className="w-full rounded border border-line p-2 text-xs focus:border-navy focus:outline-none"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-xs font-semibold text-ink/70 mb-1">Phone</label>
+                <input
+                  type="text"
+                  required
+                  value={editForm.phone}
+                  onChange={(e) => setEditForm((f) => ({ ...f, phone: e.target.value }))}
+                  className="w-full rounded border border-line p-2 text-xs focus:border-navy focus:outline-none"
+                />
+              </div>
+
+              <div className="mt-5 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setEditUser(null)}
+                  disabled={submitting}
+                  className="rounded-lg border border-line px-4 py-2 text-xs font-medium text-ink hover:bg-paper"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="rounded-lg bg-navy px-4 py-2 text-xs font-semibold text-white hover:bg-navy-dark disabled:opacity-50"
+                >
+                  {submitting ? 'Saving…' : 'Save Changes'}
                 </button>
               </div>
             </form>
