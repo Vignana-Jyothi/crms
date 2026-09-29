@@ -129,7 +129,9 @@ async function parseTextToTimetable(rawOutput, context) {
           where: {
             OR: [
               { departmentName: { equals: val, mode: 'insensitive' } },
-              { branchCode: { equals: val, mode: 'insensitive' } }
+              { branchCode: { equals: val, mode: 'insensitive' } },
+              { departmentName: { contains: val, mode: 'insensitive' } },
+              { branchCode: { contains: val, mode: 'insensitive' } }
             ]
           }
         });
@@ -207,6 +209,7 @@ async function parseTextToTimetable(rawOutput, context) {
         startTime: convertTime(row['Start Time']),
         endTime: convertTime(row['End Time']),
         courseName: row['Subject'],
+        courseShortName: row['Subject'],
         section: metaSection,
         departmentId: metaDepartmentId,
         studentYear: metaYear,
