@@ -123,7 +123,7 @@ export default function AuditLogs() {
             </button>
           </div>
         )}
-      </div>
+      </motion.div>
 
       {error && (
         <div className="mt-4 flex items-center justify-between rounded-lg border border-brick/40 bg-brick-light p-4 text-sm text-brick">
