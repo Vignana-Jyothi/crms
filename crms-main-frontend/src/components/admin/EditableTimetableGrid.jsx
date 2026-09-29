@@ -3,7 +3,7 @@ import { timetableApi } from '../../api/endpoints';
 import { Check, X, Edit2 } from 'lucide-react';
 import { fmtTime } from '../../utils/formatters';
 
-export default function EditableTimetableGrid({ timetables, resources, setTimetables, readOnly = false }) {
+export default function EditableTimetableGrid({ timetables, resources, facultyList = [], setTimetables, readOnly = false }) {
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [saving, setSaving] = useState(false);
@@ -139,14 +139,22 @@ export default function EditableTimetableGrid({ timetables, resources, setTimeta
 
                 <td className="px-4 py-3">
                   {isEditing ? (
-                    <input
-                      type="text"
-                      value={editForm.facultyName}
-                      onChange={e => setEditForm({...editForm, facultyName: e.target.value})}
-                      className="w-full p-1 border border-line rounded text-sm"
-                      placeholder="Faculty Name"
-                      disabled={saving}
-                    />
+                    <>
+                      <input
+                        list="faculty-list-edit"
+                        type="text"
+                        value={editForm.facultyName}
+                        onChange={e => setEditForm({...editForm, facultyName: e.target.value})}
+                        className="w-full p-1 border border-line rounded text-sm"
+                        placeholder="Faculty Name"
+                        disabled={saving}
+                      />
+                      <datalist id="faculty-list-edit">
+                        {facultyList.map(f => (
+                          <option key={f.userId || f} value={f.name || f} />
+                        ))}
+                      </datalist>
+                    </>
                   ) : (
                     <span className="text-slate-600">{t.facultyName || '-'}</span>
                   )}

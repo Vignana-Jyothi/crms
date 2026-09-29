@@ -29,6 +29,7 @@ export default function FullWeekTimetableGrid({
   viewMode, 
   isEditMode, 
   resources = [], 
+  facultyList = [],
   setTimetables, 
   selectedDate, 
   selectedDay,
@@ -443,7 +444,12 @@ export default function FullWeekTimetableGrid({
                       <div className="grid grid-cols-2 gap-3">
                         <div>
                           <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Faculty Name</label>
-                          <input type="text" value={editForm.facultyName} onChange={e => setEditForm({...editForm, facultyName: e.target.value})} className="w-full p-2 border border-line rounded-lg text-sm bg-slate-50" disabled={saving} />
+                          <input list="faculty-list-grid" type="text" value={editForm.facultyName} onChange={e => setEditForm({...editForm, facultyName: e.target.value})} className="w-full p-2 border border-line rounded-lg text-sm bg-slate-50" disabled={saving} />
+                          <datalist id="faculty-list-grid">
+                            {facultyList && facultyList.map(f => (
+                              <option key={f.userId || f} value={f.name || f} />
+                            ))}
+                          </datalist>
                         </div>
                         <div>
                           <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Classroom</label>

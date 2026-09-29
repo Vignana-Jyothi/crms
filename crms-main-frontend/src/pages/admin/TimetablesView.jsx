@@ -540,6 +540,7 @@ export default function TimetablesView() {
               {!(isUploadModalOpen && uploadModalMode === 'manual') && (timetables.length > 0 || (isEditMode && (selectedResource || selectedFaculty || (selectedSection && selectedDepartment && selectedStudentYear)))) && (
                 viewMode === 'grid' ? (
                   <FullWeekTimetableGrid 
+                    facultyList={facultyList}
                     timetables={timetables} 
                     viewMode={activeTab}
                     isEditMode={isEditMode}
@@ -557,6 +558,7 @@ export default function TimetablesView() {
                   <EditableTimetableGrid 
                     timetables={timetables} 
                     resources={resourceList} 
+                    facultyList={facultyList}
                     setTimetables={setTimetables}
                     readOnly={!isEditMode} 
                   />
