@@ -60,7 +60,12 @@ export default function TimetablesView() {
       }),
       masterDataApi.faculty().then(setFacultyList),
       masterDataApi.sections().then(setSectionsData),
-      masterDataApi.departments().then(setDepartments),
+      masterDataApi.departments().then(data => {
+        setDepartments(data.filter(d => 
+          !d.departmentName.includes('Institute (Shared') && 
+          !d.departmentName.includes('Unspecified Programme')
+        ));
+      }),
       masterDataApi.blocks().then(setBlocks)
     ]).catch(err => {
       console.error('Failed to load master data', err);

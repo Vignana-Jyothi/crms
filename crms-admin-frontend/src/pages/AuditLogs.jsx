@@ -29,10 +29,13 @@ export default function AuditLogs() {
   const filteredLogs = logs.filter((l) => {
     if (searchTerm.trim()) {
       const q = searchTerm.toLowerCase();
-      const matchUser = l.user?.name?.toLowerCase().includes(q) || String(l.userId).includes(q);
-      const matchDetails = l.details?.toLowerCase().includes(q);
-      const matchEntity = l.entityId?.toLowerCase?.().includes(q) || String(l.entityId).includes(q);
-      if (!matchUser && !matchDetails && !matchEntity) return false;
+      const safeString = (val) => (val ? String(val).toLowerCase() : '');
+      const matchUser = safeString(l.user?.name).includes(q) || safeString(l.userId).includes(q);
+      const matchDetails = safeString(l.details).includes(q);
+      const matchEntity = safeString(l.entityId).includes(q) || safeString(l.entityType).includes(q);
+      const matchAction = safeString(l.action).includes(q);
+      
+      if (!matchUser && !matchDetails && !matchEntity && !matchAction) return false;
     }
     return true;
   });

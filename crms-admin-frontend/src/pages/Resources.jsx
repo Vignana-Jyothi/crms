@@ -139,14 +139,18 @@ export default function Resources() {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredResources = resources.filter((r) => {
+    if (!searchTerm.trim()) return true;
     const s = searchTerm.toLowerCase();
+    const safeString = (val) => (val ? String(val).toLowerCase() : '');
     return (
-      r.resourceName?.toLowerCase().includes(s) ||
-      r.resourceId?.toLowerCase().includes(s) ||
-      r.resourceType?.typeName?.toLowerCase().includes(s) ||
-      r.department?.departmentName?.toLowerCase().includes(s) ||
-      r.block?.blockCode?.toLowerCase().includes(s) ||
-      r.block?.blockName?.toLowerCase().includes(s)
+      safeString(r.resourceName).includes(s) ||
+      safeString(r.resourceId).includes(s) ||
+      safeString(r.resourceType?.typeName).includes(s) ||
+      safeString(r.department?.departmentName).includes(s) ||
+      safeString(r.block?.blockCode).includes(s) ||
+      safeString(r.block?.blockName).includes(s) ||
+      safeString(r.floor).includes(s) ||
+      safeString(r.status).includes(s)
     );
   });
 

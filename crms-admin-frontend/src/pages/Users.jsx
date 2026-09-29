@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { masterDataApi, usersApi, authApi } from '../api/endpoints';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const EMPTY_FORM = { name: '', email: '', phone: '', roleId: '', departmentId: '' };
 
@@ -126,13 +127,16 @@ export default function Users() {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredUsers = users.filter((u) => {
+    if (!searchTerm.trim()) return true;
     const s = searchTerm.toLowerCase();
+    const safeString = (val) => (val ? String(val).toLowerCase() : '');
     return (
-      u.name?.toLowerCase().includes(s) ||
-      u.email?.toLowerCase().includes(s) ||
-      u.phone?.toLowerCase().includes(s) ||
-      u.department?.departmentName?.toLowerCase().includes(s) ||
-      u.role?.roleName?.toLowerCase().includes(s)
+      safeString(u.name).includes(s) ||
+      safeString(u.email).includes(s) ||
+      safeString(u.phone).includes(s) ||
+      safeString(u.department?.departmentName).includes(s) ||
+      safeString(u.role?.roleName).includes(s) ||
+      safeString(u.status).includes(s)
     );
   });
 
@@ -151,17 +155,21 @@ export default function Users() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="rounded border border-line px-3 py-2 text-sm w-64"
           />
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => {
               setShowForm((s) => !s);
               setError('');
             }}
-            className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white hover:bg-navy-dark whitespace-nowrap"
+            className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-navy-dark hover:shadow-md transition-all whitespace-nowrap"
           >
             {showForm ? 'Cancel' : '+ Add user'}
-          </button>
+          </motion.button>
         </div>
       </div>
+
+      <AnimatePresence>
 
       {actionAlert && (
         <div
@@ -191,8 +199,18 @@ export default function Users() {
         </div>
       )}
 
+      </AnimatePresence>
+
+      <AnimatePresence>
       {showForm && (
-        <form onSubmit={handleSubmit} className="mt-6 rounded-lg border border-line bg-white p-5">
+        <motion.form 
+          initial={{ opacity: 0, height: 0, y: -20 }}
+          animate={{ opacity: 1, height: 'auto', y: 0 }}
+          exit={{ opacity: 0, height: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+          onSubmit={handleSubmit} 
+          className="mt-6 rounded-lg border border-line bg-white p-5 shadow-md overflow-hidden"
+        >
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
             <input
               required
@@ -244,12 +262,17 @@ export default function Users() {
             disabled={submitting}
             className="mt-4 rounded bg-navy px-4 py-2 text-sm font-semibold text-white hover:bg-navy-dark disabled:opacity-60"
           >
-            {submitting ? 'Creating…' : 'Create user'}
-          </button>
-        </form>
+          </motion.button>
+        </motion.form>
       )}
+      </AnimatePresence>
 
-      <div className="mt-6 overflow-hidden rounded-lg border border-line bg-white shadow-sm">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.4 }}
+        className="mt-6 overflow-hidden rounded-lg border border-line bg-white shadow-md hover:shadow-lg transition-shadow duration-300"
+      >
         <table className="w-full text-left text-sm">
           <thead className="border-b border-line bg-paper text-xs uppercase tracking-wide text-ink/50">
             <tr>
@@ -262,9 +285,17 @@ export default function Users() {
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
-            {filteredUsers.map((u) => (
-              <tr key={u.userId} className="hover:bg-paper/30">
-                <td className="px-4 py-3 font-medium text-ink">{u.name}</td>
+            <AnimatePresence>
+            {filteredUsers.map((u, i) => (
+              <motion.tr 
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2, delay: i * 0.02 }}
+                key={u.userId} 
+                className="hover:bg-paper/50 transition-colors duration-150 group"
+              >
+                <td className="px-4 py-3 font-medium text-ink transition-transform group-hover:translate-x-1 duration-200">{u.name}</td>
                 <td className="px-4 py-3 text-ink/60">
                   <div className="font-mono text-xs">{u.phone}</div>
                   {u.email && <div className="text-xs text-ink/40">{u.email}</div>}
@@ -313,8 +344,9 @@ export default function Users() {
                     </button>
                   </div>
                 </td>
-              </tr>
+              </motion.tr>
             ))}
+            </AnimatePresence>
             {filteredUsers.length === 0 && (
               <tr>
                 <td colSpan={6} className="px-4 py-10 text-center text-sm text-ink/50">
@@ -324,12 +356,23 @@ export default function Users() {
             )}
           </tbody>
         </table>
-      </div>
+      </motion.div>
 
       {/* Password Reset Modal */}
+      <AnimatePresence>
       {resetPasswordUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/40 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl border border-line">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-navy/40 backdrop-blur-sm p-4"
+        >
+          <motion.div 
+            initial={{ scale: 0.9, y: 20 }}
+            animate={{ scale: 1, y: 0 }}
+            exit={{ scale: 0.9, y: 20 }}
+            className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl border border-line"
+          >
             <h3 className="font-display text-lg font-semibold text-navy">
               Reset Password: {resetPasswordUser.name}
             </h3>
@@ -394,9 +437,10 @@ export default function Users() {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
+      </AnimatePresence>
     </div>
   );
 }
