@@ -90,17 +90,11 @@ export default function FullWeekTimetableGrid({
     const startMins = sortedBoundaries[i];
     const endMins = sortedBoundaries[i+1];
     
-    const isStandardLunch = startMins >= 780 && endMins <= 820;
-    const isFirstYearLunch = startMins >= 720 && endMins <= 760;
+    const firstYearClassesCount = timetables.filter(t => t.studentYear === '1').length;
+    const seniorClassesCount = timetables.length - firstYearClassesCount;
+    const primaryLunchMins = firstYearClassesCount >= seniorClassesCount ? 720 : 780;
     
-    const hasClassOverlap = timetables.some(t => {
-      const s = toMins(t.startTime);
-      let e = toMins(t.endTime);
-      if (e === 0 && s === 660) e = 720;
-      return Math.max(startMins, s) < Math.min(endMins, e);
-    });
-
-    const isLunch = !hasClassOverlap && (isStandardLunch || isFirstYearLunch);
+    const isLunch = startMins === primaryLunchMins && endMins === primaryLunchMins + 40;
 
     activeTimeSlots.push({
       start: fromMins(startMins),
