@@ -329,8 +329,13 @@ export default function FullWeekTimetableGrid({
 
                   const baseClass = hasClasses ? classesRaw[0] : null;
 
+                  const isCellLunch = !isEditMode && (
+                    (!isFirstYearView && mergedStart === '13:00' && mergedEnd === '13:40') || 
+                    (isFirstYearView && mergedStart === '12:00' && mergedEnd === '12:40')
+                  );
+
                   return (
-                    <td key={idx} colSpan={colSpan} className={`border-r border-line p-2 text-center align-middle h-full ${!hasClasses && !isEditMode ? 'bg-slate-50/50' : 'bg-white hover:bg-slate-50 cursor-pointer transition-colors'}`}
+                    <td key={idx} colSpan={colSpan} className={`border-r border-line p-2 text-center align-middle h-full ${!hasClasses && !isEditMode ? (isCellLunch ? 'bg-slate-50/80' : 'bg-slate-50/50') : 'bg-white hover:bg-slate-50 cursor-pointer transition-colors'}`}
                         onClick={() => {
                           if (hasClasses || isEditMode) {
                             setSelectedSlot({ day, start: mergedStart, end: mergedEnd, label: `${day} • ${fmtTimeSlot(`1970-01-01T${mergedStart}:00Z`, `1970-01-01T${mergedEnd}:00Z`)}` });
@@ -391,8 +396,8 @@ export default function FullWeekTimetableGrid({
                           )}
                         </div>
                       ) : (
-                        <div className={`flex items-center justify-center h-full w-full text-xs py-4 ${isEditMode ? 'text-indigo-400 font-medium hover:text-indigo-600' : 'text-slate-400 italic'}`}>
-                          {isEditMode ? '+ Add' : 'Free'}
+                        <div className={`flex items-center justify-center h-full w-full py-4 ${isEditMode ? 'text-indigo-400 font-medium hover:text-indigo-600 text-xs' : (isCellLunch ? 'text-slate-500 font-medium text-xs' : 'text-slate-400 italic text-xs')}`}>
+                          {isEditMode ? '+ Add' : (isCellLunch ? 'Lunch' : 'Free')}
                         </div>
                       )}
                     </td>
