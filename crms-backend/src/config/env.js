@@ -28,5 +28,6 @@ module.exports = {
   },
   corsOrigins: parseCorsOrigins(process.env.CORS_ORIGIN),
   corsOrigin: process.env.CORS_ORIGIN || '*',
+  authUrl: process.env.AUTH_URL || 'http://localhost:3115',
 };
 
