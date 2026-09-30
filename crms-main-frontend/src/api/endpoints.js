@@ -1,19 +1,6 @@
-import client, { setTokens, clearTokens } from './client';
+import client from './client';
 
 export const authApi = {
-  async login(email, password) {
-    const { data } = await client.post('/auth/login', { email, password });
-    setTokens(data);
-    return data.user;
-  },
-  async signup(payload) {
-    const { data } = await client.post('/auth/signup', payload);
-    setTokens(data);
-    return data.user;
-  },
-  logout() {
-    clearTokens();
-  },
   setPassword: (data) => client.post('/auth/set-password', data).then((r) => r.data),
 };
 
