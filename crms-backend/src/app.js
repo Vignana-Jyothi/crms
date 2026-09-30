@@ -4,7 +4,6 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
-const cookieParser = require('cookie-parser');
 
 const env = require('./config/env');
 const errorHandler = require('./middleware/errorHandler');
@@ -43,7 +42,6 @@ app.use(helmet());
 app.use(compression());
 app.use(cors(corsOptions));
 app.use(express.json());
-app.use(cookieParser());
 app.use(morgan(env.nodeEnv === 'development' ? 'dev' : 'combined'));
 
 // Generic rate limit; tighten further specifically on /auth/login
