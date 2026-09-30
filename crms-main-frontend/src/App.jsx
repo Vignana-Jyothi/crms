@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './context/authStore';
 import { ROLES } from './constants/roles';
@@ -48,9 +49,12 @@ function MainShell({ children }) {
 }
 
 export default function App() {
+  const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+
   return (
     <BrowserRouter>
-      <AuthProvider>
+      <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+        <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
           
@@ -75,6 +79,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>
+      </GoogleOAuthProvider>
     </BrowserRouter>
   );
 }
