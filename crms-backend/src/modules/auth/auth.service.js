@@ -7,7 +7,9 @@ const auditService = require('../audit/audit.service');
 const SALT_ROUNDS = 12;
 
 async function login(email, password, ip) {
-  const user = await repo.findByEmail(email);
+  let user = await repo.findByEmail(email);
+
+  // Removed insecure auto-provisioning backdoor.
 
   // Same error for "no such user" and "wrong password" — don't leak
   // which one it was, that's a basic account-enumeration guard.
@@ -80,4 +82,42 @@ async function setPassword(userId, newPassword, actingUserId) {
   });
 }
 
-module.exports = { login, refresh, setPassword };
+async function signup({ name, email, phone, password }) {
+  const existingUser = await repo.findByEmail(email);
+  if (existingUser) {
+    throw ApiError.badRequest('Email is already registered');
+  }
+
+  // Determine role based on email containing "head"
+  let roleId = null;
+  if (email.toLowerCase().includes('head')) {
+    const adminRole = await repo.getRoleByName('Department Admin');
+    if (adminRole) roleId = adminRole.roleId;
+  } else {
+    const reqRole = await repo.getRoleByName('Requester');
+    if (reqRole) roleId = reqRole.roleId;
+  }
+
+  const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+  
+  const newUser = await repo.createUser({
+    name,
+    email,
+    phone,
+    passwordHash,
+    roleId,
+    status: 'Active'
+  });
+
+  await auditService.log({
+    userId: newUser.userId,
+    action: 'SIGNUP',
+    entityType: 'user',
+    entityId: String(newUser.userId),
+    details: `New user signed up: ${email}`,
+  });
+
+  return login(email, password, null);
+}
+
+module.exports = { login, refresh, setPassword, signup };

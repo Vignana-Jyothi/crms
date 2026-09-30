@@ -6,6 +6,11 @@ export const authApi = {
     setTokens(data);
     return data.user;
   },
+  async signup(payload) {
+    const { data } = await client.post('/auth/signup', payload);
+    setTokens(data);
+    return data.user;
+  },
   logout() {
     clearTokens();
   },

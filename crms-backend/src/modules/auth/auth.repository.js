@@ -12,4 +12,10 @@ const setPasswordHash = (userId, passwordHash) =>
 const setRefreshToken = (userId, refreshToken) =>
   prisma.user.update({ where: { userId }, data: { refreshToken, lastLoginAt: new Date() } });
 
-module.exports = { findByEmail, findById, setPasswordHash, setRefreshToken };
+const getRoleByName = (roleName) =>
+  prisma.role.findUnique({ where: { roleName } });
+
+const createUser = (data) =>
+  prisma.user.create({ data });
+
+module.exports = { findByEmail, findById, setPasswordHash, setRefreshToken, getRoleByName, createUser };

@@ -27,6 +27,12 @@ export function AuthProvider({ children }) {
     return loggedInUser;
   }
 
+  async function signup(payload) {
+    const loggedInUser = await authApi.signup(payload);
+    setUser(loggedInUser);
+    return loggedInUser;
+  }
+
   function logout() {
     authApi.logout();
     sessionStorage.removeItem('crms_dashboard_filters');
@@ -35,7 +41,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, signup, logout }}>
       {children}
     </AuthContext.Provider>
   );

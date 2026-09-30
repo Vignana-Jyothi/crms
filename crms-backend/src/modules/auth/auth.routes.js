@@ -3,12 +3,13 @@ const controller = require('./auth.controller');
 const validateRequest = require('../../middleware/validateRequest');
 const authenticate = require('../../middleware/authenticate');
 const { authorizeRole, ROLES } = require('../../middleware/authorizeRole');
-const { loginSchema, refreshSchema, setPasswordSchema } = require('./auth.validation');
+const { loginSchema, refreshSchema, setPasswordSchema, signupSchema } = require('./auth.validation');
 const ApiError = require('../../utils/ApiError');
 
 const router = Router();
 
 router.post('/login', validateRequest(loginSchema), controller.login);
+router.post('/signup', validateRequest(signupSchema), controller.signup);
 router.post('/refresh', validateRequest(refreshSchema), controller.refresh);
 
 // A user can only set THEIR OWN password unless they're Super Admin.

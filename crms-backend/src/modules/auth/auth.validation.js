@@ -23,4 +23,13 @@ const setPasswordSchema = z.object({
   }),
 });
 
-module.exports = { loginSchema, refreshSchema, setPasswordSchema };
+const signupSchema = z.object({
+  body: z.object({
+    name: z.string().min(2, 'Name must be at least 2 characters'),
+    email: z.string().email().regex(/@vnrvjiet\.in$/, 'Only @vnrvjiet.in emails are allowed'),
+    phone: z.string().regex(/^\d{10}$/, 'Phone must be 10 digits'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+  }),
+});
+
+module.exports = { loginSchema, refreshSchema, setPasswordSchema, signupSchema };
