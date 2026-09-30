@@ -16,6 +16,11 @@ async function main() {
         select: {
           departmentName: true
         }
+      },
+      role: {
+        select: {
+          roleName: true
+        }
       }
     }
   });
@@ -28,7 +33,8 @@ async function main() {
   console.log(`\n--- Found ${users.length} HOD Emails ---`);
   users.forEach((u, i) => {
     const dept = u.department ? u.department.departmentName : 'No Department Assigned';
-    console.log(`${i + 1}. ${u.email} (${u.name} - ${dept})`);
+    const role = u.role ? u.role.roleName : 'No Role Assigned';
+    console.log(`${i + 1}. ${u.email} (${u.name} - ${dept}) [Role: ${role}]`);
   });
   console.log('------------------------------\n');
 }
