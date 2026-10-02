@@ -14,10 +14,11 @@ const { ROLES } = require('../../middleware/authorizeRole');
 function listPendingFor({ approverUserId, roleId, departmentId }) {
   let where;
   if (roleId === ROLES.SUPER_ADMIN || roleId === 1) {
-    where = { decision: null };
+    where = { decision: null, booking: { status: 'Pending' } };
   } else {
     where = {
       decision: null,
+      booking: { status: 'Pending' },
       OR: [
         { approverUserId },
         // Institute/Department admins also see approvals routed to

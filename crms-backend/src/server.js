@@ -20,6 +20,8 @@ async function shutdown(signal) {
     await prisma.$disconnect();
     process.exit(0);
   });
+}
+
 // Escalate approvals older than 24h to Super Admin
 function startEscalationJob() {
   const ONE_HOUR = 60 * 60 * 1000;
