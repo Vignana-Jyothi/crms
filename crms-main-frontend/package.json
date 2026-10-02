@@ -18,7 +18,8 @@
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.2",
     "framer-motion": "^12.4.7",
-    "react-select": "^5.10.2"
+    "react-select": "^5.10.2",
+    "@react-oauth/google": "^0.12.1"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",
