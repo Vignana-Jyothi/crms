@@ -1,7 +1,9 @@
 const app = require('./app');
 const env = require('./config/env');
 const prisma = require('./config/prisma');
+const { loadRoles } = require('./middleware/authorizeRole');
 
+loadRoles(prisma).then(() => {
 const server = app.listen(env.port, () => {
   console.log(`CRMS backend listening on port ${env.port} [${env.nodeEnv}]`);
   
@@ -11,6 +13,7 @@ const server = app.listen(env.port, () => {
   const maskedDbUrl = dbUrl.replace(/:([^:@]+)@/, ':***@');
   console.log(`🔗 Connected to Database: ${maskedDbUrl}`);
 });
+}).catch(console.error);
 
 // Graceful shutdown — important under PM2/systemd/Docker restarts,
 // same pattern you'd want on BETA/GAMMA for the other VJ services.

@@ -13,5 +13,8 @@ services:
       - "4000:4000"
     env_file:
       - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
     extra_hosts:
       - "host.docker.internal:host-gateway"

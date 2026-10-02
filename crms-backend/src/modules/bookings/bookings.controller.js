@@ -27,7 +27,12 @@ const list = asyncHandler(async (req, res) => {
     filters.departmentId = req.query.departmentId;
   }
 
-  console.log('Bookings List Filters:', JSON.stringify(filters), 'User Auth:', JSON.stringify(req.auth));
+  require('fs').appendFileSync('/app/src/debug.log', JSON.stringify({
+    time: new Date(),
+    query: req.query,
+    auth: req.auth,
+    filters,
+  }) + '\\n');
 
   res.json(await service.list(filters));
 });

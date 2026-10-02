@@ -48,6 +48,7 @@ export default function Approvals() {
     } finally {
       setActingId(null);
       await refresh();
+      window.dispatchEvent(new CustomEvent('approvals-updated'));
     }
   }
 

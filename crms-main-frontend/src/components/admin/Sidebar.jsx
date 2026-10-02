@@ -61,7 +61,11 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     }
     refreshCount();
     const interval = setInterval(refreshCount, 30_000);
-    return () => clearInterval(interval);
+    window.addEventListener('approvals-updated', refreshCount);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('approvals-updated', refreshCount);
+    };
   }, [user]);
 
   const visibleNav = NAV.filter((l) => !l.roles || l.roles.includes(user?.roleId));

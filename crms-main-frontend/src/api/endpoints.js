@@ -49,7 +49,7 @@ export const resourcesApi = {
 
 export const bookingsApi = {
   mine: () => client.get(`/bookings/my?_t=${Date.now()}`).then((r) => r.data),
-  list: (params) => client.get('/bookings', { params }).then((r) => r.data),
+  list: (params) => client.get('/bookings', { params: { ...params, _t: Date.now() } }).then((r) => r.data),
   create: (payload) => client.post('/bookings', payload).then((r) => r.data),
   cancel: (id, data) => client.post(`/bookings/${id}/cancel`, data).then((r) => r.data),
 };
