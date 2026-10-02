@@ -24,7 +24,7 @@ const { ROLES } = require('../../middleware/authorizeRole');
 const INSTITUTE_OWNED_TYPES = new Set(['Seminar Hall', 'Auditorium']);
 
 async function resolveApprover(resource) {
-  const isInstituteOwned = INSTITUTE_OWNED_TYPES.has(resource.resourceType.typeName);
+  const isInstituteOwned = !resource.departmentId || INSTITUTE_OWNED_TYPES.has(resource.resourceType.typeName);
 
   const approver = isInstituteOwned
     ? await prisma.user.findFirst({ where: { roleId: ROLES.INSTITUTE_ADMIN, status: 'Active' } })

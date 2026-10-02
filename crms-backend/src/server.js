@@ -4,6 +4,12 @@ const prisma = require('./config/prisma');
 const { loadRoles } = require('./middleware/authorizeRole');
 
 loadRoles(prisma).then(() => {
+  // Temporary fix for stuck approvals (assigned to Super Admin instead of Institute Admin)
+  prisma.approval.updateMany({
+    where: { decision: null, approverRoleId: { in: [1, 2] }, booking: { resource: { departmentId: null } } },
+    data: { approverRoleId: require('./middleware/authorizeRole').ROLES.INSTITUTE_ADMIN }
+  }).then(res => console.log(`[Auto-Fix] Reassigned ${res.count} stuck approvals to Institute Admin`)).catch(console.error);
+
 const server = app.listen(env.port, () => {
   console.log(`CRMS backend listening on port ${env.port} [${env.nodeEnv}]`);
   
