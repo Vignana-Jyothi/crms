@@ -78,29 +78,43 @@ export default function TimetablesView() {
     setError('');
 
     let params = {};
-    if (activeTab === 'Rooms') {
-      if (!selectedResource) {
+    if (!isEditMode) {
+      if (activeTab === 'Rooms') {
+        if (!selectedResource) {
+          setTimetables([]);
+          setLoading(false);
+          return;
+        }
+        params.resourceId = selectedResource;
+      } else if (activeTab === 'Sections') {
+        if (!selectedSection || !selectedDepartment || !selectedStudentYear) {
+          setTimetables([]);
+          setLoading(false);
+          return;
+        }
+        params.studentYear = selectedStudentYear;
+        params.departmentId = selectedDepartment;
+        params.section = selectedSection;
+      } else if (activeTab === 'Faculty') {
+        if (!selectedFaculty) {
+          setTimetables([]);
+          setLoading(false);
+          return;
+        }
+        params.facultyName = selectedFaculty;
+      }
+    } else {
+      // In Edit Mode, filters are combined
+      if (!selectedStudentYear && !selectedDepartment && !selectedSection && !selectedFaculty && !selectedResource) {
         setTimetables([]);
         setLoading(false);
         return;
       }
-      params.resourceId = selectedResource;
-    } else if (activeTab === 'Sections') {
-      if (!selectedSection || !selectedDepartment || !selectedStudentYear) {
-        setTimetables([]);
-        setLoading(false);
-        return;
-      }
-      params.studentYear = selectedStudentYear;
-      params.departmentId = selectedDepartment;
-      params.section = selectedSection;
-    } else if (activeTab === 'Faculty') {
-      if (!selectedFaculty) {
-        setTimetables([]);
-        setLoading(false);
-        return;
-      }
-      params.facultyName = selectedFaculty;
+      if (selectedStudentYear) params.studentYear = selectedStudentYear;
+      if (selectedDepartment) params.departmentId = selectedDepartment;
+      if (selectedSection) params.section = selectedSection;
+      if (selectedFaculty) params.facultyName = selectedFaculty;
+      if (selectedResource) params.resourceId = selectedResource;
     }
     
     const derivedDay = selectedDate ? new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long' }) : selectedDay;
@@ -244,8 +258,8 @@ export default function TimetablesView() {
             <Search size={20} className="text-slate-400" />
           </div>
           
-          <div className="flex flex-wrap items-center gap-3 w-full flex-1">
-          {(activeTab === 'Rooms') && (
+          <div className={`w-full flex-1 ${isEditMode ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3' : 'flex flex-wrap items-center gap-3'}`}>
+          {(!isEditMode && activeTab === 'Rooms') && (
             <>
               <SearchableSelect
                 value={selectedBlock}
@@ -282,7 +296,7 @@ export default function TimetablesView() {
             </>
           )}
 
-          {(activeTab === 'Sections') && (
+          {(!isEditMode && activeTab === 'Sections') && (
             <>
               <SearchableSelect
                 value={selectedStudentYear}
@@ -331,7 +345,7 @@ export default function TimetablesView() {
             </>
           )}
 
-          {(activeTab === 'Faculty') && (
+          {(!isEditMode && activeTab === 'Faculty') && (
             <>
               <SearchableSelect
                 value={selectedFaculty}
@@ -356,6 +370,74 @@ export default function TimetablesView() {
             </>
           )}
 
+          {isEditMode && (
+            <>
+              <SearchableSelect
+                value={selectedStudentYear}
+                onChange={setSelectedStudentYear}
+                placeholder="All Years"
+                options={[
+                  { value: '', label: 'All Years' },
+                  { value: '1', label: '1st Year' },
+                  { value: '2', label: '2nd Year' },
+                  { value: '3', label: '3rd Year' },
+                  { value: '4', label: '4th Year' }
+                ]}
+                className="min-w-[120px]"
+              />
+              <SearchableSelect
+                value={selectedDepartment}
+                onChange={setSelectedDepartment}
+                placeholder="All Depts"
+                options={[
+                  { value: '', label: 'All Depts' },
+                  ...sortedDepartments.map(d => ({ value: d.departmentId.toString(), label: d.branchCode }))
+                ]}
+                className="min-w-[120px]"
+              />
+              <SearchableSelect
+                value={selectedSection}
+                onChange={val => setSelectedSection(val ? val.toUpperCase() : '')}
+                placeholder="Select Section"
+                allowCreate={true}
+                options={[
+                  ...availableSections.map(s => ({ value: s, label: s }))
+                ]}
+                className="min-w-[120px]"
+              />
+              <SearchableSelect
+                value={selectedResource}
+                onChange={setSelectedResource}
+                placeholder="All Rooms"
+                options={[
+                  { value: '', label: 'All Rooms' },
+                  ...resourceList.map(r => ({ value: r.resourceId, label: r.resourceName }))
+                ]}
+                className="min-w-[140px]"
+              />
+              <SearchableSelect
+                value={selectedFaculty}
+                onChange={setSelectedFaculty}
+                placeholder="All Faculty"
+                allowCreate={true}
+                options={[
+                  { value: '', label: 'All Faculty' },
+                  ...facultyList.map(f => ({ value: (f.name || f).toString(), label: (f.label || f).toString() }))
+                ]}
+                className="min-w-[150px]"
+              />
+              <SearchableSelect
+                value={selectedDay}
+                onChange={setSelectedDay}
+                placeholder="All Days"
+                options={[
+                  { value: '', label: 'All Days' },
+                  ...['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(d => ({ value: d, label: d }))
+                ]}
+                className="min-w-[120px]"
+              />
+            </>
+          )}
 
           </div>
 
@@ -493,30 +575,37 @@ export default function TimetablesView() {
           )}
 
           {(timetables.length === 0 && !loading && !(isUploadModalOpen && uploadModalMode === 'manual')) && (
-            (activeTab === 'Rooms' && selectedResource) ||
-            (activeTab === 'Sections' && (selectedSection && selectedDepartment && selectedStudentYear)) ||
-            (activeTab === 'Faculty' && selectedFaculty)
+            (!isEditMode && activeTab === 'Rooms' && selectedResource) ||
+            (!isEditMode && activeTab === 'Sections' && (selectedSection && selectedDepartment && selectedStudentYear)) ||
+            (!isEditMode && activeTab === 'Faculty' && selectedFaculty) ||
+            (isEditMode && (selectedResource || selectedFaculty || selectedSection || selectedDepartment || selectedStudentYear))
           ) && (
             <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
-              No classes scheduled for the selected {activeTab ? activeTab.toLowerCase().slice(0, -1) : 'filters'}.
+              No classes scheduled for the selected {isEditMode ? 'filters' : activeTab ? activeTab.toLowerCase().slice(0, -1) : 'filters'}.
             </div>
           )}
           
-          {!loading && timetables.length === 0 && activeTab === 'Sections' && (!selectedSection || !selectedDepartment || !selectedStudentYear) && !(isUploadModalOpen && uploadModalMode === 'manual') && (
+          {!loading && timetables.length === 0 && !isEditMode && activeTab === 'Sections' && (!selectedSection || !selectedDepartment || !selectedStudentYear) && !(isUploadModalOpen && uploadModalMode === 'manual') && (
             <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
               Please select a Year, Branch, and Section to view the timetable.
             </div>
           )}
 
-          {!loading && timetables.length === 0 && activeTab === 'Rooms' && !selectedResource && !(isUploadModalOpen && uploadModalMode === 'manual') && (
+          {!loading && timetables.length === 0 && !isEditMode && activeTab === 'Rooms' && !selectedResource && !(isUploadModalOpen && uploadModalMode === 'manual') && (
             <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
               Please select a Room / Lab to view the timetable.
             </div>
           )}
 
-          {!loading && timetables.length === 0 && activeTab === 'Faculty' && !selectedFaculty && !(isUploadModalOpen && uploadModalMode === 'manual') && (
+          {!loading && timetables.length === 0 && !isEditMode && activeTab === 'Faculty' && !selectedFaculty && !(isUploadModalOpen && uploadModalMode === 'manual') && (
             <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
               Please select a Faculty Member to view the timetable.
+            </div>
+          )}
+
+          {!loading && timetables.length === 0 && isEditMode && (!selectedResource && !selectedFaculty && !selectedSection && !selectedDepartment && !selectedStudentYear) && !(isUploadModalOpen && uploadModalMode === 'manual') && (
+            <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
+              Please select any combination of filters above to find the timetables you want to edit.
             </div>
           )}
         </div>
