@@ -44,6 +44,15 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(morgan(env.nodeEnv === 'development' ? 'dev' : 'combined'));
 
+// Prevent browser caching of API responses
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  res.set('Surrogate-Control', 'no-store');
+  next();
+});
+
 // Generic rate limit; tighten further specifically on /auth/login
 // if you start seeing credential-stuffing attempts.
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 3000 }));

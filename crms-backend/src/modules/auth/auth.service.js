@@ -3,6 +3,7 @@ const ApiError = require('../../utils/ApiError');
 const { signAccessToken, signRefreshToken, verifyRefreshToken } = require('../../utils/jwt');
 const repo = require('./auth.repository');
 const auditService = require('../audit/audit.service');
+const prisma = require('../../config/prisma');
 
 const SALT_ROUNDS = 12;
 
@@ -23,6 +24,21 @@ async function login(email, password, ip) {
   const valid = await bcrypt.compare(password, user.passwordHash);
   if (!valid) {
     throw ApiError.unauthorized('Invalid email or password');
+  }
+
+  // Auto-fix missing department for legacy department admins
+  if (user.role?.roleName === 'Department Admin' && !user.departmentId && user.email.toLowerCase().includes('head')) {
+    const prefix = user.email.split('head')[0].toUpperCase();
+    if (prefix) {
+      const dept = await prisma.department.findUnique({ where: { branchCode: prefix } });
+      if (dept) {
+        user = await prisma.user.update({
+          where: { userId: user.userId },
+          data: { departmentId: dept.departmentId },
+          include: { role: true, department: true }
+        });
+      }
+    }
   }
 
   const accessToken = signAccessToken(user);
@@ -90,9 +106,17 @@ async function signup({ name, email, phone, password }) {
 
   // Determine role based on email containing "head"
   let roleId = null;
+  let departmentId = null;
   if (email.toLowerCase().includes('head')) {
     const adminRole = await repo.getRoleByName('Department Admin');
     if (adminRole) roleId = adminRole.roleId;
+    
+    // Auto-assign department if possible (e.g. eeehead@... -> EEE)
+    const prefix = email.split('head')[0].toUpperCase();
+    if (prefix) {
+      const dept = await prisma.department.findUnique({ where: { branchCode: prefix } });
+      if (dept) departmentId = dept.departmentId;
+    }
   } else {
     const reqRole = await repo.getRoleByName('Requester');
     if (reqRole) roleId = reqRole.roleId;
@@ -106,6 +130,7 @@ async function signup({ name, email, phone, password }) {
     phone,
     passwordHash,
     roleId,
+    departmentId,
     status: 'Active'
   });
 

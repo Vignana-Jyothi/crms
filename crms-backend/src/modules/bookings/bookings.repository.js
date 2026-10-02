@@ -51,13 +51,16 @@ function findById(bookingId) {
 }
 
 function list({ requesterUserId, resourceId, status, departmentId }) {
+  const where = {};
+  if (requesterUserId !== undefined) where.requesterUserId = Number(requesterUserId);
+  if (resourceId !== undefined) where.resourceId = resourceId;
+  if (status !== undefined) where.status = status;
+  if (departmentId !== undefined) {
+    where.resource = { departmentId: departmentId === -1 ? null : Number(departmentId) };
+  }
+
   return prisma.booking.findMany({
-    where: {
-      ...(requesterUserId && { requesterUserId: Number(requesterUserId) }),
-      ...(resourceId && { resourceId }),
-      ...(status && { status }),
-      ...(departmentId && { resource: { departmentId: Number(departmentId) } }),
-    },
+    where,
     include: {
       resource: { 
         select: { 

@@ -21,9 +21,11 @@ const list = asyncHandler(async (req, res) => {
     filters.requesterUserId = req.auth.userId;
   } else if (req.auth.roleId === ROLES.DEPARTMENT_ADMIN) {
     // Force department admin to only see their own department's bookings
-    filters.departmentId = req.auth.departmentId;
+    // If they have no department assigned yet, they see nothing (we pass null explicitly)
+    filters.departmentId = req.auth.departmentId === null ? -1 : req.auth.departmentId;
+  } else if (req.query.departmentId) {
+    filters.departmentId = req.query.departmentId;
   }
-  // Institute Admin / Super Admin: can pass any departmentId via query params
 
   res.json(await service.list(filters));
 });
