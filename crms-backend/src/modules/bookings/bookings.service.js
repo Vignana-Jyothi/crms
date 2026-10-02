@@ -96,36 +96,13 @@ async function createBooking({ resourceId, bookingDate, startTime, endTime, purp
 
       const approver = await resourcesService.resolveApprover(resource);
       
-      // If the assigned approver IS the requester, they are booking their own resource!
-      const isAutoApproved = approver && approver.userId === requesterUserId && approver.roleId !== ROLES.SUPER_ADMIN;
-
-      if (isAutoApproved) {
-        // Auto-approve Tier 1 and mark booking as Approved instantly
-        await tx.booking.update({
-          where: { bookingId: booking.bookingId },
-          data: { status: 'Approved' }
-        });
-        booking.status = 'Approved';
-        
-        await tx.approval.create({
-          data: {
-            bookingId: booking.bookingId,
-            approverUserId: approver.userId,
-            approverRoleId: approver.roleId,
-            decision: 'Approved',
-            decisionAt: new Date(),
-            remarks: 'Auto-approved (Requester is the Resource Owner)'
-          },
-        });
-      } else {
-        await tx.approval.create({
-          data: {
-            bookingId: booking.bookingId,
-            approverUserId: approver?.userId ?? null,
-            approverRoleId: approver?.roleId ?? null,
-          },
-        });
-      }
+      await tx.approval.create({
+        data: {
+          bookingId: booking.bookingId,
+          approverUserId: approver?.userId ?? null,
+          approverRoleId: approver?.roleId ?? null,
+        },
+      });
 
       await auditService.log({
         userId: requesterUserId,
@@ -148,13 +125,13 @@ async function createBooking({ resourceId, bookingDate, startTime, endTime, purp
 
       // Send emails asynchronously
       notifications.notifyRequesterNewBooking(booking, requesterUser).catch(console.error);
-      if (!isAutoApproved && approverUser) {
+      if (approverUser) {
         notifications.notifyApproverActionRequired(booking, approverUser).catch(console.error);
       }
 
       return {
         ...booking,
-        status: isAutoApproved ? 'Approved' : booking.status,
+        status: booking.status,
         approverUserId: approver?.userId ?? null
       };
     },
