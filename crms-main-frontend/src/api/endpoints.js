@@ -1,8 +1,8 @@
 import client from './client';
 
 export const authApi = {
-  checkAuth: () => client.get(`${import.meta.env.VITE_AUTH_URL || 'http://localhost:3115'}/check-auth`).then(r => r.data),
-  logout: () => client.post(`${import.meta.env.VITE_AUTH_URL || 'http://localhost:3115'}/logout`).then(r => r.data),
+  checkAuth: () => client.get(`${import.meta.env.VITE_AUTH_URL || 'https://auth.vjstartup.com'}/check-auth`).then(r => r.data),
+  logout: () => client.post(`${import.meta.env.VITE_AUTH_URL || 'https://auth.vjstartup.com'}/logout`).then(r => r.data),
 };
 
 export const usersApi = {

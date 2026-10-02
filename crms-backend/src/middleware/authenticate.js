@@ -17,7 +17,7 @@ module.exports = async function authenticate(req, res, next) {
   }
 
   try {
-    const authUrl = process.env.AUTH_URL || 'http://localhost:3115';
+    const authUrl = process.env.AUTH_URL || 'https://auth.vjstartup.com';
     // Send token to auth-server for verification
     const response = await axios.post(`${authUrl}/verify-token`, { token }, {
       headers: { 'x-app-name': 'crms' }
