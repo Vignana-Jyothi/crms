@@ -48,14 +48,14 @@ export const resourcesApi = {
 };
 
 export const bookingsApi = {
-  mine: () => client.get('/bookings/my').then((r) => r.data),
+  mine: () => client.get(`/bookings/my?_t=${Date.now()}`).then((r) => r.data),
   list: (params) => client.get('/bookings', { params }).then((r) => r.data),
   create: (payload) => client.post('/bookings', payload).then((r) => r.data),
   cancel: (id, data) => client.post(`/bookings/${id}/cancel`, data).then((r) => r.data),
 };
 
 export const approvalsApi = {
-  pending: () => client.get('/approvals/pending').then((r) => r.data),
+  pending: () => client.get(`/approvals/pending?_t=${Date.now()}`).then((r) => r.data),
   approve: (approvalId, remarks) => client.post(`/approvals/${approvalId}/approve`, { remarks }).then((r) => r.data),
   reject: (approvalId, remarks) => client.post(`/approvals/${approvalId}/reject`, { remarks }).then((r) => r.data),
 };
