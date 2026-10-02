@@ -28,7 +28,9 @@ async function login(email, password, ip) {
 
   // Auto-fix missing department for legacy department admins
   if (user.role?.roleName === 'Department Admin' && !user.departmentId && user.email.toLowerCase().includes('head')) {
-    const prefix = user.email.split('head')[0].toUpperCase();
+    const rawPrefix = user.email.split('head')[0].toUpperCase();
+    const prefixMap = { 'ME': 'MECH', 'CE': 'CIVIL' };
+    const prefix = prefixMap[rawPrefix] || rawPrefix;
     if (prefix) {
       const dept = await prisma.department.findUnique({ where: { branchCode: prefix } });
       if (dept) {
@@ -112,7 +114,9 @@ async function signup({ name, email, phone, password }) {
     if (adminRole) roleId = adminRole.roleId;
     
     // Auto-assign department if possible (e.g. eeehead@... -> EEE)
-    const prefix = email.split('head')[0].toUpperCase();
+    const rawPrefix = email.split('head')[0].toUpperCase();
+    const prefixMap = { 'ME': 'MECH', 'CE': 'CIVIL' };
+    const prefix = prefixMap[rawPrefix] || rawPrefix;
     if (prefix) {
       const dept = await prisma.department.findUnique({ where: { branchCode: prefix } });
       if (dept) departmentId = dept.departmentId;

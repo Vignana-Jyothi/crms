@@ -26,7 +26,7 @@ function listPendingFor({ approverUserId, roleId, departmentId }) {
         // was deactivated after the request was created).
         {
           approverRoleId: roleId,
-          booking: departmentId ? { resource: { departmentId } } : undefined,
+          booking: departmentId ? { resource: { departmentId } } : { resource: { departmentId: null } },
         },
       ],
     };
