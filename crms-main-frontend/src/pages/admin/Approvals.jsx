@@ -27,6 +27,7 @@ export default function Approvals() {
   useEffect(refresh, []);
 
   async function act(approvalId, decision, customRemarks) {
+    if (actingId) return;
     setActingId(approvalId);
     setError('');
     try {
