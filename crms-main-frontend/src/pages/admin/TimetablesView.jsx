@@ -78,52 +78,37 @@ export default function TimetablesView() {
     setError('');
 
     let params = {};
-    if (!isEditMode) {
-      if (activeTab === 'Rooms') {
-        if (!selectedResource) {
-          setTimetables([]);
-          setLoading(false);
-          return;
-        }
-        params.resourceId = selectedResource;
-      } else if (activeTab === 'Sections') {
-        if (!selectedSection || !selectedDepartment || !selectedStudentYear) {
-          setTimetables([]);
-          setLoading(false);
-          return;
-        }
-      } else if (activeTab === 'Faculty') {
-        if (!selectedFaculty) {
-          setTimetables([]);
-          setLoading(false);
-          return;
-        }
-        params.facultyName = selectedFaculty;
-      }
-      
-      // Pass any other selected filters to narrow down the view
-      if (selectedStudentYear) params.studentYear = selectedStudentYear;
-      if (selectedDepartment) params.departmentId = selectedDepartment;
-      if (selectedSection) params.section = selectedSection;
-      if (selectedResource && activeTab !== 'Rooms') params.resourceId = selectedResource;
-      if (selectedFaculty && activeTab !== 'Faculty') params.facultyName = selectedFaculty;
-      
-      const derivedDay = selectedDate ? new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long' }) : selectedDay;
-      if (derivedDay) params.dayOfWeek = derivedDay;
-    } else {
-      if (!selectedStudentYear && !selectedDepartment && !selectedSection && !selectedFaculty && !selectedResource) {
+    if (activeTab === 'Rooms') {
+      if (!selectedResource) {
         setTimetables([]);
         setLoading(false);
         return;
       }
-      if (selectedStudentYear) params.studentYear = selectedStudentYear;
-      if (selectedDepartment) params.departmentId = selectedDepartment;
-      if (selectedSection) params.section = selectedSection;
-      if (selectedFaculty) params.facultyName = selectedFaculty;
-      if (selectedResource) params.resourceId = selectedResource;
-      const derivedDay = selectedDate ? new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long' }) : selectedDay;
-      if (derivedDay) params.dayOfWeek = derivedDay;
+      params.resourceId = selectedResource;
+    } else if (activeTab === 'Sections') {
+      if (!selectedSection || !selectedDepartment || !selectedStudentYear) {
+        setTimetables([]);
+        setLoading(false);
+        return;
+      }
+    } else if (activeTab === 'Faculty') {
+      if (!selectedFaculty) {
+        setTimetables([]);
+        setLoading(false);
+        return;
+      }
+      params.facultyName = selectedFaculty;
     }
+    
+    // Pass any other selected filters to narrow down the view
+    if (selectedStudentYear) params.studentYear = selectedStudentYear;
+    if (selectedDepartment) params.departmentId = selectedDepartment;
+    if (selectedSection) params.section = selectedSection;
+    if (selectedResource && activeTab !== 'Rooms') params.resourceId = selectedResource;
+    if (selectedFaculty && activeTab !== 'Faculty') params.facultyName = selectedFaculty;
+    
+    const derivedDay = selectedDate ? new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long' }) : selectedDay;
+    if (derivedDay) params.dayOfWeek = derivedDay;
 
     timetableApi
       .list(params)
@@ -263,8 +248,8 @@ export default function TimetablesView() {
             <Search size={20} className="text-slate-400" />
           </div>
           
-          <div className={`w-full flex-1 ${isEditMode ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3' : 'flex flex-wrap items-center gap-3'}`}>
-          {(!isEditMode && activeTab === 'Rooms') && (
+          <div className="flex flex-wrap items-center gap-3 w-full flex-1">
+          {(activeTab === 'Rooms') && (
             <>
               <SearchableSelect
                 value={selectedBlock}
@@ -301,7 +286,7 @@ export default function TimetablesView() {
             </>
           )}
 
-          {(!isEditMode && activeTab === 'Sections') && (
+          {(activeTab === 'Sections') && (
             <>
               <SearchableSelect
                 value={selectedStudentYear}
@@ -350,7 +335,7 @@ export default function TimetablesView() {
             </>
           )}
 
-          {(!isEditMode && activeTab === 'Faculty') && (
+          {(activeTab === 'Faculty') && (
             <>
               <SearchableSelect
                 value={selectedFaculty}
@@ -375,64 +360,7 @@ export default function TimetablesView() {
             </>
           )}
 
-          {isEditMode && (
-            <>
-              <SearchableSelect
-                value={selectedStudentYear}
-                onChange={setSelectedStudentYear}
-                placeholder="All Years"
-                options={[
-                  { value: '', label: 'All Years' },
-                  { value: '1', label: '1st Year' },
-                  { value: '2', label: '2nd Year' },
-                  { value: '3', label: '3rd Year' },
-                  { value: '4', label: '4th Year' }
-                ]}
-                className="min-w-[120px]"
-              />
-              <SearchableSelect
-                value={selectedDepartment}
-                onChange={setSelectedDepartment}
-                placeholder="All Depts"
-                options={[
-                  { value: '', label: 'All Depts' },
-                  ...sortedDepartments.map(d => ({ value: d.departmentId.toString(), label: d.branchCode }))
-                ]}
-                className="min-w-[120px]"
-              />
-              <SearchableSelect
-                value={selectedSection}
-                onChange={val => setSelectedSection(val ? val.toUpperCase() : '')}
-                placeholder="Select or Type Section"
-                allowCreate={true}
-                options={[
-                  ...availableSections.map(s => ({ value: s, label: s }))
-                ]}
-                className="min-w-[120px]"
-              />
-              <SearchableSelect
-                value={selectedFaculty}
-                onChange={setSelectedFaculty}
-                placeholder="Select or Type Faculty"
-                allowCreate={true}
-                options={[
-                  { value: '', label: 'All Faculty' },
-                  ...facultyList.map(f => ({ value: (f.name || f).toString(), label: (f.label || f).toString() }))
-                ]}
-                className="min-w-[180px]"
-              />
-              <SearchableSelect
-                value={selectedDay}
-                onChange={setSelectedDay}
-                placeholder="All Days"
-                options={[
-                  { value: '', label: 'All Days' },
-                  ...['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(d => ({ value: d, label: d }))
-                ]}
-                className="min-w-[140px]"
-              />
-            </>
-          )}
+
           </div>
 
           {/* Clear Filters Button */}
@@ -568,37 +496,31 @@ export default function TimetablesView() {
             </div>
           )}
 
-          {timetables.length === 0 && !isEditMode && !loading && (
-            (!isEditMode && activeTab === 'Rooms' && selectedResource) ||
-            (!isEditMode && activeTab === 'Sections' && (selectedSection && selectedDepartment && selectedStudentYear)) ||
-            (!isEditMode && activeTab === 'Faculty' && selectedFaculty)
+          {(timetables.length === 0 && !loading && !(isUploadModalOpen && uploadModalMode === 'manual')) && (
+            (activeTab === 'Rooms' && selectedResource) ||
+            (activeTab === 'Sections' && (selectedSection && selectedDepartment && selectedStudentYear)) ||
+            (activeTab === 'Faculty' && selectedFaculty)
           ) && (
             <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
               No classes scheduled for the selected {activeTab ? activeTab.toLowerCase().slice(0, -1) : 'filters'}.
             </div>
           )}
           
-          {!loading && timetables.length === 0 && !isEditMode && activeTab === 'Sections' && (!selectedSection || !selectedDepartment || !selectedStudentYear) && (
+          {!loading && timetables.length === 0 && activeTab === 'Sections' && (!selectedSection || !selectedDepartment || !selectedStudentYear) && !(isUploadModalOpen && uploadModalMode === 'manual') && (
             <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
               Please select a Year, Branch, and Section to view the timetable.
             </div>
           )}
 
-          {!loading && timetables.length === 0 && !isEditMode && activeTab === 'Rooms' && !selectedResource && (
+          {!loading && timetables.length === 0 && activeTab === 'Rooms' && !selectedResource && !(isUploadModalOpen && uploadModalMode === 'manual') && (
             <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
               Please select a Room / Lab to view the timetable.
             </div>
           )}
 
-          {!loading && timetables.length === 0 && !isEditMode && activeTab === 'Faculty' && !selectedFaculty && (
+          {!loading && timetables.length === 0 && activeTab === 'Faculty' && !selectedFaculty && !(isUploadModalOpen && uploadModalMode === 'manual') && (
             <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
               Please select a Faculty Member to view the timetable.
-            </div>
-          )}
-
-          {!loading && timetables.length === 0 && isEditMode && (!selectedResource && !selectedFaculty && (!selectedSection || !selectedDepartment || !selectedStudentYear)) && !(isUploadModalOpen && uploadModalMode === 'manual') && (
-            <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
-              Please select filters above to find the timetable you want to edit.
             </div>
           )}
         </div>
