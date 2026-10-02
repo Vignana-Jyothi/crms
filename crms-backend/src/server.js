@@ -5,10 +5,39 @@ const { loadRoles } = require('./middleware/authorizeRole');
 
 loadRoles(prisma).then(() => {
   // Temporary fix for stuck approvals (assigned to Super Admin instead of Institute Admin)
-  prisma.approval.updateMany({
-    where: { decision: null, approverRoleId: { in: [1, 2] }, booking: { resource: { departmentId: null } } },
-    data: { approverRoleId: require('./middleware/authorizeRole').ROLES.INSTITUTE_ADMIN }
-  }).then(res => console.log(`[Auto-Fix] Reassigned ${res.count} stuck approvals to Institute Admin`)).catch(console.error);
+  prisma.approval.findMany({
+    where: { decision: null, approverRoleId: { in: [1, 2] }, booking: { resource: { departmentId: null } } }
+  }).then(approvals => {
+    const ids = approvals.map(a => a.approvalId);
+    if (ids.length > 0) {
+      return prisma.approval.updateMany({
+        where: { approvalId: { in: ids } },
+        data: { approverRoleId: require('./middleware/authorizeRole').ROLES.INSTITUTE_ADMIN }
+      }).then(res => console.log(`[Auto-Fix] Reassigned ${res.count} stuck approvals to Institute Admin`));
+    }
+  }).catch(console.error);
+
+  // Temporary fix for extracurricular activities falsely occupying classrooms
+  prisma.timetable.updateMany({
+    where: {
+      resourceId: { not: null },
+      OR: [
+        { courseName: { contains: 'library' } },
+        { courseName: { contains: 'sports' } },
+        { courseName: { contains: 'cca' } },
+        { courseName: { contains: 'eca' } },
+        { courseName: { contains: 'cva-l' } },
+        { courseName: { contains: 'mtp' } },
+        { courseCode: { contains: 'library' } },
+        { courseCode: { contains: 'sports' } },
+        { courseCode: { contains: 'cca' } },
+        { courseCode: { contains: 'eca' } },
+        { courseCode: { contains: 'cva-l' } },
+        { courseCode: { contains: 'mtp' } }
+      ]
+    },
+    data: { resourceId: null }
+  }).then(res => console.log(`[Auto-Fix] Unassigned ${res.count} extracurricular activities from classrooms`)).catch(console.error);
 
 const server = app.listen(env.port, () => {
   console.log(`CRMS backend listening on port ${env.port} [${env.nodeEnv}]`);
