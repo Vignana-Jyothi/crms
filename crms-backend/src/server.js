@@ -22,18 +22,18 @@ loadRoles(prisma).then(() => {
     where: {
       resourceId: { not: null },
       OR: [
-        { courseName: { contains: 'library' } },
-        { courseName: { contains: 'sports' } },
-        { courseName: { contains: 'cca' } },
-        { courseName: { contains: 'eca' } },
-        { courseName: { contains: 'cva-l' } },
-        { courseName: { contains: 'mtp' } },
-        { courseCode: { contains: 'library' } },
-        { courseCode: { contains: 'sports' } },
-        { courseCode: { contains: 'cca' } },
-        { courseCode: { contains: 'eca' } },
-        { courseCode: { contains: 'cva-l' } },
-        { courseCode: { contains: 'mtp' } }
+        { courseName: { contains: 'lib', mode: 'insensitive' } },
+        { courseName: { contains: 'sports', mode: 'insensitive' } },
+        { courseName: { contains: 'cca', mode: 'insensitive' } },
+        { courseName: { contains: 'eca', mode: 'insensitive' } },
+        { courseName: { contains: 'cva-l', mode: 'insensitive' } },
+        { courseName: { contains: 'mtp', mode: 'insensitive' } },
+        { courseCode: { contains: 'lib', mode: 'insensitive' } },
+        { courseCode: { contains: 'sports', mode: 'insensitive' } },
+        { courseCode: { contains: 'cca', mode: 'insensitive' } },
+        { courseCode: { contains: 'eca', mode: 'insensitive' } },
+        { courseCode: { contains: 'cva-l', mode: 'insensitive' } },
+        { courseCode: { contains: 'mtp', mode: 'insensitive' } }
       ]
     },
     data: { resourceId: null }

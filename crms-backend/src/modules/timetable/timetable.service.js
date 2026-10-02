@@ -6,7 +6,7 @@ const eduprimeService = require('../eduprime/eduprime.service');
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 function shouldUnassignRoom(courseCode, courseName) {
-  const keywords = ['library', 'sports', 'cca', 'eca', 'cva-l', 'mtp'];
+  const keywords = ['library', 'lib', 'sports', 'cca', 'eca', 'cva-l', 'mtp'];
   const name = (courseName || '').toLowerCase();
   const code = (courseCode || '').toLowerCase();
   
