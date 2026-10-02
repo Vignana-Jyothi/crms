@@ -63,7 +63,7 @@ async function notifyRequesterNewBooking(booking, user) {
   await sendEmail({
     to: user.email,
     subject: `CRMS: Booking Request ${booking.status} - ${booking.resource?.resourceName || ''}`,
-    html: `<h2>Booking Request Received</h2><p>Hi ${escapeHtml(user.name)},</p><p>Your booking request for <b>${escapeHtml(booking.resource?.resourceName)}</b> has been received.</p><ul><li><b>Booking ID:</b> ${booking.bookingId}</li><li><b>Date:</b> ${formatDate(booking.bookingDate)}</li><li><b>Time:</b> ${formatTime(booking.startTime)} to ${formatTime(booking.endTime)}</li><li><b>Status:</b> ${statusHtml}</li></ul><p>Thank you,</p><p>CRMS Team</p>`,
+    html: `<h2>Booking Request Received</h2><p>Hi ${escapeHtml(user.name)},</p><p>Your booking request for <b>${escapeHtml(booking.resource?.resourceName)}</b> has been received.</p><ul><li><b>Booking ID:</b> ${booking.bookingId}</li><li><b>Date:</b> ${formatDate(booking.bookingDate)}</li><li><b>Time:</b> ${formatTime(booking.startTime)} to ${formatTime(booking.endTime)}</li><li><b>Purpose:</b> ${escapeHtml(booking.purpose)}</li><li><b>Status:</b> ${statusHtml}</li></ul><p>Thank you,</p><p>CRMS Team</p>`,
   });
 }
 

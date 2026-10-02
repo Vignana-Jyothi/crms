@@ -20,7 +20,32 @@ async function shutdown(signal) {
     await prisma.$disconnect();
     process.exit(0);
   });
+// Escalate approvals older than 24h to Super Admin
+function startEscalationJob() {
+  const ONE_HOUR = 60 * 60 * 1000;
+  setInterval(async () => {
+    try {
+      const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const escalated = await prisma.approval.updateMany({
+        where: {
+          decision: null,
+          approverRoleId: { not: 1 },
+          booking: { createdAt: { lt: twentyFourHoursAgo } }
+        },
+        data: {
+          approverRoleId: 1,
+          approverUserId: null,
+        }
+      });
+      if (escalated.count > 0) {
+        console.log(`[Escalation Job] Escalated ${escalated.count} pending approvals to Super Admin.`);
+      }
+    } catch (err) {
+      console.error('[Escalation Job] Error escalating approvals:', err);
+    }
+  }, ONE_HOUR);
 }
+startEscalationJob();
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));

@@ -8,38 +8,7 @@ const STATUS_STYLE = {
   Cancelled: 'bg-ink/10 text-ink/50',
 };
 
-function fmtTime(iso) {
-  if (!iso) return '';
-  if (typeof iso === 'string') {
-    const trimmed = iso.trim();
-    const timeMatch = trimmed.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
-    if (timeMatch) {
-      return `${timeMatch[1].padStart(2, '0')}:${timeMatch[2]}`;
-    }
-  }
-  try {
-    const d = iso instanceof Date ? iso : new Date(iso);
-    if (isNaN(d.getTime())) return String(iso).slice(0, 5);
-    return d.toISOString().slice(11, 16);
-  } catch {
-    return String(iso || '').slice(0, 5);
-  }
-}
-
-function fmtDate(iso) {
-  if (!iso) return '';
-  if (typeof iso === 'string') {
-    const match = iso.trim().match(/^(\d{4}-\d{2}-\d{2})/);
-    if (match) return match[1];
-  }
-  try {
-    const d = iso instanceof Date ? iso : new Date(iso);
-    if (isNaN(d.getTime())) return String(iso).slice(0, 10);
-    return d.toISOString().slice(0, 10);
-  } catch {
-    return String(iso || '').slice(0, 10);
-  }
-}
+import { fmtDate, fmtTime, fmtDateTime } from '../utils/formatters';
 
 export default function MyBookings() {
   const [bookings, setBookings] = useState([]);
@@ -111,7 +80,10 @@ export default function MyBookings() {
                   )}
                 </div>
                 <p className="mt-0.5 text-xs text-ink/50">
-                  {fmtDate(b.bookingDate)} · {fmtTime(b.startTime)}–{fmtTime(b.endTime)}
+                  {fmtDate(b.bookingDate)} · {fmtTime(b.startTime)} - {fmtTime(b.endTime)}
+                </p>
+                <p className="mt-1 text-[10px] text-ink/40">
+                  Requested on {fmtDateTime(b.createdAt)}
                 </p>
                 <p className="mt-1 text-sm text-ink/70">{b.purpose}</p>
 

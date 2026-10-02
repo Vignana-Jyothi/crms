@@ -61,24 +61,29 @@ export function fmtTime(val) {
 export function fmtDate(val) {
   if (val === null || val === undefined || val === '') return '—';
 
+  let d;
   if (typeof val === 'string') {
     const trimmed = val.trim();
     if (!trimmed) return '—';
 
-    // Direct match for YYYY-MM-DD prefix
-    const dateMatch = trimmed.match(/^(\d{4}-\d{2}-\d{2})/);
+    // If it's a date-only string like YYYY-MM-DD, parse it carefully
+    const dateMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})/);
     if (dateMatch) {
-      return dateMatch[1];
+      d = new Date(parseInt(dateMatch[1], 10), parseInt(dateMatch[2], 10) - 1, parseInt(dateMatch[3], 10));
+    } else {
+      d = new Date(val);
     }
+  } else {
+    d = val instanceof Date ? val : new Date(val);
   }
 
-  try {
-    const d = val instanceof Date ? val : new Date(val);
-    if (isNaN(d.getTime())) return '—';
-    return d.toISOString().slice(0, 10);
-  } catch {
-    return '—';
-  }
+  if (isNaN(d.getTime())) return '—';
+
+  return d.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
 }
 
 /**

@@ -38,7 +38,6 @@ export default function Approvals() {
         setRejectModalApproval(null);
         setRejectionRemarks('');
       }
-      refresh();
     } catch (err) {
       const msg = err.response?.data?.error || `Failed to ${decision.toLowerCase()} request. Please try again.`;
       if (rejectModalApproval?.approvalId === approvalId) {
@@ -48,6 +47,7 @@ export default function Approvals() {
       }
     } finally {
       setActingId(null);
+      await refresh();
     }
   }
 
