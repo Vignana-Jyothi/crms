@@ -91,6 +91,9 @@ export default function TimetablesView() {
         setLoading(false);
         return;
       }
+      params.studentYear = selectedStudentYear;
+      params.departmentId = selectedDepartment;
+      params.section = selectedSection;
     } else if (activeTab === 'Faculty') {
       if (!selectedFaculty) {
         setTimetables([]);
@@ -99,13 +102,6 @@ export default function TimetablesView() {
       }
       params.facultyName = selectedFaculty;
     }
-    
-    // Pass any other selected filters to narrow down the view
-    if (selectedStudentYear) params.studentYear = selectedStudentYear;
-    if (selectedDepartment) params.departmentId = selectedDepartment;
-    if (selectedSection) params.section = selectedSection;
-    if (selectedResource && activeTab !== 'Rooms') params.resourceId = selectedResource;
-    if (selectedFaculty && activeTab !== 'Faculty') params.facultyName = selectedFaculty;
     
     const derivedDay = selectedDate ? new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long' }) : selectedDay;
     if (derivedDay) params.dayOfWeek = derivedDay;
