@@ -110,7 +110,7 @@ async function notifyApproverActionRequired(booking, approverUser) {
           </div>
           
           <p style="font-size: 15px; text-align: center; margin: 30px 0;">
-            <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/admin/approvals" style="background-color: #0f2c59; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">Review Request in CRMS</a>
+            <a href="${process.env.FRONTEND_URL || 'https://dev-crms.vjstartup.com'}/admin/approvals" style="background-color: #0f2c59; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">Review Request in CRMS</a>
           </p>
           
           <p style="font-size: 14px; color: #666666; margin-bottom: 0;">Thank you,<br/><strong>VNRVJIET CRMS Team</strong></p>
