@@ -69,16 +69,17 @@ function startEscalationJob() {
       const escalated = await prisma.approval.updateMany({
         where: {
           decision: null,
-          approverRoleId: { not: 1 },
+          approverRoleId: 3, // Department Admin
           booking: { createdAt: { lt: twentyFourHoursAgo } }
         },
         data: {
           approverRoleId: 1,
           approverUserId: null,
+          remarks: 'System: Automatically escalated to Super Admin due to 24-hour SLA timeout.'
         }
       });
       if (escalated.count > 0) {
-        console.log(`[Escalation Job] Escalated ${escalated.count} pending approvals to Super Admin.`);
+        console.log(`[Escalation Job] Escalated ${escalated.count} pending Department Admin approvals to Super Admin.`);
       }
     } catch (err) {
       console.error('[Escalation Job] Error escalating approvals:', err);

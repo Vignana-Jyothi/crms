@@ -46,8 +46,25 @@ async function createBooking({ resourceId, bookingDate, startTime, endTime, purp
   const [hours, minutes] = startTime.split(':');
   const bookingStartLocal = new Date(year, month - 1, day, hours, minutes);
   const now = new Date();
-  if (bookingStartLocal < now) {
+  
+  // Set "today" to start of day for date-only comparison
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const bookingDateObj = new Date(year, month - 1, day);
+  
+  if (bookingDateObj < today) {
     throw ApiError.badRequest('Cannot book a time slot in the past');
+  }
+
+  // Same-day checks
+  if (bookingDateObj.getTime() === today.getTime() && bookingStartLocal < now) {
+    throw ApiError.badRequest('Cannot book a time slot in the past');
+  }
+
+  const maxDate = new Date(today.getTime());
+  maxDate.setDate(maxDate.getDate() + 15);
+  
+  if (bookingDateObj > maxDate) {
+    throw ApiError.badRequest('Cannot book more than 15 days in advance');
   }
 
   const dayOfWeek = dayOfWeekFor(bookingDate);

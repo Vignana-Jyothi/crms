@@ -5,7 +5,7 @@ const SMTP_PORT = Number(process.env.SMTP_PORT || 587);
 const SMTP_SECURE = process.env.SMTP_SECURE === 'true';
 const SMTP_USER = process.env.SMTP_USER;
 const SMTP_PASS = process.env.SMTP_PASS;
-const SMTP_FROM = process.env.SMTP_FROM || 'CRMS Notifications <no-reply@crms.vnrvjiet.ac.in>';
+const SMTP_FROM = process.env.SMTP_FROM || 'CRMS Notifications <pavanibandarupalli58@gmail.com>';
 
 let transporter = null;
 
@@ -63,7 +63,27 @@ async function notifyRequesterNewBooking(booking, user) {
   await sendEmail({
     to: user.email,
     subject: `CRMS: Booking Request ${booking.status} - ${booking.resource?.resourceName || ''}`,
-    html: `<h2>Booking Request Received</h2><p>Hi ${escapeHtml(user.name)},</p><p>Your booking request for <b>${escapeHtml(booking.resource?.resourceName)}</b> has been received.</p><ul><li><b>Booking ID:</b> ${booking.bookingId}</li><li><b>Date:</b> ${formatDate(booking.bookingDate)}</li><li><b>Time:</b> ${formatTime(booking.startTime)} to ${formatTime(booking.endTime)}</li><li><b>Purpose:</b> ${escapeHtml(booking.purpose)}</li><li><b>Status:</b> ${statusHtml}</li></ul><p>Thank you,</p><p>CRMS Team</p>`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <div style="background-color: #0f2c59; color: #ffffff; padding: 20px; text-align: center;">
+          <h2 style="margin: 0; font-size: 24px;">Booking Request Received</h2>
+        </div>
+        <div style="padding: 30px; background-color: #ffffff; color: #333333;">
+          <p style="font-size: 16px; margin-top: 0;">Hi <strong>${escapeHtml(user.name)}</strong>,</p>
+          <p style="font-size: 15px; line-height: 1.5;">Your booking request for <strong>${escapeHtml(booking.resource?.resourceName)}</strong> has been successfully received by the CRMS system.</p>
+          
+          <div style="background-color: #f8f9fa; border-left: 4px solid #0f2c59; padding: 15px; margin: 25px 0;">
+            <p style="margin: 5px 0; font-size: 14px;"><strong>Booking ID:</strong> <span style="font-family: monospace;">${booking.bookingId}</span></p>
+            <p style="margin: 5px 0; font-size: 14px;"><strong>Date:</strong> ${formatDate(booking.bookingDate)}</p>
+            <p style="margin: 5px 0; font-size: 14px;"><strong>Time:</strong> ${formatTime(booking.startTime)} to ${formatTime(booking.endTime)}</p>
+            <p style="margin: 5px 0; font-size: 14px;"><strong>Purpose:</strong> ${escapeHtml(booking.purpose)}</p>
+            <p style="margin: 5px 0; font-size: 14px;"><strong>Status:</strong> ${statusHtml}</p>
+          </div>
+          
+          <p style="font-size: 14px; color: #666666; margin-bottom: 0;">Thank you,<br/><strong>VNRVJIET CRMS Team</strong></p>
+        </div>
+      </div>
+    `,
   });
 }
 
@@ -72,7 +92,31 @@ async function notifyApproverActionRequired(booking, approverUser) {
   await sendEmail({
     to: approverUser.email,
     subject: `CRMS: Action Required - Booking Request for ${booking.resource?.resourceName || ''}`,
-    html: `<h2>Action Required: New Booking Request</h2><p>Hi ${escapeHtml(approverUser.name)},</p><p>A new booking request requires your approval.</p><ul><li><b>Resource:</b> ${escapeHtml(booking.resource?.resourceName)}</li><li><b>Date:</b> ${formatDate(booking.bookingDate)}</li><li><b>Time:</b> ${formatTime(booking.startTime)} to ${formatTime(booking.endTime)}</li><li><b>Purpose:</b> ${escapeHtml(booking.purpose)}</li></ul><p>Please log in to the CRMS Admin Dashboard to approve or reject this request.</p><p>Thank you,</p><p>CRMS Team</p>`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <div style="background-color: #d97706; color: #ffffff; padding: 20px; text-align: center;">
+          <h2 style="margin: 0; font-size: 24px;">Action Required</h2>
+        </div>
+        <div style="padding: 30px; background-color: #ffffff; color: #333333;">
+          <p style="font-size: 16px; margin-top: 0;">Hi <strong>${escapeHtml(approverUser.name)}</strong>,</p>
+          <p style="font-size: 15px; line-height: 1.5;">A new booking request requires your approval.</p>
+          
+          <div style="background-color: #fdf6e3; border-left: 4px solid #d97706; padding: 15px; margin: 25px 0;">
+            <p style="margin: 5px 0; font-size: 14px;"><strong>Resource:</strong> ${escapeHtml(booking.resource?.resourceName)}</p>
+            <p style="margin: 5px 0; font-size: 14px;"><strong>Date:</strong> ${formatDate(booking.bookingDate)}</p>
+            <p style="margin: 5px 0; font-size: 14px;"><strong>Time:</strong> ${formatTime(booking.startTime)} to ${formatTime(booking.endTime)}</p>
+            <p style="margin: 5px 0; font-size: 14px;"><strong>Purpose:</strong> ${escapeHtml(booking.purpose)}</p>
+            <p style="margin: 5px 0; font-size: 14px;"><strong>Requester:</strong> ${escapeHtml(booking.requesterUser?.name || 'Unknown')}</p>
+          </div>
+          
+          <p style="font-size: 15px; text-align: center; margin: 30px 0;">
+            <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/admin/approvals" style="background-color: #0f2c59; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">Review Request in CRMS</a>
+          </p>
+          
+          <p style="font-size: 14px; color: #666666; margin-bottom: 0;">Thank you,<br/><strong>VNRVJIET CRMS Team</strong></p>
+        </div>
+      </div>
+    `,
   });
 }
 
@@ -80,10 +124,29 @@ async function notifyRequesterDecision(booking, approverUser, decision, remarks)
   if (!booking.requesterUser?.email) return;
   const color = decision === 'Approved' ? 'green' : 'red';
   const remarksHtml = remarks ? `<p><b>Remarks:</b> ${escapeHtml(remarks)}</p>` : '';
+  const bgColor = decision === 'Approved' ? '#16a34a' : '#dc2626';
   await sendEmail({
     to: booking.requesterUser.email,
     subject: `CRMS: Booking ${decision} - ${booking.resource?.resourceName || ''}`,
-    html: `<h2>Booking ${escapeHtml(decision)}</h2><p>Hi ${escapeHtml(booking.requesterUser.name)},</p><p>Your booking request for <b>${escapeHtml(booking.resource?.resourceName)}</b> has been <strong style="color: ${color};">${escapeHtml(decision.toLowerCase())}</strong> by ${escapeHtml(approverUser?.name)}.</p><ul><li><b>Date:</b> ${formatDate(booking.bookingDate)}</li><li><b>Time:</b> ${formatTime(booking.startTime)} to ${formatTime(booking.endTime)}</li></ul>${remarksHtml}<p>Thank you,</p><p>CRMS Team</p>`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <div style="background-color: ${bgColor}; color: #ffffff; padding: 20px; text-align: center;">
+          <h2 style="margin: 0; font-size: 24px;">Booking ${escapeHtml(decision)}</h2>
+        </div>
+        <div style="padding: 30px; background-color: #ffffff; color: #333333;">
+          <p style="font-size: 16px; margin-top: 0;">Hi <strong>${escapeHtml(booking.requesterUser.name)}</strong>,</p>
+          <p style="font-size: 15px; line-height: 1.5;">Your booking request for <strong>${escapeHtml(booking.resource?.resourceName)}</strong> has been <strong style="color: ${color};">${escapeHtml(decision.toLowerCase())}</strong> by ${escapeHtml(approverUser?.name || 'an Administrator')}.</p>
+          
+          <div style="background-color: #f8f9fa; border-left: 4px solid ${bgColor}; padding: 15px; margin: 25px 0;">
+            <p style="margin: 5px 0; font-size: 14px;"><strong>Date:</strong> ${formatDate(booking.bookingDate)}</p>
+            <p style="margin: 5px 0; font-size: 14px;"><strong>Time:</strong> ${formatTime(booking.startTime)} to ${formatTime(booking.endTime)}</p>
+            ${remarks ? `<p style="margin: 10px 0 5px; font-size: 14px; border-top: 1px dashed #ccc; padding-top: 10px;"><strong>Remarks:</strong> ${escapeHtml(remarks)}</p>` : ''}
+          </div>
+          
+          <p style="font-size: 14px; color: #666666; margin-bottom: 0;">Thank you,<br/><strong>VNRVJIET CRMS Team</strong></p>
+        </div>
+      </div>
+    `,
   });
 }
 
