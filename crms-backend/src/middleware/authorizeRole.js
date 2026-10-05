@@ -11,16 +11,25 @@ const ROLES = {
 };
 
 let rolesLoaded = false;
-async function loadRoles(prisma) {
+async function loadRoles(prisma, retries = 5, delayMs = 2000) {
   if (rolesLoaded) return;
-  const dbRoles = await prisma.role.findMany();
-  for (const r of dbRoles) {
-    if (r.roleName === 'Super Admin') ROLES.SUPER_ADMIN = r.roleId;
-    if (r.roleName === 'Institute Admin') ROLES.INSTITUTE_ADMIN = r.roleId;
-    if (r.roleName === 'Department Admin') ROLES.DEPARTMENT_ADMIN = r.roleId;
-    if (r.roleName === 'Requester') ROLES.REQUESTER = r.roleId;
+  for (let i = 0; i < retries; i++) {
+    try {
+      const dbRoles = await prisma.role.findMany();
+      for (const r of dbRoles) {
+        if (r.roleName === 'Super Admin') ROLES.SUPER_ADMIN = r.roleId;
+        if (r.roleName === 'Institute Admin') ROLES.INSTITUTE_ADMIN = r.roleId;
+        if (r.roleName === 'Department Admin') ROLES.DEPARTMENT_ADMIN = r.roleId;
+        if (r.roleName === 'Requester') ROLES.REQUESTER = r.roleId;
+      }
+      rolesLoaded = true;
+      return;
+    } catch (err) {
+      console.warn(`[loadRoles] Database not ready (attempt ${i + 1}/${retries}). Retrying in ${delayMs}ms...`);
+      if (i === retries - 1) throw err;
+      await new Promise(res => setTimeout(res, delayMs));
+    }
   }
-  rolesLoaded = true;
 }
 
 // "What are you allowed to do?" — Section 13.

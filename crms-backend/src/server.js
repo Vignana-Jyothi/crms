@@ -3,6 +3,8 @@ const env = require('./config/env');
 const prisma = require('./config/prisma');
 const { loadRoles } = require('./middleware/authorizeRole');
 
+let server;
+
 loadRoles(prisma).then(() => {
   // Temporary fix for stuck approvals (assigned to Super Admin instead of Institute Admin)
   prisma.approval.findMany({
@@ -39,7 +41,7 @@ loadRoles(prisma).then(() => {
     data: { resourceId: null }
   }).then(res => console.log(`[Auto-Fix] Unassigned ${res.count} extracurricular activities from classrooms`)).catch(console.error);
 
-const server = app.listen(env.port, () => {
+server = app.listen(env.port, () => {
   console.log(`CRMS backend listening on port ${env.port} [${env.nodeEnv}]`);
   
   // Log the database connection URL so we can verify which DB is being used
