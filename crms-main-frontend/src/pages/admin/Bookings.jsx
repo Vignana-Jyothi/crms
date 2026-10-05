@@ -13,6 +13,8 @@ export default function Bookings() {
   const [status, setStatus] = useState('');
   const [departmentId, setDepartmentId] = useState('');
   const [resourceId, setResourceId] = useState('');
+  const [blockId, setBlockId] = useState('');
+  const [resourceTypeId, setResourceTypeId] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [search, setSearch] = useState('');
@@ -20,6 +22,8 @@ export default function Bookings() {
 
   const [departments, setDepartments] = useState([]);
   const [resources, setResources] = useState([]);
+  const [blocks, setBlocks] = useState([]);
+  const [resourceTypes, setResourceTypes] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -30,6 +34,8 @@ export default function Bookings() {
 
   useEffect(() => {
     masterDataApi.departments().then(setDepartments).catch(() => {});
+    masterDataApi.blocks().then(setBlocks).catch(() => {});
+    masterDataApi.resourceTypes().then(setResourceTypes).catch(() => {});
     resourcesApi.list({}).then(setResources).catch(() => {});
   }, []);
 
@@ -71,6 +77,8 @@ export default function Bookings() {
       const matchPurpose = b.purpose?.toLowerCase().includes(q);
       if (!matchResource && !matchRequester && !matchPurpose) return false;
     }
+    if (blockId && b.resource?.blockId !== parseInt(blockId)) return false;
+    if (resourceTypeId && b.resource?.resourceTypeId !== parseInt(resourceTypeId)) return false;
     return true;
   });
 
@@ -171,6 +179,36 @@ export default function Bookings() {
             </select>
           </div>
           <div>
+            <label className="block text-xs font-semibold text-ink/70 mb-1">Block</label>
+            <select
+              value={blockId}
+              onChange={(e) => setBlockId(e.target.value)}
+              className="w-full rounded border border-line px-3 py-2 text-xs focus:border-navy focus:outline-none"
+            >
+              <option value="">All blocks</option>
+              {blocks.map((b) => (
+                <option key={b.blockId} value={b.blockId}>
+                  {b.blockCode}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-ink/70 mb-1">Room Type</label>
+            <select
+              value={resourceTypeId}
+              onChange={(e) => setResourceTypeId(e.target.value)}
+              className="w-full rounded border border-line px-3 py-2 text-xs focus:border-navy focus:outline-none"
+            >
+              <option value="">All room types</option>
+              {resourceTypes.map((t) => (
+                <option key={t.resourceTypeId} value={t.resourceTypeId}>
+                  {t.typeName}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
             <label className="block text-xs font-semibold text-ink/70 mb-1">From Date</label>
             <input
               type="date"
@@ -189,7 +227,7 @@ export default function Bookings() {
             />
           </div>
         </div>
-        {(status || departmentId || resourceId || startDate || endDate || search) && (
+        {(status || departmentId || resourceId || startDate || endDate || search || blockId || resourceTypeId) && (
           <div className="mt-3 flex justify-end">
             <button
               onClick={() => {
@@ -199,6 +237,8 @@ export default function Bookings() {
                 setStartDate('');
                 setEndDate('');
                 setSearch('');
+                setBlockId('');
+                setResourceTypeId('');
               }}
               className="text-xs font-medium text-navy hover:underline"
             >

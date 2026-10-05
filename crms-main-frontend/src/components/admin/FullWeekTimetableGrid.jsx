@@ -372,7 +372,7 @@ export default function FullWeekTimetableGrid({
                             {aggregatedDisplay.courseShortNames.join(' / ')}
                           </div>
                           
-                          {viewMode === 'Classrooms' && (
+                          {viewMode === 'Rooms' && (
                             <>
                               <div className="text-[9px] text-indigo-700 font-medium whitespace-nowrap">
                                 {baseClass.studentYear && `${baseClass.studentYear}${baseClass.studentYear === '1' ? 'st' : baseClass.studentYear === '2' ? 'nd' : baseClass.studentYear === '3' ? 'rd' : 'th'} Yr`} {baseClass.department?.branchCode} - {baseClass.section}

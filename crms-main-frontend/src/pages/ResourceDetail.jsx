@@ -12,6 +12,15 @@ function todayStr() {
   return `${year}-${month}-${day}`;
 }
 
+function maxDateStr() {
+  const d = new Date();
+  d.setDate(d.getDate() + 15);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 export default function ResourceDetail() {
   const { resourceId } = useParams();
   const navigate = useNavigate();
@@ -108,6 +117,7 @@ export default function ResourceDetail() {
             type="date"
             value={date}
             min={todayStr()}
+            max={maxDateStr()}
             onChange={(e) => setDate(e.target.value)}
             className="rounded border border-line px-2 py-1 text-sm"
           />

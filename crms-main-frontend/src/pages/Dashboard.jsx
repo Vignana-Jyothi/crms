@@ -13,6 +13,15 @@ function todayStr() {
   return `${year}-${month}-${day}`;
 }
 
+function maxDateStr() {
+  const d = new Date();
+  d.setDate(d.getDate() + 15);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 const SEMINAR_HALL_NAMES = {
   'C001': 'K S Auditorium',
   'B011': 'B-Block Seminar Hall',
@@ -235,6 +244,8 @@ export default function Dashboard() {
           <input
             type="date"
             value={selectedDate}
+            min={todayStr()}
+            max={maxDateStr()}
             onChange={handleDateChange}
             className="rounded border border-line px-2 py-2 text-sm bg-white w-full"
           />

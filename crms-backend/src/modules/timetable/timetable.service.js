@@ -3,8 +3,15 @@ const ApiError = require('../../utils/ApiError');
 const prisma = require('../../config/prisma');
 const eduprimeService = require('../eduprime/eduprime.service');
 
-// Maps EduPrime 1-7 (Monday=1, Sunday=7) to DAY_NAMES
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+function shouldUnassignRoom(courseCode, courseName) {
+  const keywords = ['library', 'lib', 'sports', 'cca', 'eca', 'cva-l', 'mtp'];
+  const name = (courseName || '').toLowerCase();
+  const code = (courseCode || '').toLowerCase();
+  
+  return keywords.some(kw => name.includes(kw) || code.includes(kw));
+}
 
 async function list(filters) {
   const parsedFilters = { ...filters };
@@ -80,14 +87,17 @@ async function syncEduPrime() {
         // Only insert if times are valid
         if (!startT || !endT) return null;
 
+        const courseNameStr = entry.CourseName || entry.SubjectName || entry.CourseTitle || null;
+        const unassign = shouldUnassignRoom(entry.CourseCode, courseNameStr);
+
         return {
-          resourceId: resource.resourceId,
+          resourceId: unassign ? null : resource.resourceId,
           departmentId: resource.departmentId,
           dayOfWeek: dayName,
           startTime: startT,
           endTime: endT,
           courseCode: entry.CourseCode,
-          courseName: entry.CourseName || entry.SubjectName || entry.CourseTitle || null,
+          courseName: courseNameStr,
           section: resource.allocatedSection,
           academicYear: '2026-27',
           facultyName: entry.PrimaryFacultyName
@@ -135,6 +145,11 @@ async function batchCreate(entries) {
     if (data.endTime) data.endTime = toTimeValue(data.endTime);
     // Remove the temporary 'id' field used by the frontend
     if (data.id) delete data.id;
+    
+    if (shouldUnassignRoom(data.courseCode, data.courseName)) {
+      data.resourceId = null;
+    }
+    
     return data;
   });
 

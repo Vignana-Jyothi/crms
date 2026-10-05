@@ -37,6 +37,36 @@ function dayOfWeekFor(dateStr) {
 async function createBooking({ resourceId, bookingDate, startTime, endTime, purpose }, requesterUserId) {
   const startVal = toTimeValue(startTime);
   const endVal = toTimeValue(endTime);
+
+  if (endVal <= startVal) {
+    throw ApiError.badRequest('End time must be strictly after start time');
+  }
+
+  const [year, month, day] = bookingDate.split('-');
+  const [hours, minutes] = startTime.split(':');
+  const bookingStartLocal = new Date(year, month - 1, day, hours, minutes);
+  const now = new Date();
+  
+  // Set "today" to start of day for date-only comparison
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const bookingDateObj = new Date(year, month - 1, day);
+  
+  if (bookingDateObj < today) {
+    throw ApiError.badRequest('Cannot book a time slot in the past');
+  }
+
+  // Same-day checks
+  if (bookingDateObj.getTime() === today.getTime() && bookingStartLocal < now) {
+    throw ApiError.badRequest('Cannot book a time slot in the past');
+  }
+
+  const maxDate = new Date(today.getTime());
+  maxDate.setDate(maxDate.getDate() + 15);
+  
+  if (bookingDateObj > maxDate) {
+    throw ApiError.badRequest('Cannot book more than 15 days in advance');
+  }
+
   const dayOfWeek = dayOfWeekFor(bookingDate);
 
   return prisma.$transaction(
@@ -226,7 +256,18 @@ async function cancel(bookingId, actingUserId, auth, reason = null) {
         throw ApiError.conflict('Booking was already cancelled or decided');
       }
 
-      if (reason) {
+      const pendingApprovals = await tx.approval.updateMany({
+        where: { bookingId: Number(bookingId), decision: null },
+        data: { 
+          decision: 'Cancelled', 
+          remarks: reason || 'Cancelled by requester', 
+          decisionAt: new Date(),
+          approverUserId: userId
+        }
+      });
+
+      if (pendingApprovals.count === 0 && reason) {
+        // If there were no pending approvals (e.g. it was already approved), create a record to store the cancellation reason
         await tx.approval.create({
           data: {
             bookingId: Number(bookingId),

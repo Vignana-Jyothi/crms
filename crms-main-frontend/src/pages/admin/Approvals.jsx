@@ -27,6 +27,7 @@ export default function Approvals() {
   useEffect(refresh, []);
 
   async function act(approvalId, decision, customRemarks) {
+    if (actingId) return;
     setActingId(approvalId);
     setError('');
     try {
@@ -37,7 +38,6 @@ export default function Approvals() {
         setRejectModalApproval(null);
         setRejectionRemarks('');
       }
-      refresh();
     } catch (err) {
       const msg = err.response?.data?.error || `Failed to ${decision.toLowerCase()} request. Please try again.`;
       if (rejectModalApproval?.approvalId === approvalId) {
@@ -47,6 +47,8 @@ export default function Approvals() {
       }
     } finally {
       setActingId(null);
+      await refresh();
+      window.dispatchEvent(new CustomEvent('approvals-updated'));
     }
   }
 
