@@ -565,7 +565,7 @@ function ResourceCardContent({ r, isFree, occupant, since, until, filterType }) 
                   <>
                     {rawId}
                     {r.resourceName && r.resourceName !== rawId && (
-                      <span className="block text-sm font-normal text-ink/70 mt-0.5">{r.resourceName}</span>
+                      <span className="block text-sm font-medium text-ink/90 mt-0.5">{r.resourceName}</span>
                     )}
                   </>
                );
@@ -586,7 +586,7 @@ function ResourceCardContent({ r, isFree, occupant, since, until, filterType }) 
         </div>
       </div>
       <div className="mt-2">
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink/60">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-medium text-ink/80">
           {r.department && <span>{r.department.departmentName}</span>}
           {r.block && <span>{r.block.blockName}{r.floor ? `, Floor ${r.floor}` : ''}</span>}
           {r.capacityOrAreaSqm && (
