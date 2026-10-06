@@ -197,7 +197,7 @@ export default function TimetablesView() {
                   onClick={() => handleTabChange(tab)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     activeTab === tab && !isEditMode
-                      ? 'bg-indigo-600 text-white shadow-sm'
+                      ? 'bg-navy text-white shadow-sm'
                       : 'text-slate-600 hover:bg-slate-100 hover:text-navy'
                   }`}
                 >
@@ -220,7 +220,7 @@ export default function TimetablesView() {
                   }}
                   className={`flex items-center justify-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl text-sm font-medium transition-colors shadow-sm border ${
                     isUploadModalOpen && uploadModalMode === 'manual'
-                      ? 'bg-indigo-600 text-white border-indigo-600'
+                      ? 'bg-navy text-white border-navy'
                       : 'bg-white text-slate-700 border-line hover:bg-slate-50'
                   }`}
                 >
@@ -242,8 +242,8 @@ export default function TimetablesView() {
               onClick={() => { setIsEditMode(!isEditMode); setActiveTab(''); setIsUploadModalOpen(false); }}
               className={`flex items-center justify-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl text-sm font-medium transition-colors shadow-sm border ml-2 ${
                 isEditMode
-                  ? 'bg-indigo-600 text-white border-indigo-600'
-                  : 'bg-white text-indigo-600 border-line hover:bg-indigo-50'
+                  ? 'bg-navy text-white border-navy'
+                  : 'bg-white text-navy border-line hover:bg-navy/5'
               }`}
             >
               <Edit2 size={18} />
@@ -482,7 +482,7 @@ export default function TimetablesView() {
             <button
               onClick={() => { setViewMode('grid'); }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                viewMode === 'grid' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-navy'
+                viewMode === 'grid' ? 'bg-white text-navy shadow-sm' : 'text-slate-500 hover:text-navy'
               }`}
             >
               <LayoutGrid size={14} />
@@ -491,7 +491,7 @@ export default function TimetablesView() {
             <button
               onClick={() => { setViewMode('list'); }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                viewMode === 'list' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-navy'
+                viewMode === 'list' ? 'bg-white text-navy shadow-sm' : 'text-slate-500 hover:text-navy'
               }`}
             >
               <List size={14} />
