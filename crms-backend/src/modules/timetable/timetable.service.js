@@ -119,7 +119,9 @@ async function update(timetableId, data) {
   if (data.facultyName !== undefined) allowedData.facultyName = data.facultyName;
   if (data.courseCode !== undefined) allowedData.courseCode = data.courseCode;
   if (data.courseName !== undefined) allowedData.courseName = data.courseName;
-  if (data.resourceId !== undefined) allowedData.resourceId = data.resourceId;
+  if (data.resourceId !== undefined) {
+    allowedData.resourceId = data.resourceId === '' ? null : data.resourceId;
+  }
   if (data.section !== undefined) allowedData.section = data.section;
   
   return prisma.timetable.update({

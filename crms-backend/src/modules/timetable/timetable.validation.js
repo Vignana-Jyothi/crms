@@ -8,11 +8,11 @@ const updateTimetableSchema = z.object({
   params: z.object({ timetableId: z.coerce.number().int().positive() }),
   body: z
     .object({
-      facultyName: z.string().trim().min(1).max(100).optional(),
-      courseCode: z.string().trim().min(1).max(20).optional(),
-      courseName: z.string().trim().min(1).max(100).optional(),
-      resourceId: z.string().trim().min(1).max(20).optional(),
-      section: z.string().trim().min(1).max(20).optional(),
+      facultyName: z.string().trim().max(100).optional().nullable(),
+      courseCode: z.string().trim().max(20).optional().nullable(),
+      courseName: z.string().trim().max(100).optional().nullable(),
+      resourceId: z.string().trim().max(20).optional().nullable(),
+      section: z.string().trim().max(20).optional().nullable(),
     })
     .strict(),
 });
