@@ -2,11 +2,21 @@ import React, { useState } from 'react';
 import { timetableApi } from '../../api/endpoints';
 import { Check, X, Edit2 } from 'lucide-react';
 import { fmtTime } from '../../utils/formatters';
+import { useAuth } from '../../context/authStore';
 
 export default function EditableTimetableGrid({ timetables, resources, facultyList = [], setTimetables, readOnly = false }) {
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [saving, setSaving] = useState(false);
+
+  const { user } = useAuth();
+  const allowedDeptIds = user?.roleId === 3 ? [user.departmentId, ...(user.managedDepartments?.map(d => d.departmentId) || [])].filter(Boolean) : null;
+  const canEditDepartment = (deptId) => {
+    if (!user) return false;
+    if (user.roleId === 1 || user.roleId === 2) return true;
+    if (user.roleId === 3 && deptId) return allowedDeptIds.includes(parseInt(deptId));
+    return false;
+  };
 
   const handleEdit = (t) => {
     setEditingId(t.timetableId);
@@ -48,7 +58,7 @@ export default function EditableTimetableGrid({ timetables, resources, facultyLi
       setEditingId(null);
     } catch (err) {
       console.error('Failed to update timetable', err);
-      alert('Failed to update timetable. Please try again.');
+      alert(err.response?.data?.error || 'Failed to update timetable. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -182,13 +192,15 @@ export default function EditableTimetableGrid({ timetables, resources, facultyLi
                         </button>
                       </div>
                     ) : (
-                      <button 
-                        onClick={() => handleEdit(t)}
-                        className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/10 rounded transition-colors"
-                        title="Edit"
-                      >
-                        <Edit2 size={16} />
-                      </button>
+                      canEditDepartment(t.departmentId) ? (
+                        <button 
+                          onClick={() => handleEdit(t)}
+                          className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/10 rounded transition-colors"
+                          title="Edit"
+                        >
+                          <Edit2 size={16} />
+                        </button>
+                      ) : null
                     )}
                   </td>
                 )}

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Check, Edit2 } from 'lucide-react';
 import { fmtTimeSlot } from '../../utils/formatters';
 import { timetableApi } from '../../api/endpoints';
+import { useAuth } from '../../context/authStore';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const TIME_SLOTS_STANDARD = [
@@ -44,6 +45,16 @@ export default function FullWeekTimetableGrid({
   const [editForm, setEditForm] = useState({});
   const [saving, setSaving] = useState(false);
   
+  const { user } = useAuth();
+  
+  const allowedDeptIds = user?.roleId === 3 ? [user.departmentId, ...(user.managedDepartments?.map(d => d.departmentId) || [])].filter(Boolean) : null;
+  const canEditDepartment = (deptId) => {
+    if (!user) return false;
+    if (user.roleId === 1 || user.roleId === 2) return true;
+    if (user.roleId === 3 && deptId) return allowedDeptIds.includes(parseInt(deptId));
+    return false;
+  };
+
   const isFirstYearView = selectedStudentYear === '1' || (timetables.length > 0 && timetables.every(t => t.studentYear === '1'));
   
   const toMins = (t) => {
@@ -184,7 +195,7 @@ export default function FullWeekTimetableGrid({
       setEditingId(null);
     } catch (err) {
       console.error('Failed to save:', err);
-      alert('Failed to save changes. Please try again.');
+      alert(err.response?.data?.error || 'Failed to save changes. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -356,13 +367,19 @@ export default function FullWeekTimetableGrid({
                     <td key={idx} colSpan={colSpan} className={`border-r border-line p-2 text-center align-middle h-full ${!hasClasses && !isEditMode ? (isCellLunch ? 'bg-slate-50/80' : 'bg-slate-50/50') : 'bg-white hover:bg-slate-50 cursor-pointer transition-colors'}`}
                         onClick={() => {
                           if (hasClasses || isEditMode) {
+                            // Only allow adding new classes if a valid department is selected
+                            const canAdd = isEditMode && selectedDepartment && canEditDepartment(selectedDepartment);
+                            
                             setSelectedSlot({ day, start: mergedStart, end: mergedEnd, label: `${day} • ${fmtTimeSlot(`1970-01-01T${mergedStart}:00Z`, `1970-01-01T${mergedEnd}:00Z`)}` });
-                            if (!hasClasses && isEditMode) {
+                            if (!hasClasses && canAdd) {
                               setEditingId('new');
                               setEditForm({
                                 courseCode: '', courseName: '', section: selectedSection || '', facultyName: selectedFaculty || '', resourceId: selectedResource || '',
                                 dayOfWeek: day, startTime: `${mergedStart}:00`, endTime: `${mergedEnd}:00`
                               });
+                            } else if (!hasClasses && isEditMode && !canAdd) {
+                               alert('You must select a Branch/Department that you manage before adding a class.');
+                               setSelectedSlot(null);
                             }
                           }
                         }}>
@@ -501,7 +518,7 @@ export default function FullWeekTimetableGrid({
                           <div className="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-md text-xs font-bold border border-indigo-100 whitespace-nowrap">
                             {c.resource?.resourceName || 'No Room Assigned'}
                           </div>
-                          {isEditMode && (
+                          {isEditMode && canEditDepartment(c.departmentId) && (
                             <button onClick={() => handleEdit(c)} className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors shadow-sm border border-transparent hover:border-indigo-100">
                               <Edit2 size={16} />
                             </button>
@@ -562,7 +579,7 @@ export default function FullWeekTimetableGrid({
                 </div>
               )}
               
-              {isEditMode && editingId !== 'new' && getClassesForSlot(selectedSlot.day, selectedSlot.start, selectedSlot.end).length > 0 && (
+              {isEditMode && editingId !== 'new' && selectedDepartment && canEditDepartment(selectedDepartment) && getClassesForSlot(selectedSlot.day, selectedSlot.start, selectedSlot.end).length > 0 && (
                 <button 
                   onClick={() => {
                     setEditingId('new');
