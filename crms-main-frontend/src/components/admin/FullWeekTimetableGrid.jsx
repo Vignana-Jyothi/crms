@@ -174,9 +174,11 @@ export default function FullWeekTimetableGrid({
         setTimetables(prev => [...prev, newRecord]);
       } else {
         const payload = {
-          ...editForm,
-          startTime: `1970-01-01T${editForm.startTime}:00Z`,
-          endTime: `1970-01-01T${editForm.endTime}:00Z`
+          facultyName: editForm.facultyName,
+          courseCode: editForm.courseCode,
+          courseName: editForm.courseName,
+          resourceId: editForm.resourceId,
+          section: editForm.section
         };
         const updated = await timetableApi.update(id, payload);
         setTimetables(prev => prev.map(t => t.timetableId === id ? updated : t));
@@ -470,7 +472,7 @@ export default function FullWeekTimetableGrid({
                         </div>
                         <div>
                           <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Classroom</label>
-                          <select value={editForm.resourceId} onChange={e => setEditForm({...editForm, resourceId: e.target.value ? parseInt(e.target.value) : ''})} className="w-full p-2 border border-line rounded-lg text-sm bg-slate-50" disabled={saving}>
+                          <select value={editForm.resourceId} onChange={e => setEditForm({...editForm, resourceId: e.target.value ? e.target.value : ''})} className="w-full p-2 border border-line rounded-lg text-sm bg-slate-50" disabled={saving}>
                             <option value="">No Room</option>
                             {resources.map(r => (
                               <option key={r.resourceId} value={r.resourceId}>{r.resourceName}</option>
