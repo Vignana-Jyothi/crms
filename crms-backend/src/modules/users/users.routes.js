@@ -30,7 +30,7 @@ router.post(
   '/',
   authorizeRole(ROLES.SUPER_ADMIN),
   asyncHandler(async (req, res) => {
-    const { name, email, phone, roleId, departmentId, notes, roomNo } = req.body;
+    const { name, email, phone, roleId, departmentId, managedDepartmentIds, notes, roomNo } = req.body;
 
     if (!name || !email || !phone || !roleId) {
       throw ApiError.badRequest('name, email, phone, and roleId are required');
@@ -54,6 +54,9 @@ router.post(
       phone,
       roleId,
       departmentId: departmentId ?? null,
+      managedDepartments: managedDepartmentIds && managedDepartmentIds.length > 0 ? {
+        connect: managedDepartmentIds.map(id => ({ departmentId: id }))
+      } : undefined,
       notes: notes || null,
       roomNo: roomNo || null,
       passwordHash,
@@ -132,14 +135,14 @@ router.patch(
   '/:userId/role',
   authorizeRole(ROLES.SUPER_ADMIN),
   asyncHandler(async (req, res) => {
-    const { roleId, departmentId } = req.body;
+    const { roleId, departmentId, managedDepartmentIds } = req.body;
     if (!VALID_ROLE_IDS.has(Number(roleId))) {
       throw ApiError.badRequest('roleId must be a valid role');
     }
     if (Number(roleId) === ROLES.DEPARTMENT_ADMIN && !departmentId) {
       throw ApiError.badRequest('departmentId is required for Department Admin users');
     }
-    const updated = await repo.updateRole(Number(req.params.userId), roleId, departmentId ?? null);
+    const updated = await repo.updateRole(Number(req.params.userId), roleId, departmentId ?? null, managedDepartmentIds || []);
     await auditService.log({
       userId: req.auth.userId,
       action: 'CHANGE_USER_ROLE',

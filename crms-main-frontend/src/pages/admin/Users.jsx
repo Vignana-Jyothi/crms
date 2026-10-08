@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { masterDataApi, usersApi, authApi } from '../../api/endpoints';
 
-const EMPTY_FORM = { name: '', email: '', phone: '', roleId: '', departmentId: '' };
+const EMPTY_FORM = { name: '', email: '', phone: '', roleId: '', departmentId: '', managedDepartmentIds: [] };
 
 export default function Users() {
   const [users, setUsers] = useState([]);
@@ -51,6 +51,7 @@ export default function Users() {
         ...form,
         roleId: form.roleId ? Number(form.roleId) : undefined,
         departmentId: form.departmentId ? Number(form.departmentId) : null,
+        managedDepartmentIds: form.managedDepartmentIds.map(Number)
       });
       setTempPasswordFor(created);
       setForm(EMPTY_FORM);
@@ -70,6 +71,7 @@ export default function Users() {
     setActionAlert(null);
     setSubmitting(true);
     try {
+      await usersApi.updateRole(editUser.userId, Number(editForm.roleId), editForm.departmentId ? Number(editForm.departmentId) : null, editForm.managedDepartmentIds.map(Number));
       await usersApi.update(editUser.userId, {
         name: editForm.name,
         email: editForm.email,
@@ -86,10 +88,10 @@ export default function Users() {
     }
   }
 
-  async function changeRole(userId, roleId, departmentId) {
+  async function changeRole(userId, roleId, departmentId, managedDepartmentIds = []) {
     setActionAlert(null);
     try {
-      await usersApi.updateRole(userId, Number(roleId), departmentId ? Number(departmentId) : null);
+      await usersApi.updateRole(userId, Number(roleId), departmentId ? Number(departmentId) : null, managedDepartmentIds);
       setActionAlert({ type: 'success', message: 'User role/department updated successfully.' });
       refresh();
     } catch (err) {
@@ -254,11 +256,30 @@ export default function Users() {
               onChange={(e) => setForm((f) => ({ ...f, departmentId: e.target.value }))}
               className="rounded border border-line px-3 py-2 text-sm"
             >
-              <option value="">No department</option>
+              <option value="">No primary department</option>
               {departments.map((d) => (
                 <option key={d.departmentId} value={d.departmentId}>{d.departmentName}</option>
               ))}
             </select>
+            {form.roleId == '3' && ( // Only show if Department Admin (roleId=3)
+              <div className="col-span-2 sm:col-span-3">
+                <label className="block text-xs font-semibold text-ink/70 mb-1">Additional Managed Departments</label>
+                <select
+                  multiple
+                  value={form.managedDepartmentIds}
+                  onChange={(e) => {
+                    const selectedOptions = Array.from(e.target.selectedOptions).map(opt => opt.value);
+                    setForm(f => ({ ...f, managedDepartmentIds: selectedOptions }));
+                  }}
+                  className="w-full rounded border border-line px-3 py-2 text-sm h-24"
+                >
+                  {departments.map((d) => (
+                    <option key={d.departmentId} value={d.departmentId}>{d.departmentName}</option>
+                  ))}
+                </select>
+                <p className="text-[10px] text-ink/50 mt-1">Hold Ctrl/Cmd to select multiple. Only needed if they manage more than one department.</p>
+              </div>
+            )}
           </div>
 
           {error && <p className="mt-4 rounded bg-brick-light px-3 py-2 text-sm text-brick">{error}</p>}
@@ -298,7 +319,7 @@ export default function Users() {
                 <td className="px-4 py-3">
                   <select
                     value={u.roleId || ''}
-                    onChange={(e) => changeRole(u.userId, e.target.value, u.departmentId)}
+                    onChange={(e) => changeRole(u.userId, e.target.value, u.departmentId, u.managedDepartments?.map(d => d.departmentId) || [])}
                     className="rounded border border-line px-2 py-1 text-xs"
                   >
                     {roles.map((r) => (
@@ -309,7 +330,7 @@ export default function Users() {
                 <td className="px-4 py-3">
                   <select
                     value={u.departmentId || ''}
-                    onChange={(e) => changeRole(u.userId, u.roleId, e.target.value)}
+                    onChange={(e) => changeRole(u.userId, u.roleId, e.target.value, u.managedDepartments?.map(d => d.departmentId) || [])}
                     className="rounded border border-line px-2 py-1 text-xs max-w-[180px] truncate"
                   >
                     <option value="">No department</option>
@@ -326,7 +347,14 @@ export default function Users() {
                     <button
                       onClick={() => {
                         setEditUser(u);
-                        setEditForm({ name: u.name, email: u.email || '', phone: u.phone, roleId: u.roleId, departmentId: u.departmentId });
+                        setEditForm({ 
+                          name: u.name, 
+                          email: u.email || '', 
+                          phone: u.phone, 
+                          roleId: u.roleId, 
+                          departmentId: u.departmentId,
+                          managedDepartmentIds: u.managedDepartments?.map(d => d.departmentId) || []
+                        });
                       }}
                       className="text-xs font-semibold text-navy hover:underline"
                     >
@@ -381,7 +409,7 @@ export default function Users() {
                   <label className="block text-[10px] uppercase font-bold text-ink/50 mb-1 tracking-wide">Role</label>
                   <select
                     value={u.roleId || ''}
-                    onChange={(e) => changeRole(u.userId, e.target.value, u.departmentId)}
+                    onChange={(e) => changeRole(u.userId, e.target.value, u.departmentId, u.managedDepartments?.map(d => d.departmentId) || [])}
                     className="w-full rounded border border-line px-2 py-1.5 text-xs focus:border-navy"
                   >
                     {roles.map((r) => (
@@ -393,7 +421,7 @@ export default function Users() {
                   <label className="block text-[10px] uppercase font-bold text-ink/50 mb-1 tracking-wide">Department</label>
                   <select
                     value={u.departmentId || ''}
-                    onChange={(e) => changeRole(u.userId, u.roleId, e.target.value)}
+                    onChange={(e) => changeRole(u.userId, u.roleId, e.target.value, u.managedDepartments?.map(d => d.departmentId) || [])}
                     className="w-full rounded border border-line px-2 py-1.5 text-xs focus:border-navy"
                   >
                     <option value="">No department</option>
@@ -408,7 +436,14 @@ export default function Users() {
                 <button
                   onClick={() => {
                     setEditUser(u);
-                    setEditForm({ name: u.name, email: u.email || '', phone: u.phone, roleId: u.roleId, departmentId: u.departmentId });
+                    setEditForm({ 
+                      name: u.name, 
+                      email: u.email || '', 
+                      phone: u.phone, 
+                      roleId: u.roleId, 
+                      departmentId: u.departmentId,
+                      managedDepartmentIds: u.managedDepartments?.map(d => d.departmentId) || []
+                    });
                   }}
                   className="text-xs font-semibold text-navy hover:underline"
                 >
@@ -550,6 +585,26 @@ export default function Users() {
                   className="w-full rounded border border-line p-2 text-xs focus:border-navy focus:outline-none"
                 />
               </div>
+
+              {editForm.roleId == '3' && (
+                <div>
+                  <label className="block text-xs font-semibold text-ink/70 mb-1">Additional Managed Departments</label>
+                  <select
+                    multiple
+                    value={editForm.managedDepartmentIds}
+                    onChange={(e) => {
+                      const selectedOptions = Array.from(e.target.selectedOptions).map(opt => opt.value);
+                      setEditForm(f => ({ ...f, managedDepartmentIds: selectedOptions }));
+                    }}
+                    className="w-full rounded border border-line p-2 text-xs focus:border-navy focus:outline-none h-24"
+                  >
+                    {departments.map((d) => (
+                      <option key={d.departmentId} value={d.departmentId}>{d.departmentName}</option>
+                    ))}
+                  </select>
+                  <p className="text-[10px] text-ink/50 mt-1">Hold Ctrl/Cmd to select multiple.</p>
+                </div>
+              )}
 
               <div className="mt-5 flex justify-end gap-3">
                 <button

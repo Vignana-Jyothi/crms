@@ -33,7 +33,10 @@ module.exports = async function authenticate(req, res, next) {
     }
 
     // Lookup user by email in the local database
-    let user = await prisma.user.findUnique({ where: { email } });
+    let user = await prisma.user.findUnique({ 
+      where: { email },
+      include: { managedDepartments: true }
+    });
 
     // Auto-provision if user does not exist (default to Requester role)
     if (!user) {
@@ -56,6 +59,7 @@ module.exports = async function authenticate(req, res, next) {
       userId: user.userId,
       roleId: user.roleId,
       departmentId: user.departmentId,
+      managedDepartmentIds: user.managedDepartments ? user.managedDepartments.map(d => d.departmentId) : []
     };
     next();
   } catch (err) {

@@ -49,6 +49,7 @@ model Department {
   resources Resource[]
   timetable Timetable[]
   announcements Announcement[]
+  managers User[] @relation("ManagedDepartments")
 
   @@map("departments")
 }
@@ -123,6 +124,7 @@ model User {
   approvalsGiven Approval[] @relation("ApprovalApprover")
   announcementsPosted Announcement[] @relation("AnnouncementPoster")
   auditLogs AuditLog[]
+  managedDepartments Department[] @relation("ManagedDepartments")
 
   @@map("users")
 }
