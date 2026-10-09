@@ -17,13 +17,13 @@ const syncEduPrime = asyncHandler(async (req, res) => {
 });
 
 const update = asyncHandler(async (req, res) => {
-  const result = await service.update(req.params.timetableId, req.body);
+  const result = await service.update(req.params.timetableId, req.body, req.auth);
   cache.flushAll(); // Invalidate timetable cache
   res.json(result);
 });
 
 const create = asyncHandler(async (req, res) => {
-  const result = await service.create(req.body);
+  const result = await service.create(req.body, req.auth);
   cache.flushAll(); // Invalidate timetable cache
   res.json(result);
 });

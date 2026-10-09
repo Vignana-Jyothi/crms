@@ -114,7 +114,14 @@ async function syncEduPrime() {
   return { success: true, totalSynced };
 }
 
-async function update(timetableId, data) {
+async function update(timetableId, data, auth) {
+  const existing = await getById(timetableId);
+  if (auth && auth.roleId === 3) {
+    if (!auth.managedDepartmentIds || !auth.managedDepartmentIds.includes(existing.departmentId)) {
+      throw ApiError.forbidden("You are not authorized to update timetables for this department.");
+    }
+  }
+
   const allowedData = {};
   if (data.facultyName !== undefined) allowedData.facultyName = data.facultyName;
   if (data.courseCode !== undefined) allowedData.courseCode = data.courseCode;
@@ -130,7 +137,13 @@ async function update(timetableId, data) {
   });
 }
 
-async function create(data) {
+async function create(data, auth) {
+  if (auth && auth.roleId === 3) {
+    if (!auth.managedDepartmentIds || !auth.managedDepartmentIds.includes(data.departmentId)) {
+      throw ApiError.forbidden("You are not authorized to create timetables for this department.");
+    }
+  }
+
   if (data.startTime) data.startTime = toTimeValue(data.startTime);
   if (data.endTime) data.endTime = toTimeValue(data.endTime);
   return repo.create(data);
