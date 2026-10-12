@@ -149,6 +149,8 @@ model Timetable {
   department Department? @relation(fields: [departmentId], references: [departmentId])
   uploadedBy User? @relation("TimetableUploader", fields: [uploadedByUserId], references: [userId])
 
+  @@index([dayOfWeek, resourceId])
+  @@index([departmentId, studentYear, section, dayOfWeek])
   @@map("timetable")
 }
 
@@ -167,6 +169,9 @@ model Booking {
   requester User? @relation("BookingRequester", fields: [requesterUserId], references: [userId])
   approvals Approval[]
 
+  @@index([bookingDate, status])
+  @@index([resourceId, bookingDate])
+  @@index([requesterUserId])
   @@map("bookings")
 }
 

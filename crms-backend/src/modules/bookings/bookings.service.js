@@ -5,6 +5,7 @@ const resourcesService = require('../resources/resources.service');
 const auditService = require('../audit/audit.service');
 const { ROLES } = require('../../middleware/authorizeRole');
 const notifications = require('../notifications/notifications.service');
+const { getCached, setCached, invalidateKeys } = require('../../config/redis');
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -69,8 +70,11 @@ async function createBooking({ resourceId, bookingDate, startTime, endTime, purp
 
   const dayOfWeek = dayOfWeekFor(bookingDate);
 
-  return prisma.$transaction(
+  const result = await prisma.$transaction(
     async (tx) => {
+      // Row lock on the resource to strictly serialize concurrent bookings on this specific room
+      await tx.$queryRaw`SELECT 1 FROM resources WHERE resource_id = ${resourceId} FOR UPDATE`;
+
       const resource = await tx.resource.findUnique({
         where: { resourceId },
         include: { resourceType: true },
@@ -167,9 +171,18 @@ async function createBooking({ resourceId, bookingDate, startTime, endTime, purp
     },
     { isolationLevel: 'Serializable' }
   );
+
+  // Invalidate cached availability for this resource asynchronously
+  invalidateKeys(`avail:${resourceId}:*`).catch(() => {});
+
+  return result;
 }
 
 async function getAvailability(resourceId, date) {
+  const cacheKey = `avail:${resourceId}:${date}`;
+  const cached = await getCached(cacheKey);
+  if (cached) return cached;
+
   const resource = await prisma.resource.findUnique({ where: { resourceId } });
   if (!resource) throw ApiError.notFound(`Resource ${resourceId} not found`);
 
@@ -185,7 +198,7 @@ async function getAvailability(resourceId, date) {
     }),
   ]);
 
-  return {
+  const availability = {
     resourceId,
     date,
     dayOfWeek,
@@ -207,6 +220,11 @@ async function getAvailability(resourceId, date) {
       requester: b.requester
     })),
   };
+
+  // Cache for 120 seconds in Redis
+  await setCached(cacheKey, availability, 120);
+
+  return availability;
 }
 
 async function getById(bookingId, auth) {
@@ -293,6 +311,13 @@ async function cancel(bookingId, actingUserId, auth, reason = null) {
     },
     { isolationLevel: 'Serializable' }
   );
+
+  // Invalidate cached availability for the room
+  if (booking.resourceId) {
+    invalidateKeys(`avail:${booking.resourceId}:*`).catch(() => {});
+  }
+
+  return updated;
 }
 
 async function getLiveStatus(dateInput, startTimeInput, endTimeInput) {

@@ -31,7 +31,8 @@ COPY --from=prisma-build /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=prisma-build /app/node_modules/@prisma/client ./node_modules/@prisma/client
 COPY prisma ./prisma
 COPY src ./src
+COPY ecosystem.config.js ./ecosystem.config.js
 
 EXPOSE 4000
 
-CMD ["node", "src/server.js"]
+CMD ["npx", "pm2-runtime", "ecosystem.config.js"]
