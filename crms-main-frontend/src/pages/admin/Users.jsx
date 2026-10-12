@@ -120,6 +120,26 @@ export default function Users() {
     }
   }
 
+  async function handleDeleteUser(user) {
+    if (!window.confirm(`Are you sure you want to permanently remove "${user.name}"? This action cannot be undone.`)) {
+      return;
+    }
+    setActionAlert(null);
+    try {
+      await usersApi.remove(user.userId);
+      setActionAlert({
+        type: 'success',
+        message: `User "${user.name}" removed successfully.`,
+      });
+      refresh();
+    } catch (err) {
+      setActionAlert({
+        type: 'error',
+        message: err.response?.data?.error || 'Failed to delete user.',
+      });
+    }
+  }
+
   async function handlePasswordResetSubmit(e) {
     e.preventDefault();
     setResetPasswordError('');
@@ -263,21 +283,40 @@ export default function Users() {
             </select>
             {form.roleId == '3' && ( // Only show if Department Admin (roleId=3)
               <div className="col-span-2 sm:col-span-3">
-                <label className="block text-xs font-semibold text-ink/70 mb-1">Additional Managed Departments</label>
-                <select
-                  multiple
-                  value={form.managedDepartmentIds}
-                  onChange={(e) => {
-                    const selectedOptions = Array.from(e.target.selectedOptions).map(opt => opt.value);
-                    setForm(f => ({ ...f, managedDepartmentIds: selectedOptions }));
-                  }}
-                  className="w-full rounded border border-line px-3 py-2 text-sm h-24"
-                >
-                  {departments.map((d) => (
-                    <option key={d.departmentId} value={d.departmentId}>{d.departmentName}</option>
-                  ))}
-                </select>
-                <p className="text-[10px] text-ink/50 mt-1">Hold Ctrl/Cmd to select multiple. Only needed if they manage more than one department.</p>
+                <label className="block text-xs font-semibold text-ink/70 mb-1.5">
+                  Managed Departments (Select all departments this HOD oversees)
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3 bg-paper/50 rounded-lg border border-line max-h-44 overflow-y-auto">
+                  {departments.map((d) => {
+                    const isChecked = form.managedDepartmentIds.some(id => String(id) === String(d.departmentId));
+                    return (
+                      <label
+                        key={d.departmentId}
+                        className={`flex items-center gap-2 p-2 rounded border cursor-pointer text-xs transition-colors ${
+                          isChecked
+                            ? 'bg-navy/5 border-navy/40 font-medium text-navy'
+                            : 'bg-white border-line text-ink/80 hover:bg-paper'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(e) => {
+                            setForm((f) => {
+                              const updated = e.target.checked
+                                ? [...f.managedDepartmentIds, d.departmentId]
+                                : f.managedDepartmentIds.filter(id => String(id) !== String(d.departmentId));
+                              return { ...f, managedDepartmentIds: updated };
+                            });
+                          }}
+                          className="rounded border-line text-navy focus:ring-navy w-4 h-4 cursor-pointer"
+                        />
+                        <span className="truncate">{d.departmentName}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+                <p className="text-[11px] text-ink/50 mt-1">Check all departments that this HOD oversees.</p>
               </div>
             )}
           </div>
@@ -313,7 +352,15 @@ export default function Users() {
               <tr key={u.userId} className="hover:bg-paper/30">
                 <td className="px-4 py-3 font-medium text-ink">{u.name}</td>
                 <td className="px-4 py-3 text-ink/60">
-                  <div className="font-mono text-xs">{u.phone}</div>
+                  <div className="font-mono text-xs">
+                    {u.phone === '0000000000' || !u.phone ? (
+                      <span className="inline-flex items-center gap-1 rounded bg-amber/15 px-1.5 py-0.5 text-[11px] font-sans text-amber-800">
+                        Not added yet
+                      </span>
+                    ) : (
+                      u.phone
+                    )}
+                  </div>
                   {u.email && <div className="text-xs text-ink/40">{u.email}</div>}
                 </td>
                 <td className="px-4 py-3">
@@ -338,6 +385,15 @@ export default function Users() {
                       <option key={d.departmentId} value={d.departmentId}>{d.departmentName}</option>
                     ))}
                   </select>
+                  {u.roleId === 3 && u.managedDepartments?.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1 max-w-[200px]">
+                      {u.managedDepartments.map(d => (
+                        <span key={d.departmentId} className="inline-block px-1.5 py-0.5 rounded text-[10px] bg-paper text-navy font-medium border border-line" title={d.departmentName}>
+                          {d.branchCode || d.departmentName}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </td>
                 <td className="px-4 py-3">
                   <span className={u.status === 'Active' ? 'text-forest font-medium' : 'text-ink/40'}>{u.status}</span>
@@ -374,6 +430,13 @@ export default function Users() {
                     <button onClick={() => toggleStatus(u)} className="text-xs font-medium text-navy hover:underline">
                       {u.status === 'Active' ? 'Deactivate' : 'Reactivate'}
                     </button>
+                    <button
+                      onClick={() => handleDeleteUser(u)}
+                      className="text-xs font-medium text-brick hover:underline"
+                      title="Permanently remove user"
+                    >
+                      Delete
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -397,7 +460,15 @@ export default function Users() {
                 <div>
                   <h3 className="font-semibold text-navy text-base">{u.name}</h3>
                   <p className="mt-0.5 text-xs text-ink/60">{u.email}</p>
-                  <p className="mt-0.5 font-mono text-xs text-ink/50">{u.phone}</p>
+                  <p className="mt-0.5 font-mono text-xs text-ink/50">
+                    {u.phone === '0000000000' || !u.phone ? (
+                      <span className="inline-flex items-center gap-1 rounded bg-amber/15 px-1.5 py-0.5 text-[10px] font-sans text-amber-800">
+                        Phone not added
+                      </span>
+                    ) : (
+                      u.phone
+                    )}
+                  </p>
                 </div>
                 <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${u.status === 'Active' ? 'bg-forest-light text-forest' : 'bg-ink/10 text-ink/50'}`}>
                   {u.status}
@@ -429,6 +500,15 @@ export default function Users() {
                       <option key={d.departmentId} value={d.departmentId}>{d.departmentName}</option>
                     ))}
                   </select>
+                  {u.roleId === 3 && u.managedDepartments?.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1.5">
+                      {u.managedDepartments.map(d => (
+                        <span key={d.departmentId} className="inline-block px-1.5 py-0.5 rounded text-[10px] bg-paper text-navy font-medium border border-line">
+                          {d.branchCode || d.departmentName}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -462,6 +542,12 @@ export default function Users() {
                 </button>
                 <button onClick={() => toggleStatus(u)} className="text-xs font-medium text-navy hover:underline">
                   {u.status === 'Active' ? 'Deactivate' : 'Reactivate'}
+                </button>
+                <button
+                  onClick={() => handleDeleteUser(u)}
+                  className="text-xs font-medium text-brick hover:underline"
+                >
+                  Delete
                 </button>
               </div>
             </div>
@@ -588,21 +674,38 @@ export default function Users() {
 
               {editForm.roleId == '3' && (
                 <div>
-                  <label className="block text-xs font-semibold text-ink/70 mb-1">Additional Managed Departments</label>
-                  <select
-                    multiple
-                    value={editForm.managedDepartmentIds}
-                    onChange={(e) => {
-                      const selectedOptions = Array.from(e.target.selectedOptions).map(opt => opt.value);
-                      setEditForm(f => ({ ...f, managedDepartmentIds: selectedOptions }));
-                    }}
-                    className="w-full rounded border border-line p-2 text-xs focus:border-navy focus:outline-none h-24"
-                  >
-                    {departments.map((d) => (
-                      <option key={d.departmentId} value={d.departmentId}>{d.departmentName}</option>
-                    ))}
-                  </select>
-                  <p className="text-[10px] text-ink/50 mt-1">Hold Ctrl/Cmd to select multiple.</p>
+                  <label className="block text-xs font-semibold text-ink/70 mb-1.5">Managed Departments</label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3 bg-paper/50 rounded-lg border border-line max-h-44 overflow-y-auto">
+                    {departments.map((d) => {
+                      const isChecked = editForm.managedDepartmentIds.some(id => String(id) === String(d.departmentId));
+                      return (
+                        <label
+                          key={d.departmentId}
+                          className={`flex items-center gap-2 p-2 rounded border cursor-pointer text-xs transition-colors ${
+                            isChecked
+                              ? 'bg-navy/5 border-navy/40 font-medium text-navy'
+                              : 'bg-white border-line text-ink/80 hover:bg-paper'
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={(e) => {
+                              setEditForm((f) => {
+                                const updated = e.target.checked
+                                  ? [...f.managedDepartmentIds, d.departmentId]
+                                  : f.managedDepartmentIds.filter(id => String(id) !== String(d.departmentId));
+                                return { ...f, managedDepartmentIds: updated };
+                              });
+                            }}
+                            className="rounded border-line text-navy focus:ring-navy w-4 h-4 cursor-pointer"
+                          />
+                          <span className="truncate">{d.departmentName}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                  <p className="text-[11px] text-ink/50 mt-1">Check all departments that this HOD oversees.</p>
                 </div>
               )}
 

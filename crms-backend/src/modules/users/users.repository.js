@@ -33,9 +33,10 @@ const updateRole = (userId, roleId, departmentId, managedDepartmentIds = []) =>
 const updateStatus = (userId, status) =>
   prisma.user.update({ where: { userId }, data: { status }, select: SAFE_SELECT });
 
-const create = (data) => prisma.user.create({ data, select: SAFE_SELECT });
-
 const update = (userId, data) => 
   prisma.user.update({ where: { userId }, data, select: SAFE_SELECT });
 
-module.exports = { list, findById, updateRole, updateStatus, create, update };
+const deleteUser = (userId) =>
+  prisma.user.delete({ where: { userId } });
+
+module.exports = { list, findById, updateRole, updateStatus, create, update, deleteUser };

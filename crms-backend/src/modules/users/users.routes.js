@@ -117,6 +117,33 @@ router.get(
   })
 );
 
+// Any authenticated user can update their own profile details (phone, name, roomNo)
+router.patch(
+  '/me',
+  asyncHandler(async (req, res) => {
+    const { name, phone, roomNo } = req.body;
+    const data = {};
+    if (name !== undefined) data.name = name.trim();
+    if (roomNo !== undefined) data.roomNo = roomNo;
+    if (phone !== undefined) {
+      if (phone && !PHONE_REGEX.test(phone)) {
+        throw ApiError.badRequest('phone must be a valid 10-digit Indian mobile number');
+      }
+      data.phone = phone;
+    }
+
+    const updated = await repo.update(req.auth.userId, data);
+    await auditService.log({
+      userId: req.auth.userId,
+      action: 'UPDATE_PROFILE',
+      entityType: 'user',
+      entityId: req.auth.userId,
+      details: `Profile updated by user: phone -> ${phone || 'unchanged'}`,
+    });
+    res.json(updated);
+  })
+);
+
 router.get(
   '/:userId',
   asyncHandler(async (req, res) => {
@@ -173,6 +200,32 @@ router.put(
     });
     
     res.json(updated);
+  })
+);
+
+// Super Admin can delete a user (e.g. invalid, duplicate, or mock users)
+router.delete(
+  '/:userId',
+  authorizeRole(ROLES.SUPER_ADMIN),
+  asyncHandler(async (req, res) => {
+    const targetUserId = Number(req.params.userId);
+    if (targetUserId === req.auth.userId) {
+      throw ApiError.badRequest('You cannot delete your own admin account');
+    }
+    const targetUser = await repo.findById(targetUserId);
+    if (!targetUser) throw ApiError.notFound('User not found');
+
+    await repo.deleteUser(targetUserId);
+
+    await auditService.log({
+      userId: req.auth.userId,
+      action: 'DELETE_USER',
+      entityType: 'user',
+      entityId: targetUserId,
+      details: `Deleted user: ${targetUser.name} (${targetUser.email || targetUser.phone})`,
+    });
+
+    res.json({ success: true, message: `User "${targetUser.name}" has been removed.` });
   })
 );
 

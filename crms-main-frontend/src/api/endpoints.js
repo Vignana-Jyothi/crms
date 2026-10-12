@@ -9,12 +9,16 @@ export const usersApi = {
   me: () => client.get('/users/me').then((r) => r.data),
   list: (departmentId) => client.get('/users', { params: { departmentId } }).then((r) => r.data),
   create: (payload) => client.post('/users', payload).then((r) => r.data),
-  updateRole: (userId, roleId, departmentId) =>
-    client.patch(`/users/${userId}/role`, { roleId, departmentId }).then((r) => r.data),
+  updateRole: (userId, roleId, departmentId, managedDepartmentIds = []) =>
+    client.patch(`/users/${userId}/role`, { roleId, departmentId, managedDepartmentIds }).then((r) => r.data),
   updateStatus: (userId, status) =>
     client.patch(`/users/${userId}/status`, { status }).then((r) => r.data),
   update: (userId, data) => 
     client.put(`/users/${userId}`, data).then((r) => r.data),
+  updateProfile: (data) =>
+    client.patch('/users/me', data).then((r) => r.data),
+  remove: (userId) =>
+    client.delete(`/users/${userId}`).then((r) => r.data),
 };
 
 export const masterDataApi = {
