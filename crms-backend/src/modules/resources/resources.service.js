@@ -126,13 +126,21 @@ async function aiRecommend({ query, date, startTime, endTime, capacity, blockId,
       }
     }
 
-    // Extract block hints: e.g., "in b block", "in block e", but NOT "all blocks"
+    // Extract block hints: e.g., "in block A", "block a", "a-block", "b block"
     if (!targetBlockId && !q.includes('all blocks') && !q.includes('any block')) {
-      const blockMatch = q.match(/\b(?:block\s*([a-zA-Z0-9]+)|([a-zA-Z0-9]+)\s*block)\b/i);
+      // Matches "block A", "block-a", "block: a", "a block", "a-block"
+      const blockMatch = q.match(/\bblock\s*[:\-\s]?\s*([a-zA-Z0-9]+)\b/i) || q.match(/\b([a-zA-Z0-9]+)\s*[\-]?block\b/i);
       if (blockMatch) {
-        const candidate = (blockMatch[1] || blockMatch[2]).toUpperCase();
+        const candidate = (blockMatch[1]).toUpperCase();
         if (candidate !== 'ALL' && candidate !== 'ANY') {
-          const foundBlock = await prisma.block.findFirst({ where: { blockCode: candidate } });
+          const foundBlock = await prisma.block.findFirst({
+            where: {
+              OR: [
+                { blockCode: candidate },
+                { blockName: { contains: candidate, mode: 'insensitive' } }
+              ]
+            }
+          });
           if (foundBlock) targetBlockId = foundBlock.blockId;
         }
       }
@@ -154,11 +162,17 @@ async function aiRecommend({ query, date, startTime, endTime, capacity, blockId,
   const availableRooms = liveStatusList.filter(r => r.isFree);
 
   // 4. Enrich with full database details for accurate scoring
+  // If targetBlockId was explicitly requested by user (e.g. "in block A"), strictly filter to that block!
+  const whereClause = {
+    resourceId: { in: availableRooms.map(r => r.resourceId) },
+    status: 'Active'
+  };
+  if (targetBlockId) {
+    whereClause.blockId = targetBlockId;
+  }
+
   const enrichedRooms = await prisma.resource.findMany({
-    where: {
-      resourceId: { in: availableRooms.map(r => r.resourceId) },
-      status: 'Active'
-    },
+    where: whereClause,
     include: {
       resourceType: true,
       department: true,
@@ -180,7 +194,6 @@ async function aiRecommend({ query, date, startTime, endTime, capacity, blockId,
         // Room accommodates requested crowd
         const ratio = targetCapacity / roomCapacity;
         if (ratio >= 0.7) {
-          // Optimal fit (not oversized, not wasted)
           score += 25;
           reasons.push(`Optimal seating size (${Math.floor(roomCapacity)} capacity for ~${targetCapacity} people)`);
           tags.push('Optimal Capacity');
@@ -192,8 +205,9 @@ async function aiRecommend({ query, date, startTime, endTime, capacity, blockId,
           reasons.push(`High capacity hall (${Math.floor(roomCapacity)} seats)`);
         }
       } else {
-        // Undersized room penalty
-        score -= 30;
+        // Severe penalty for failing capacity requirement
+        const underRatio = roomCapacity / targetCapacity;
+        score -= Math.round(40 * (1 - underRatio) + 15);
         reasons.push(`Under required capacity (${Math.floor(roomCapacity)} < ${targetCapacity})`);
       }
     } else {
@@ -214,7 +228,7 @@ async function aiRecommend({ query, date, startTime, endTime, capacity, blockId,
     // Block / Location Match
     if (targetBlockId && room.blockId === targetBlockId) {
       score += 15;
-      reasons.push(`Located in preferred Block ${room.block?.blockCode}`);
+      reasons.push(`Located in Block ${room.block?.blockCode}`);
       tags.push(`Block ${room.block?.blockCode}`);
     }
 
@@ -231,8 +245,8 @@ async function aiRecommend({ query, date, startTime, endTime, capacity, blockId,
       tags.push('Easy Ground Access');
     }
 
-    // Clamp score to 100
-    const matchPercentage = Math.min(99, Math.max(40, score));
+    // Cap score at 99 max
+    const matchPercentage = Math.min(99, Math.max(0, score));
 
     return {
       resourceId: room.resourceId,
@@ -261,30 +275,24 @@ async function aiRecommend({ query, date, startTime, endTime, capacity, blockId,
     const matchingTypeRooms = enrichedRooms.filter(r => r.resourceTypeId === targetTypeId);
     const otherTypeRooms = enrichedRooms.filter(r => r.resourceTypeId !== targetTypeId);
 
-    // Score primary matching rooms
-    // If target capacity was requested and classrooms don't reach it, sort them so largest classrooms across different blocks come first!
+    // Score primary matching rooms and filter out poor matches under 50%
     primaryRecommendations = matchingTypeRooms
       .map(r => scoreRoom(r, false))
-      .sort((a, b) => {
-        // If both are under capacity, prefer larger capacity first
-        if (targetCapacity && a.capacity < targetCapacity && b.capacity < targetCapacity) {
-          if (b.capacity !== a.capacity) {
-            return b.capacity - a.capacity;
-          }
-        }
-        return b.matchScore - a.matchScore;
-      });
+      .filter(r => r.matchScore >= 50)
+      .sort((a, b) => b.matchScore - a.matchScore);
 
-    // If target capacity requested, find alternative types that actually satisfy the capacity across all blocks!
+    // If target capacity requested, find alternative types that actually satisfy the capacity!
     if (targetCapacity) {
       alternativeSuggestions = otherTypeRooms
         .filter(r => (r.capacityOrAreaSqm ? Number(r.capacityOrAreaSqm) : 0) >= targetCapacity)
         .map(r => scoreRoom(r, true))
+        .filter(r => r.matchScore >= 50)
         .sort((a, b) => b.matchScore - a.matchScore)
         .slice(0, 10);
     } else {
       alternativeSuggestions = otherTypeRooms
         .map(r => scoreRoom(r, true))
+        .filter(r => r.matchScore >= 50)
         .sort((a, b) => b.matchScore - a.matchScore)
         .slice(0, 10);
     }
@@ -294,9 +302,10 @@ async function aiRecommend({ query, date, startTime, endTime, capacity, blockId,
       alternativeMessage = `There are also ${distinctTypes.join('s, ')}s with this capacity (${targetCapacity ? `${targetCapacity}+ seats` : 'available'}):`;
     }
   } else {
-    // No specific type requested -> score all
+    // No specific type requested -> score all and filter out matches < 50%
     primaryRecommendations = enrichedRooms
       .map(r => scoreRoom(r, false))
+      .filter(r => r.matchScore >= 50)
       .sort((a, b) => b.matchScore - a.matchScore);
   }
 
@@ -311,9 +320,9 @@ async function aiRecommend({ query, date, startTime, endTime, capacity, blockId,
       targetTypeId
     },
     totalAvailable: enrichedRooms.length,
-    recommendations: primaryRecommendations.slice(0, 8), // Primary recommendations first
+    recommendations: primaryRecommendations.slice(0, 8), // Top matches >= 50%
     alternativeMessage,
-    alternativeSuggestions // Suggested alternatives matching capacity
+    alternativeSuggestions
   };
 }
 
