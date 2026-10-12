@@ -89,12 +89,15 @@ async function aiRecommend({ query, date, startTime, endTime, capacity, blockId,
   if (query) {
     const q = query.toLowerCase();
     
-    // Extract capacity: "for 100 students", "120 people", "seats 60", "50 cap"
-    const capMatch = q.match(/(?:for|seats?|capacity|around|about)?\s*(\d{2,4})\s*(?:students?|people|seats?|members?|attendees?|persons?|capacity)?/i);
-    if (capMatch && !targetCapacity) {
-      const parsedNum = parseInt(capMatch[1], 10);
-      if (parsedNum >= 10 && parsedNum <= 2000) {
-        targetCapacity = parsedNum;
+    // Extract capacity: "3000+ capacity", "3000 capacity", "for 100 students", "120 people", "seats 60"
+    if (!targetCapacity) {
+      const capMatch = q.match(/(\d+)\s*(?:\+|plus)?\s*(?:students?|people|seats?|members?|attendees?|persons?|capacity)?/i) ||
+                       q.match(/(?:for|seats?|capacity|around|about)\s*(\d+)/i);
+      if (capMatch) {
+        const parsedNum = parseInt(capMatch[1], 10);
+        if (!isNaN(parsedNum) && parsedNum > 0) {
+          targetCapacity = parsedNum;
+        }
       }
     }
 
@@ -205,9 +208,9 @@ async function aiRecommend({ query, date, startTime, endTime, capacity, blockId,
           reasons.push(`High capacity hall (${Math.floor(roomCapacity)} seats)`);
         }
       } else {
-        // Severe penalty for failing capacity requirement
-        const underRatio = roomCapacity / targetCapacity;
-        score -= Math.round(40 * (1 - underRatio) + 15);
+        // Severe disqualifying penalty: If room is less than requested capacity, it cannot host the event!
+        const shortage = 1 - (roomCapacity / targetCapacity);
+        score -= Math.round(shortage * 60 + 20); // e.g. 116 vs 3000 -> shortage ~0.96 -> score -78
         reasons.push(`Under required capacity (${Math.floor(roomCapacity)} < ${targetCapacity})`);
       }
     } else {
