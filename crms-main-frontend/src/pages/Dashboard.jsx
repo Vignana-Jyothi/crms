@@ -4,6 +4,7 @@ import { masterDataApi, resourcesApi } from '../api/endpoints';
 import { useAuth } from '../context/authStore';
 import { ROLES } from '../constants/roles';
 import RoomQuickSearchModal from '../components/common/RoomQuickSearchModal';
+import AiRoomRecommenderModal from '../components/common/AiRoomRecommenderModal';
 
 function todayStr() {
   const d = new Date();
@@ -43,6 +44,7 @@ export default function Dashboard() {
   const savedFilters = JSON.parse(savedFiltersStr || '{}');
   const hasShownQuickSearch = sessionStorage.getItem(QUICK_SEARCH_SHOWN_KEY) === 'true';
   const [isQuickSearchOpen, setIsQuickSearchOpen] = useState(!hasShownQuickSearch);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
 
   useEffect(() => {
     if (!hasShownQuickSearch) {
@@ -209,12 +211,43 @@ export default function Dashboard() {
         resourceTypes={resourceTypes}
       />
 
+      <AiRoomRecommenderModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        onSelectRoom={(rec) => {
+          if (rec.targetDate) setSelectedDate(rec.targetDate);
+          if (rec.targetStart && rec.targetEnd) {
+            setFilterType('Custom');
+            setCustomStart(rec.targetStart);
+            setCustomEnd(rec.targetEnd);
+          }
+          setFilters(prev => ({
+            ...prev,
+            search: rec.resourceName,
+            availability: 'Free'
+          }));
+          const fullRoom = resources.find(r => r.resourceId === rec.resourceId);
+          if (fullRoom) {
+            setSelectedRoom(fullRoom);
+          }
+        }}
+      />
+
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="font-display text-2xl font-semibold text-navy">Book a Room</h1>
           <p className="mt-1 text-sm text-ink/60">
             Search classrooms, labs, seminar halls, and auditoriums across campus.
           </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setIsAiModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white font-medium text-sm shadow-md hover:shadow-indigo-500/25 hover:opacity-95 transition-all cursor-pointer"
+          >
+            <span>✨ AI Room Recommender</span>
+          </button>
         </div>
       </div>
 
