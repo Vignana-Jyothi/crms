@@ -33,6 +33,8 @@ const updateRole = (userId, roleId, departmentId, managedDepartmentIds = []) =>
 const updateStatus = (userId, status) =>
   prisma.user.update({ where: { userId }, data: { status }, select: SAFE_SELECT });
 
+const create = (data) => prisma.user.create({ data, select: SAFE_SELECT });
+
 const update = (userId, data) => 
   prisma.user.update({ where: { userId }, data, select: SAFE_SELECT });
 
