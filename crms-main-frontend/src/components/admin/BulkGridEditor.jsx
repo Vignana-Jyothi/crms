@@ -338,7 +338,6 @@ export default function BulkGridEditor({
                       const { idx, colSpan, hasClasses, classesRaw, mergedStart, mergedEnd } = slotData;
 
                       return (
-                      return (
                         <td key={idx} colSpan={colSpan} className={`border-r border-line p-2 text-center align-top h-full ${!hasClasses ? 'bg-white hover:bg-blue-50/50 cursor-pointer transition-colors' : 'bg-white'}`}
                             onClick={() => {
                               if (!hasClasses) {
