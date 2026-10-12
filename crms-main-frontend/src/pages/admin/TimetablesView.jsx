@@ -183,7 +183,7 @@ export default function TimetablesView() {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="shrink-0">
             <h1 className="text-2xl font-bold text-navy flex items-center gap-2 whitespace-nowrap">
-              <Calendar className="text-primary" size={24} />
+              <Calendar className="text-navy" size={24} />
               Unified Timetables
             </h1>
             <p className="text-slate-500 mt-1">Manage and view weekly schedules</p>
