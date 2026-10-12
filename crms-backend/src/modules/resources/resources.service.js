@@ -126,13 +126,15 @@ async function aiRecommend({ query, date, startTime, endTime, capacity, blockId,
       }
     }
 
-    // Extract block hints: "b block", "d-block", "block e"
-    if (!targetBlockId) {
-      const blockMatch = q.match(/(?:block\s*([a-zA-Z0-9]+)|([a-zA-Z0-9]+)\s*block)/i);
+    // Extract block hints: e.g., "in b block", "in block e", but NOT "all blocks"
+    if (!targetBlockId && !q.includes('all blocks') && !q.includes('any block')) {
+      const blockMatch = q.match(/\b(?:block\s*([a-zA-Z0-9]+)|([a-zA-Z0-9]+)\s*block)\b/i);
       if (blockMatch) {
-        const blockCode = (blockMatch[1] || blockMatch[2]).toUpperCase();
-        const foundBlock = await prisma.block.findFirst({ where: { blockCode } });
-        if (foundBlock) targetBlockId = foundBlock.blockId;
+        const candidate = (blockMatch[1] || blockMatch[2]).toUpperCase();
+        if (candidate !== 'ALL' && candidate !== 'ANY') {
+          const foundBlock = await prisma.block.findFirst({ where: { blockCode: candidate } });
+          if (foundBlock) targetBlockId = foundBlock.blockId;
+        }
       }
     }
   }
@@ -165,7 +167,7 @@ async function aiRecommend({ query, date, startTime, endTime, capacity, blockId,
   });
 
   // 5. Intelligent Multi-Criteria Scoring & Ranking Engine
-  const scoredRecommendations = enrichedRooms.map(room => {
+  const scoreRoom = (room, isAlternative = false) => {
     let score = 70; // Base score for being fully available
     const reasons = ['Available with zero conflicts'];
     const tags = [];
@@ -183,15 +185,15 @@ async function aiRecommend({ query, date, startTime, endTime, capacity, blockId,
           reasons.push(`Optimal seating size (${Math.floor(roomCapacity)} capacity for ~${targetCapacity} people)`);
           tags.push('Optimal Capacity');
         } else if (ratio >= 0.4) {
-          score += 15;
+          score += 18;
           reasons.push(`Comfortably spacious (${Math.floor(roomCapacity)} seats)`);
         } else {
-          score += 5; // Oversized
+          score += 10;
           reasons.push(`High capacity hall (${Math.floor(roomCapacity)} seats)`);
         }
       } else {
         // Undersized room penalty
-        score -= 40;
+        score -= 30;
         reasons.push(`Under required capacity (${Math.floor(roomCapacity)} < ${targetCapacity})`);
       }
     } else {
@@ -201,8 +203,10 @@ async function aiRecommend({ query, date, startTime, endTime, capacity, blockId,
     // Resource Type Match
     if (targetTypeId) {
       if (room.resourceTypeId === targetTypeId) {
-        score += 20;
+        score += 30; // Heavy boost for matching user requested type
         reasons.push(`Exact type match: ${room.resourceType.typeName}`);
+        tags.push(room.resourceType.typeName);
+      } else if (isAlternative) {
         tags.push(room.resourceType.typeName);
       }
     }
@@ -228,7 +232,7 @@ async function aiRecommend({ query, date, startTime, endTime, capacity, blockId,
     }
 
     // Clamp score to 100
-    const matchPercentage = Math.min(99, Math.max(45, score));
+    const matchPercentage = Math.min(99, Math.max(40, score));
 
     return {
       resourceId: room.resourceId,
@@ -246,10 +250,55 @@ async function aiRecommend({ query, date, startTime, endTime, capacity, blockId,
       targetStart,
       targetEnd
     };
-  });
+  };
 
-  // Sort descending by match score
-  scoredRecommendations.sort((a, b) => b.matchScore - a.matchScore);
+  let primaryRecommendations = [];
+  let alternativeSuggestions = [];
+  let alternativeMessage = null;
+
+  if (targetTypeId) {
+    // Separate by requested type vs other types
+    const matchingTypeRooms = enrichedRooms.filter(r => r.resourceTypeId === targetTypeId);
+    const otherTypeRooms = enrichedRooms.filter(r => r.resourceTypeId !== targetTypeId);
+
+    // Score primary matching rooms
+    // If target capacity was requested and classrooms don't reach it, sort them so largest classrooms across different blocks come first!
+    primaryRecommendations = matchingTypeRooms
+      .map(r => scoreRoom(r, false))
+      .sort((a, b) => {
+        // If both are under capacity, prefer larger capacity first
+        if (targetCapacity && a.capacity < targetCapacity && b.capacity < targetCapacity) {
+          if (b.capacity !== a.capacity) {
+            return b.capacity - a.capacity;
+          }
+        }
+        return b.matchScore - a.matchScore;
+      });
+
+    // If target capacity requested, find alternative types that actually satisfy the capacity across all blocks!
+    if (targetCapacity) {
+      alternativeSuggestions = otherTypeRooms
+        .filter(r => (r.capacityOrAreaSqm ? Number(r.capacityOrAreaSqm) : 0) >= targetCapacity)
+        .map(r => scoreRoom(r, true))
+        .sort((a, b) => b.matchScore - a.matchScore)
+        .slice(0, 10);
+    } else {
+      alternativeSuggestions = otherTypeRooms
+        .map(r => scoreRoom(r, true))
+        .sort((a, b) => b.matchScore - a.matchScore)
+        .slice(0, 10);
+    }
+
+    if (alternativeSuggestions.length > 0) {
+      const distinctTypes = [...new Set(alternativeSuggestions.map(s => s.resourceType))];
+      alternativeMessage = `There are also ${distinctTypes.join('s, ')}s with this capacity (${targetCapacity ? `${targetCapacity}+ seats` : 'available'}):`;
+    }
+  } else {
+    // No specific type requested -> score all
+    primaryRecommendations = enrichedRooms
+      .map(r => scoreRoom(r, false))
+      .sort((a, b) => b.matchScore - a.matchScore);
+  }
 
   return {
     parsedCriteria: {
@@ -261,8 +310,10 @@ async function aiRecommend({ query, date, startTime, endTime, capacity, blockId,
       targetBlockId,
       targetTypeId
     },
-    totalAvailable: scoredRecommendations.length,
-    recommendations: scoredRecommendations.slice(0, 8) // Top 8 best matches
+    totalAvailable: enrichedRooms.length,
+    recommendations: primaryRecommendations.slice(0, 8), // Primary recommendations first
+    alternativeMessage,
+    alternativeSuggestions // Suggested alternatives matching capacity
   };
 }
 

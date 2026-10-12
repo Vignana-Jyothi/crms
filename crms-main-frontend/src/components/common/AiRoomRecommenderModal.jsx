@@ -131,75 +131,158 @@ export default function AiRoomRecommenderModal({ isOpen, onClose, onSelectRoom }
                 <span>Sorted by AI Fit Score</span>
               </div>
 
-              {results.recommendations.length === 0 ? (
+              {results.recommendations.length === 0 && (!results.alternativeSuggestions || results.alternativeSuggestions.length === 0) ? (
                 <div className="text-center py-8 text-slate-500 text-sm">
                   No rooms fully matched your exact criteria for this time window. Try expanding your capacity or choosing a different slot.
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {results.recommendations.map((rec) => {
-                    const isHighMatch = rec.matchScore >= 80;
-                    return (
-                      <div
-                        key={rec.resourceId}
-                        className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500/50 bg-white dark:bg-slate-800/60 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group"
-                      >
-                        <div>
-                          <div className="flex items-start justify-between gap-2 mb-2">
-                            <div>
-                              <h3 className="font-semibold text-slate-900 dark:text-white text-base group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                                {rec.resourceName}
-                              </h3>
-                              <p className="text-xs text-slate-500 dark:text-slate-400">
-                                {rec.resourceType} • Block {rec.block} (Floor {rec.floor})
-                              </p>
+                <div className="space-y-6">
+                  {/* Primary Recommendations */}
+                  {results.recommendations.length > 0 && (
+                    <div>
+                      <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-2">
+                        <span>🎯 Recommended Matches</span>
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {results.recommendations.map((rec) => {
+                          const isHighMatch = rec.matchScore >= 80;
+                          return (
+                            <div
+                              key={rec.resourceId}
+                              className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500/50 bg-white dark:bg-slate-800/60 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group"
+                            >
+                              <div>
+                                <div className="flex items-start justify-between gap-2 mb-2">
+                                  <div>
+                                    <h3 className="font-semibold text-slate-900 dark:text-white text-base group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                      {rec.resourceName}
+                                    </h3>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                      {rec.resourceType} • Block {rec.block} (Floor {rec.floor})
+                                    </p>
+                                  </div>
+                                  <span className={`px-2.5 py-1 rounded-full text-xs font-bold shrink-0 ${
+                                    isHighMatch 
+                                      ? 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800' 
+                                      : 'bg-blue-100 dark:bg-blue-950/50 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-800'
+                                  }`}>
+                                    {rec.matchScore}% Match
+                                  </span>
+                                </div>
+
+                                <div className="flex flex-wrap gap-1.5 mb-3">
+                                  <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                                    👥 {rec.capacity} Seats
+                                  </span>
+                                  {rec.tags.map((tag, tIdx) => (
+                                    <span key={tIdx} className="px-2 py-0.5 rounded text-[11px] font-medium bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300">
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </div>
+
+                                <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-1 mb-4">
+                                  {rec.reasons.map((r, rIdx) => (
+                                    <li key={rIdx} className="flex items-center gap-1.5">
+                                      <span className={r.includes('Under required') ? 'text-amber-500' : 'text-emerald-500'}>
+                                        {r.includes('Under required') ? '⚠' : '✓'}
+                                      </span>
+                                      <span>{r}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (onSelectRoom) {
+                                    onSelectRoom(rec);
+                                  }
+                                  onClose();
+                                }}
+                                className="w-full py-2 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs transition-colors shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+                              >
+                                <span>Select & Book Room</span>
+                                <span>→</span>
+                              </button>
                             </div>
-                            <span className={`px-2.5 py-1 rounded-full text-xs font-bold shrink-0 ${
-                              isHighMatch 
-                                ? 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800' 
-                                : 'bg-blue-100 dark:bg-blue-950/50 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-800'
-                            }`}>
-                              {rec.matchScore}% Match
-                            </span>
-                          </div>
-
-                          <div className="flex flex-wrap gap-1.5 mb-3">
-                            <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
-                              👥 {rec.capacity} Seats
-                            </span>
-                            {rec.tags.map((tag, tIdx) => (
-                              <span key={tIdx} className="px-2 py-0.5 rounded text-[11px] font-medium bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300">
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-
-                          <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-1 mb-4">
-                            {rec.reasons.map((r, rIdx) => (
-                              <li key={rIdx} className="flex items-center gap-1.5">
-                                <span className="text-emerald-500">✓</span>
-                                <span>{r}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (onSelectRoom) {
-                              onSelectRoom(rec);
-                            }
-                            onClose();
-                          }}
-                          className="w-full py-2 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs transition-colors shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
-                        >
-                          <span>Select & Book Room</span>
-                          <span>→</span>
-                        </button>
+                          );
+                        })}
                       </div>
-                    );
-                  })}
+                    </div>
+                  )}
+
+                  {/* Alternative Suggestions for Capacity (Labs, Seminar Halls, Auditoriums) */}
+                  {results.alternativeSuggestions && results.alternativeSuggestions.length > 0 && (
+                    <div className="pt-3 border-t border-dashed border-slate-200 dark:border-slate-800">
+                      <div className="p-3 mb-3 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 flex items-center gap-2.5 text-xs text-amber-900 dark:text-amber-200">
+                        <span className="text-base">💡</span>
+                        <span className="font-medium">
+                          {results.alternativeMessage || "There are also other halls/labs that meet this capacity:"}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {results.alternativeSuggestions.map((rec) => (
+                          <div
+                            key={rec.resourceId}
+                            className="p-4 rounded-xl border border-amber-200 dark:border-amber-800/40 hover:border-amber-400 bg-amber-50/20 dark:bg-slate-800/60 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group"
+                          >
+                            <div>
+                              <div className="flex items-start justify-between gap-2 mb-2">
+                                <div>
+                                  <h3 className="font-semibold text-slate-900 dark:text-white text-base group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                                    {rec.resourceName}
+                                  </h3>
+                                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                                    <strong className="text-amber-700 dark:text-amber-400">{rec.resourceType}</strong> • Block {rec.block} (Floor {rec.floor})
+                                  </p>
+                                </div>
+                                <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800 shrink-0">
+                                  {rec.matchScore}% Fit
+                                </span>
+                              </div>
+
+                              <div className="flex flex-wrap gap-1.5 mb-3">
+                                <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300">
+                                  👥 {rec.capacity} Seats (Fits 200+)
+                                </span>
+                                {rec.tags.map((tag, tIdx) => (
+                                  <span key={tIdx} className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+
+                              <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-1 mb-4">
+                                {rec.reasons.map((r, rIdx) => (
+                                  <li key={rIdx} className="flex items-center gap-1.5">
+                                    <span className="text-emerald-500">✓</span>
+                                    <span>{r}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (onSelectRoom) {
+                                  onSelectRoom(rec);
+                                }
+                                onClose();
+                              }}
+                              className="w-full py-2 px-3 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-medium text-xs transition-colors shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+                            >
+                              <span>Select & Book Alternative</span>
+                              <span>→</span>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
