@@ -281,7 +281,7 @@ export default function Users() {
                 <option key={d.departmentId} value={d.departmentId}>{d.departmentName}</option>
               ))}
             </select>
-            {form.roleId == '3' && ( // Only show if Department Admin (roleId=3)
+            {Number(form.roleId) === 3 && ( // Only show if Department Admin (roleId=3)
               <div className="col-span-2 sm:col-span-3">
                 <label className="block text-xs font-semibold text-ink/70 mb-1.5">
                   Managed Departments (Select all departments this HOD oversees)
@@ -672,7 +672,34 @@ export default function Users() {
                 />
               </div>
 
-              {editForm.roleId == '3' && (
+              <div>
+                <label className="block text-xs font-semibold text-ink/70 mb-1">Role</label>
+                <select
+                  value={editForm.roleId || ''}
+                  onChange={(e) => setEditForm((f) => ({ ...f, roleId: e.target.value }))}
+                  className="w-full rounded border border-line p-2 text-xs focus:border-navy focus:outline-none"
+                >
+                  {roles.map((r) => (
+                    <option key={r.roleId} value={r.roleId}>{r.roleName}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-ink/70 mb-1">Primary Department</label>
+                <select
+                  value={editForm.departmentId || ''}
+                  onChange={(e) => setEditForm((f) => ({ ...f, departmentId: e.target.value }))}
+                  className="w-full rounded border border-line p-2 text-xs focus:border-navy focus:outline-none"
+                >
+                  <option value="">No department</option>
+                  {departments.map((d) => (
+                    <option key={d.departmentId} value={d.departmentId}>{d.departmentName}</option>
+                  ))}
+                </select>
+              </div>
+
+              {Number(editForm.roleId) === 3 && (
                 <div>
                   <label className="block text-xs font-semibold text-ink/70 mb-1.5">Managed Departments</label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3 bg-paper/50 rounded-lg border border-line max-h-44 overflow-y-auto">

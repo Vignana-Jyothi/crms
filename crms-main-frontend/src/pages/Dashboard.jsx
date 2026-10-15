@@ -240,7 +240,8 @@ export default function Dashboard() {
             Search classrooms, labs, seminar halls, and auditoriums across campus.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        {/* AI Recommender button disabled for now */}
+        {/* <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setIsAiModalOpen(true)}
@@ -248,7 +249,7 @@ export default function Dashboard() {
           >
             <span>✨ AI Room Recommender</span>
           </button>
-        </div>
+        </div> */}
       </div>
 
       <div className="mt-6">
