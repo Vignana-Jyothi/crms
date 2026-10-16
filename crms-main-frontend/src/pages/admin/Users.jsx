@@ -271,16 +271,24 @@ export default function Users() {
                 <option key={r.roleId} value={r.roleId}>{r.roleName}</option>
               ))}
             </select>
-            <select
-              value={form.departmentId}
-              onChange={(e) => setForm((f) => ({ ...f, departmentId: e.target.value }))}
-              className="rounded border border-line px-3 py-2 text-sm"
-            >
-              <option value="">No primary department</option>
-              {departments.map((d) => (
-                <option key={d.departmentId} value={d.departmentId}>{d.departmentName}</option>
-              ))}
-            </select>
+            <div className="col-span-2 sm:col-span-3">
+              <label className="block text-xs font-semibold text-ink/70 mb-1.5">Primary Department</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3 bg-paper/50 rounded-lg border border-line max-h-44 overflow-y-auto">
+                <label className={`flex items-center gap-2 p-2 rounded border cursor-pointer text-xs transition-colors ${!form.departmentId ? 'bg-navy/5 border-navy/40 font-medium text-navy' : 'bg-white border-line text-ink/80 hover:bg-paper'}`}>
+                  <input type="radio" name="add-primary-dept" checked={!form.departmentId} onChange={() => setForm((f) => ({ ...f, departmentId: '' }))} className="w-4 h-4 cursor-pointer" />
+                  <span>No primary department</span>
+                </label>
+                {departments.map((d) => {
+                  const isChecked = String(form.departmentId) === String(d.departmentId);
+                  return (
+                    <label key={d.departmentId} className={`flex items-center gap-2 p-2 rounded border cursor-pointer text-xs transition-colors ${isChecked ? 'bg-navy/5 border-navy/40 font-medium text-navy' : 'bg-white border-line text-ink/80 hover:bg-paper'}`}>
+                      <input type="radio" name="add-primary-dept" checked={isChecked} onChange={() => setForm((f) => ({ ...f, departmentId: d.departmentId }))} className="w-4 h-4 cursor-pointer" />
+                      <span className="truncate">{d.departmentName}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
             {Number(form.roleId) === 3 && ( // Only show if Department Admin (roleId=3)
               <div className="col-span-2 sm:col-span-3">
                 <label className="block text-xs font-semibold text-ink/70 mb-1.5">
@@ -686,17 +694,22 @@ export default function Users() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-ink/70 mb-1">Primary Department</label>
-                <select
-                  value={editForm.departmentId || ''}
-                  onChange={(e) => setEditForm((f) => ({ ...f, departmentId: e.target.value }))}
-                  className="w-full rounded border border-line p-2 text-xs focus:border-navy focus:outline-none"
-                >
-                  <option value="">No department</option>
-                  {departments.map((d) => (
-                    <option key={d.departmentId} value={d.departmentId}>{d.departmentName}</option>
-                  ))}
-                </select>
+                <label className="block text-xs font-semibold text-ink/70 mb-1.5">Primary Department</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3 bg-paper/50 rounded-lg border border-line max-h-44 overflow-y-auto">
+                  <label className={`flex items-center gap-2 p-2 rounded border cursor-pointer text-xs transition-colors ${!editForm.departmentId ? 'bg-navy/5 border-navy/40 font-medium text-navy' : 'bg-white border-line text-ink/80 hover:bg-paper'}`}>
+                    <input type="radio" name="edit-primary-dept" checked={!editForm.departmentId} onChange={() => setEditForm((f) => ({ ...f, departmentId: '' }))} className="w-4 h-4 cursor-pointer" />
+                    <span>No department</span>
+                  </label>
+                  {departments.map((d) => {
+                    const isChecked = String(editForm.departmentId) === String(d.departmentId);
+                    return (
+                      <label key={d.departmentId} className={`flex items-center gap-2 p-2 rounded border cursor-pointer text-xs transition-colors ${isChecked ? 'bg-navy/5 border-navy/40 font-medium text-navy' : 'bg-white border-line text-ink/80 hover:bg-paper'}`}>
+                        <input type="radio" name="edit-primary-dept" checked={isChecked} onChange={() => setEditForm((f) => ({ ...f, departmentId: d.departmentId }))} className="w-4 h-4 cursor-pointer" />
+                        <span className="truncate">{d.departmentName}</span>
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
 
               {Number(editForm.roleId) === 3 && (
