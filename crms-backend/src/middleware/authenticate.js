@@ -38,16 +38,14 @@ module.exports = async function authenticate(req, res, next) {
       include: { managedDepartments: true }
     });
 
-    // Auto-provision if user does not exist (default to Requester role)
+    // Only allow pre-registered users. Unknown emails are rejected.
     if (!user) {
-      user = await prisma.user.create({
-        data: {
-          email,
-          name: response.data.user.name || email.split('@')[0],
-          phone: '0000000000', // Dummy phone to satisfy NOT NULL constraint
-          roleId: 4, // 4 = REQUESTER
-          status: 'Active'
-        }
+      const err = new Error('Email not registered in CRMS');
+      err.statusCode = 403;
+      err.code = 'EMAIL_NOT_REGISTERED';
+      return res.status(403).json({
+        error: 'Access denied. Your email is not registered in CRMS.',
+        code: 'EMAIL_NOT_REGISTERED'
       });
     }
 
