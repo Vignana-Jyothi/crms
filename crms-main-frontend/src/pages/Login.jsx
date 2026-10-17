@@ -114,8 +114,8 @@ export default function Login() {
         { withCredentials: true, headers: { 'x-app-name': 'crms' } }
       );
 
-      // Cookies are now set. Tell context to fetch user profile.
-      await checkAuthStatus();
+      // Cookies are now set. Fetch full profile — throws if email not registered.
+      await checkAuthStatus({ silent: false });
       navigate('/');
     } catch (err) {
       const code = err.response?.data?.code;

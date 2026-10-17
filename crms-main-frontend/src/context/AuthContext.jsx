@@ -6,21 +6,26 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  async function checkAuthStatus() {
+  // silent = true  → used by the initial page-load (swallows errors quietly)
+  // silent = false → used by Login.jsx after SSO (re-throws so the caller can inspect)
+  async function checkAuthStatus({ silent = true } = {}) {
     setLoading(true);
     try {
       const data = await authApi.checkAuth();
       if (data.logged_in) {
-        // Also fetch the local database profile to get role and department!
-        // wait, the backend `usersApi.me()` still works because authenticate.js reads the cookie.
-        // It's safer to just fetch `usersApi.me()` so we get the full local profile.
+        // Fetch the full local profile (role, department, etc.) from the backend.
+        // authenticate.js middleware will reject unregistered emails with 403 here.
         const localProfile = await usersApi.me();
         setUser(localProfile);
       } else {
         setUser(null);
       }
-    } catch {
+    } catch (err) {
       setUser(null);
+      if (!silent) {
+        // Re-throw so Login.jsx can inspect the error code (e.g. EMAIL_NOT_REGISTERED)
+        throw err;
+      }
     } finally {
       setLoading(false);
     }
