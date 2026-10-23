@@ -3,6 +3,10 @@ import { X, Check, Edit2 } from 'lucide-react';
 import { fmtTimeSlot } from '../../utils/formatters';
 import { timetableApi } from '../../api/endpoints';
 import { useAuth } from '../../context/authStore';
+import { DEFAULT_PROGRAM, formatClassYear } from '../../constants/programs';
+
+// The early 9:00 schedule only applies to B.Tech 1st year
+const isBTechFirstYear = (t) => t.studentYear === '1' && (t.program || DEFAULT_PROGRAM) === DEFAULT_PROGRAM;
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const TIME_SLOTS_STANDARD = [
@@ -34,6 +38,7 @@ export default function FullWeekTimetableGrid({
   setTimetables, 
   selectedDate, 
   selectedDay,
+  selectedProgram = DEFAULT_PROGRAM,
   selectedStudentYear,
   selectedDepartment,
   selectedSection,
@@ -55,7 +60,7 @@ export default function FullWeekTimetableGrid({
     return false;
   };
 
-  const isFirstYearView = selectedStudentYear === '1' || (timetables.length > 0 && timetables.every(t => t.studentYear === '1'));
+  const isFirstYearView = isBTechFirstYear({ studentYear: selectedStudentYear, program: selectedProgram }) || (timetables.length > 0 && timetables.every(isBTechFirstYear));
   
   const toMins = (t) => {
     if (!t) return 0;
@@ -101,7 +106,7 @@ export default function FullWeekTimetableGrid({
     const startMins = sortedBoundaries[i];
     const endMins = sortedBoundaries[i+1];
     
-    const firstYearClassesCount = timetables.filter(t => t.studentYear === '1').length;
+    const firstYearClassesCount = timetables.filter(isBTechFirstYear).length;
     const seniorClassesCount = timetables.length - firstYearClassesCount;
     const primaryLunchMins = firstYearClassesCount >= seniorClassesCount ? 720 : 780;
     
@@ -176,6 +181,7 @@ export default function FullWeekTimetableGrid({
       if (id === 'new') {
         const payload = {
           ...editForm,
+          program: selectedProgram,
           studentYear: selectedStudentYear || '1',
           departmentId: selectedDepartment,
           startTime: `1970-01-01T${editForm.startTime}:00Z`,
@@ -337,7 +343,7 @@ export default function FullWeekTimetableGrid({
 
                   const baseClass = hasClasses ? classesRaw[0] : null;
 
-                  const firstYearClasses = timetables.filter(t => t.studentYear === '1').length;
+                  const firstYearClasses = timetables.filter(isBTechFirstYear).length;
                   const seniorClasses = timetables.length - firstYearClasses;
                   const primaryLunchStart = firstYearClasses >= seniorClasses ? '12:00' : '13:00';
                   
@@ -394,7 +400,7 @@ export default function FullWeekTimetableGrid({
                           {viewMode === 'Rooms' && (
                             <>
                               <div className="text-[9px] text-navy/80 font-medium whitespace-nowrap">
-                                {baseClass.studentYear && `${baseClass.studentYear}${baseClass.studentYear === '1' ? 'st' : baseClass.studentYear === '2' ? 'nd' : baseClass.studentYear === '3' ? 'rd' : 'th'} Yr`} {baseClass.department?.branchCode} - {baseClass.section}
+                                {formatClassYear(baseClass.studentYear, baseClass.program)} {baseClass.department?.branchCode} - {baseClass.section}
                               </div>
                               <div className="text-[9px] text-slate-600 line-clamp-1">
                                 {aggregatedDisplay.facultyNames?.length > 0 ? aggregatedDisplay.facultyNames.join(' / ') : 'Unassigned'}
@@ -413,7 +419,7 @@ export default function FullWeekTimetableGrid({
                           {viewMode === 'Faculty' && (
                             <>
                               <div className="text-[9px] text-navy/80 font-medium whitespace-nowrap">
-                                {baseClass.studentYear && `${baseClass.studentYear}${baseClass.studentYear === '1' ? 'st' : baseClass.studentYear === '2' ? 'nd' : baseClass.studentYear === '3' ? 'rd' : 'th'} Yr`} {baseClass.department?.branchCode} - {baseClass.section}
+                                {formatClassYear(baseClass.studentYear, baseClass.program)} {baseClass.department?.branchCode} - {baseClass.section}
                               </div>
                               <div className="text-[9px] text-slate-600 line-clamp-1">
                                 {aggregatedDisplay.resourceNames?.length > 0 ? aggregatedDisplay.resourceNames.join(' / ') : 'No Room'}
@@ -424,7 +430,7 @@ export default function FullWeekTimetableGrid({
                           {!viewMode && (
                             <>
                               <div className="text-[9px] text-navy/80 font-medium whitespace-nowrap">
-                                {baseClass.studentYear && `${baseClass.studentYear}${baseClass.studentYear === '1' ? 'st' : baseClass.studentYear === '2' ? 'nd' : baseClass.studentYear === '3' ? 'rd' : 'th'} Yr`} {baseClass.department?.branchCode} - {baseClass.section}
+                                {formatClassYear(baseClass.studentYear, baseClass.program)} {baseClass.department?.branchCode} - {baseClass.section}
                               </div>
                               <div className="text-[9px] text-slate-600 line-clamp-1 text-center px-1">
                                 {aggregatedDisplay.resourceNames?.length > 0 ? aggregatedDisplay.resourceNames.join(' / ') : 'No Room'} • {aggregatedDisplay.facultyNames?.length > 0 ? aggregatedDisplay.facultyNames.join(' / ') : 'Unassigned'}
@@ -513,7 +519,7 @@ export default function FullWeekTimetableGrid({
                             {c.courseName && c.courseName !== c.courseCode ? `${c.courseName} (${c.courseCode})` : c.courseCode}
                           </h4>
                           <p className="text-xs text-navy/80 font-medium mb-2">
-                            {c.studentYear && `${c.studentYear}${c.studentYear === '1' ? 'st' : c.studentYear === '2' ? 'nd' : c.studentYear === '3' ? 'rd' : 'th'} Year`} {c.department?.branchCode} - {c.section}
+                            {formatClassYear(c.studentYear, c.program, 'Year')} {c.department?.branchCode} - {c.section}
                           </p>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">

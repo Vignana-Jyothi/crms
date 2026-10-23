@@ -210,6 +210,7 @@ async function getAvailability(resourceId, date) {
       facultyName: t.facultyName, 
       section: t.section,
       studentYear: t.studentYear,
+      program: t.program,
       branchCode: t.department?.branchCode || null
     })),
     blockedByBookings: bookings.map((b) => ({ 
@@ -439,6 +440,8 @@ async function getLiveStatus(dateInput, startTimeInput, endTimeInput) {
           else if (t.studentYear == 3) yearPrefix = '3rd Year ';
           else if (t.studentYear == 4) yearPrefix = '4th Year ';
           else yearPrefix = `${t.studentYear} Year `;
+          if (t.program === 'MTECH') yearPrefix = `M.Tech ${yearPrefix}`;
+          else if (t.program === 'MCA') yearPrefix = `MCA ${yearPrefix}`;
         }
         
         const startTimeStr = new Date(t.startTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' });

@@ -4,6 +4,7 @@ const prisma = require('../../config/prisma');
 const eduprimeService = require('../eduprime/eduprime.service');
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const PROGRAMS = ['BTECH', 'MTECH', 'MCA'];
 
 function shouldUnassignRoom(courseCode, courseName) {
   const keywords = ['library', 'lib', 'sports', 'cca', 'eca', 'cva-l', 'mtp'];
@@ -147,6 +148,8 @@ async function batchCreate(entries) {
     if (data.endTime) data.endTime = toTimeValue(data.endTime);
     // Remove the temporary 'id' field used by the frontend
     if (data.id) delete data.id;
+    // Unknown programs fall back to the column default (BTECH)
+    if (!PROGRAMS.includes(data.program)) delete data.program;
     
     if (shouldUnassignRoom(data.courseCode, data.courseName)) {
       data.resourceId = null;

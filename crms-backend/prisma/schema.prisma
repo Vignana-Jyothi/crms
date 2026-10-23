@@ -142,6 +142,7 @@ model Timetable {
   section String? @db.VarChar(20)
   academicYear String? @map("academic_year") @db.VarChar(20)
   studentYear String? @map("student_year") @db.VarChar(20)
+  program String @default("BTECH") @db.VarChar(10)
   facultyName String? @map("faculty_name") @db.VarChar(500)
   uploadedByUserId Int? @map("uploaded_by_user_id")
 
@@ -151,6 +152,7 @@ model Timetable {
 
   @@index([dayOfWeek, resourceId])
   @@index([departmentId, studentYear, section, dayOfWeek])
+  @@index([program, departmentId, studentYear, section])
   @@map("timetable")
 }
 

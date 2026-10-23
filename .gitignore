@@ -21,6 +21,7 @@ yarn-error.log*
 # Database backups and temp files
 *.dump
 *.sql
+!crms-backend/prisma/migrations/*.sql
 scratch/
 scratch.*
 

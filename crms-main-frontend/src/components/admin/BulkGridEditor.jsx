@@ -3,6 +3,7 @@ import { X, Check, Save } from 'lucide-react';
 import { fmtTimeSlot } from '../../utils/formatters';
 import { timetableApi } from '../../api/endpoints';
 import SearchableSelect from '../common/SearchableSelect';
+import { PROGRAMS, DEFAULT_PROGRAM, yearOptionsFor } from '../../constants/programs';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const TIME_SLOTS_STANDARD = [
@@ -31,10 +32,12 @@ export default function BulkGridEditor({
   onSaveSuccess,
   onCancel,
   initialDepartment = '',
+  initialProgram = DEFAULT_PROGRAM,
   initialStudentYear = '',
   initialSection = '',
   availableSections = []
 }) {
+  const [selectedProgram, setSelectedProgram] = useState(initialProgram);
   const [selectedStudentYear, setSelectedStudentYear] = useState(initialStudentYear);
   const [selectedDepartment, setSelectedDepartment] = useState(initialDepartment);
   const [selectedSection, setSelectedSection] = useState(initialSection);
@@ -47,6 +50,7 @@ export default function BulkGridEditor({
     if (selectedStudentYear && selectedDepartment && selectedSection) {
       setLoadingExisting(true);
       timetableApi.list({
+        program: selectedProgram,
         studentYear: selectedStudentYear,
         departmentId: selectedDepartment,
         section: selectedSection
@@ -60,7 +64,7 @@ export default function BulkGridEditor({
     } else {
       setLocalClasses([]);
     }
-  }, [selectedStudentYear, selectedDepartment, selectedSection]);
+  }, [selectedProgram, selectedStudentYear, selectedDepartment, selectedSection]);
   
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [editForm, setEditForm] = useState({});
@@ -69,7 +73,8 @@ export default function BulkGridEditor({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
-  const isFirstYearView = selectedStudentYear === '1';
+  // The early 9:00 schedule only applies to B.Tech 1st year
+  const isFirstYearView = selectedProgram === DEFAULT_PROGRAM && selectedStudentYear === '1';
   const activeTimeSlots = isFirstYearView ? TIME_SLOTS_FIRST_YEAR : TIME_SLOTS_STANDARD;
 
   // Use the exact same overlap logic as FullWeekTimetableGrid
@@ -113,7 +118,8 @@ export default function BulkGridEditor({
     const newClass = {
       ...editForm,
       // Create a fake unique ID if it's new so we can edit/delete it locally before batch save
-      timetableId: editingId === 'new' ? `temp-${Date.now()}` : editingId, 
+      timetableId: editingId === 'new' ? `temp-${Date.now()}` : editingId,
+      program: selectedProgram,
       studentYear: selectedStudentYear,
       departmentId: selectedDepartment,
       section: editForm.section || selectedSection,
@@ -160,6 +166,7 @@ export default function BulkGridEditor({
         startTime: c.startTime,
         endTime: c.endTime,
         departmentId: selectedDepartment,
+        program: selectedProgram,
         studentYear: selectedStudentYear,
         section: c.section || selectedSection,
         resourceId: c.resourceId || null
@@ -195,13 +202,23 @@ export default function BulkGridEditor({
         )}
 
         <div className="flex flex-wrap gap-4 p-4 bg-slate-50 rounded-xl border border-line">
+          <div className="flex-1 min-w-[130px]">
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Program <span className="text-red-500">*</span></label>
+            <SearchableSelect
+              value={selectedProgram}
+              onChange={val => setSelectedProgram(val || DEFAULT_PROGRAM)}
+              placeholder="Select Program"
+              options={PROGRAMS.map(p => ({ value: p.value, label: p.label }))}
+              className="w-full"
+            />
+          </div>
           <div className="flex-1 min-w-[150px]">
             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Year <span className="text-red-500">*</span></label>
             <SearchableSelect
               value={selectedStudentYear}
               onChange={setSelectedStudentYear}
               placeholder="Select or Type Year"
-              options={[{value: '1', label: '1st Year'}, {value: '2', label: '2nd Year'}, {value: '3', label: '3rd Year'}, {value: '4', label: '4th Year'}]}
+              options={yearOptionsFor(selectedProgram)}
               allowCreate={true}
               className="w-full"
             />
