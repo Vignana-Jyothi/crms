@@ -1,4 +1,4 @@
-FROM node:20-bookworm-slim AS prisma-build
+FROM node:24-bookworm-slim AS prisma-build
 
 RUN apt-get update -y && apt-get install -y --no-install-recommends openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
@@ -8,7 +8,7 @@ RUN npm install
 COPY prisma ./prisma
 RUN npx prisma generate
 
-FROM node:20-bookworm-slim
+FROM node:24-bookworm-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 
