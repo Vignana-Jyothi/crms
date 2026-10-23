@@ -154,6 +154,7 @@ export default function TimetablesView() {
     const program = val || DEFAULT_PROGRAM;
     setSelectedProgram(program);
     if (Number(selectedStudentYear) > yearOptionsFor(program).length) setSelectedStudentYear('');
+    if (!isEditMode) setSelectedDepartment('');
     setSelectedSection('');
   };
 
@@ -191,6 +192,25 @@ export default function TimetablesView() {
     if (!aHasData && bHasData) return 1;
     return a.departmentName.localeCompare(b.departmentName);
   });
+
+  // PG programs only run in a few branches (e.g. MCA is only under IT), so list just those
+  const programDepartments = selectedProgram === DEFAULT_PROGRAM
+    ? sortedDepartments
+    : sortedDepartments.filter(d => sectionsData.some(s =>
+        s.departmentId === d.departmentId && s.program === selectedProgram &&
+        (!selectedStudentYear || s.studentYear === selectedStudentYear)
+      ));
+
+  const programLabel = PROGRAMS.find(p => p.value === selectedProgram)?.label;
+
+  // Pre-select the branch when the program has only one (MCA -> Information Technology)
+  useEffect(() => {
+    if (isEditMode || activeTab !== 'Sections' || selectedProgram === DEFAULT_PROGRAM) return;
+    if (programDepartments.length === 1) {
+      const onlyId = programDepartments[0].departmentId.toString();
+      if (selectedDepartment !== onlyId) setSelectedDepartment(onlyId);
+    }
+  }, [isEditMode, activeTab, selectedProgram, programDepartments, selectedDepartment]);
 
   return (
     <div className="p-6 bg-slate-50 min-h-full">
@@ -335,10 +355,10 @@ export default function TimetablesView() {
               <SearchableSelect
                 value={selectedDepartment}
                 onChange={val => { setSelectedDepartment(val); setSelectedSection(''); }}
-                placeholder="Select Branch..."
+                placeholder={programDepartments.length === 0 ? `No ${programLabel} timetables yet` : 'Select Branch...'}
                 options={[
                   { value: '', label: 'Select Branch...' },
-                  ...sortedDepartments.map(d => ({ value: d.departmentId.toString(), label: d.departmentName }))
+                  ...programDepartments.map(d => ({ value: d.departmentId.toString(), label: d.departmentName }))
                 ]}
                 className="min-w-[200px]"
               />
