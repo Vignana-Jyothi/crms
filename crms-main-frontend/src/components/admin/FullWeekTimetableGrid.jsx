@@ -3,7 +3,7 @@ import { X, Check, Edit2 } from 'lucide-react';
 import { fmtTimeSlot } from '../../utils/formatters';
 import { timetableApi } from '../../api/endpoints';
 import { useAuth } from '../../context/authStore';
-import { DEFAULT_PROGRAM, formatClassYear } from '../../constants/programs';
+import { DEFAULT_PROGRAM, formatClassYear, sectionLabel } from '../../constants/programs';
 
 // The early 9:00 schedule only applies to B.Tech 1st year
 const isBTechFirstYear = (t) => t.studentYear === '1' && (t.program || DEFAULT_PROGRAM) === DEFAULT_PROGRAM;
@@ -519,7 +519,7 @@ export default function FullWeekTimetableGrid({
                             {c.courseName && c.courseName !== c.courseCode ? `${c.courseName} (${c.courseCode})` : c.courseCode}
                           </h4>
                           <p className="text-xs text-navy/80 font-medium mb-2">
-                            {formatClassYear(c.studentYear, c.program, 'Year')} {c.department?.branchCode} - {c.section}
+                            {formatClassYear(c.studentYear, c.program, 'Year')} {c.department?.branchCode} - {sectionLabel(c.section, c.program)}
                           </p>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">

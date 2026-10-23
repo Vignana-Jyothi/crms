@@ -3,7 +3,7 @@ import { X, Check, Save } from 'lucide-react';
 import { fmtTimeSlot } from '../../utils/formatters';
 import { timetableApi } from '../../api/endpoints';
 import SearchableSelect from '../common/SearchableSelect';
-import { PROGRAMS, DEFAULT_PROGRAM, yearOptionsFor } from '../../constants/programs';
+import { PROGRAMS, DEFAULT_PROGRAM, yearOptionsFor, sectionLabel } from '../../constants/programs';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const TIME_SLOTS_STANDARD = [
@@ -239,7 +239,7 @@ export default function BulkGridEditor({
               value={selectedSection}
               onChange={val => setSelectedSection(val ? val.toUpperCase() : '')}
               placeholder="Select or Type Section"
-              options={availableSections.map(s => ({ value: s, label: s }))}
+              options={availableSections.map(s => ({ value: s, label: sectionLabel(s, selectedProgram) }))}
               allowCreate={true}
               className="w-full"
             />

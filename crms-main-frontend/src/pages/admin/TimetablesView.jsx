@@ -7,7 +7,7 @@ import TimetableUploadModal from '../../components/admin/TimetableUploadModal';
 import BulkGridEditor from '../../components/admin/BulkGridEditor';
 import { Calendar, Search, Edit2, List, LayoutGrid, X, Upload } from 'lucide-react';
 import SearchableSelect from '../../components/common/SearchableSelect';
-import { PROGRAMS, DEFAULT_PROGRAM, yearOptionsFor } from '../../constants/programs';
+import { PROGRAMS, DEFAULT_PROGRAM, yearOptionsFor, sectionLabel } from '../../constants/programs';
 
 const STORAGE_KEY = 'crms_timetables_filters';
 
@@ -369,9 +369,9 @@ export default function TimetablesView() {
                 disabled={!selectedStudentYear || !selectedDepartment}
                 allowCreate={true}
                 options={[
-                  ...availableSections.map(s => ({ value: s, label: s }))
+                  ...availableSections.map(s => ({ value: s, label: sectionLabel(s, selectedProgram) }))
                 ]}
-                className="min-w-[150px]"
+                className={selectedProgram === 'MTECH' ? 'min-w-[280px]' : 'min-w-[150px]'}
               />
               <SearchableSelect
                 value={selectedDay}
@@ -446,7 +446,7 @@ export default function TimetablesView() {
                 placeholder="Select Section"
                 allowCreate={true}
                 options={[
-                  ...availableSections.map(s => ({ value: s, label: s }))
+                  ...availableSections.map(s => ({ value: s, label: sectionLabel(s, selectedProgram) }))
                 ]}
                 className="min-w-[120px]"
               />
