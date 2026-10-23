@@ -2,7 +2,7 @@ import React from 'react';
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
-export default function SearchableSelect({ options, value, onChange, placeholder, disabled, className, allowCreate = false }) {
+export default function SearchableSelect({ options, value, onChange, placeholder, disabled, className, title, allowCreate = false }) {
   // react-select expects options as { value, label }
   // Find the selected object based on value
   const selectedOption = options.find(opt => opt.value === value) || (allowCreate && value ? { value, label: value } : null);
@@ -71,7 +71,7 @@ export default function SearchableSelect({ options, value, onChange, placeholder
   };
 
   return (
-    <div className={`flex-1 ${className || ''}`}>
+    <div className={`flex-1 ${className || ''}`} title={title}>
       <SelectComponent
         value={selectedOption}
         onChange={(option) => onChange(option ? option.value : '')}

@@ -295,7 +295,14 @@ export default function TimetablesView() {
             <Search size={20} className="text-slate-400" />
           </div>
           
-          <div className={`w-full flex-1 ${isEditMode ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3' : 'flex flex-wrap items-center gap-3'}`}>
+          <div className={`w-full flex-1 ${
+            isEditMode
+              ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3'
+              : activeTab === 'Sections'
+                // One row on desktop: short Program/Year/Day, wide Branch/Section
+                ? 'grid grid-cols-2 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,0.85fr)_minmax(0,1.6fr)_minmax(0,1.9fr)_minmax(0,0.9fr)] gap-3'
+                : 'flex flex-wrap items-center gap-3'
+          }`}>
           {(!isEditMode && activeTab === 'Rooms') && (
             <>
               <SearchableSelect
@@ -340,7 +347,7 @@ export default function TimetablesView() {
                 onChange={handleProgramChange}
                 placeholder="Select Program..."
                 options={PROGRAMS.map(p => ({ value: p.value, label: p.label }))}
-                className="min-w-[120px]"
+                className="min-w-0"
               />
               <SearchableSelect
                 value={selectedStudentYear}
@@ -350,7 +357,7 @@ export default function TimetablesView() {
                   { value: '', label: 'Select Year...' },
                   ...yearOptionsFor(selectedProgram)
                 ]}
-                className="min-w-[140px]"
+                className="min-w-0"
               />
               <SearchableSelect
                 value={selectedDepartment}
@@ -360,7 +367,8 @@ export default function TimetablesView() {
                   { value: '', label: 'Select Branch...' },
                   ...programDepartments.map(d => ({ value: d.departmentId.toString(), label: d.departmentName }))
                 ]}
-                className="min-w-[200px]"
+                title={programDepartments.find(d => d.departmentId.toString() === selectedDepartment)?.departmentName}
+                className="min-w-0 col-span-2 lg:col-span-1"
               />
               <SearchableSelect
                 value={selectedSection}
@@ -371,7 +379,8 @@ export default function TimetablesView() {
                 options={[
                   ...availableSections.map(s => ({ value: s, label: sectionLabel(s, selectedProgram) }))
                 ]}
-                className={selectedProgram === 'MTECH' ? 'min-w-[280px]' : 'min-w-[150px]'}
+                title={selectedSection ? sectionLabel(selectedSection, selectedProgram) : undefined}
+                className="min-w-0 col-span-2 lg:col-span-1"
               />
               <SearchableSelect
                 value={selectedDay}
@@ -381,7 +390,7 @@ export default function TimetablesView() {
                   { value: '', label: 'All Days' },
                   ...['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(d => ({ value: d, label: d }))
                 ]}
-                className="min-w-[140px]"
+                className="min-w-0 col-span-2 lg:col-span-1"
               />
             </>
           )}
