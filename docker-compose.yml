@@ -54,19 +54,6 @@ services:
     depends_on:
       - crms-backend
 
-  crms-admin-frontend:
-    build:
-      context: ./crms-admin-frontend
-      dockerfile: Dockerfile
-      args:
-        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
-    container_name: crms-admin-frontend
-    restart: unless-stopped
-    ports:
-      - "${ADMIN_FRONTEND_PORT:-18433}:80"
-    depends_on:
-      - crms-backend
-
 volumes:
   postgres_data:
   redis_data:
