@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react';
 import { masterDataApi, usersApi, authApi } from '../../api/endpoints';
 
-const EMPTY_FORM = { name: '', email: '', phone: '', roleId: '', departmentId: '' };
+const EMPTY_FORM = { name: '', email: '', phone: '', roleId: '', managedDepartmentIds: [] };
+
+// Derive primary departmentId from managed list (first selected)
+function deriveDeptId(managedDepartmentIds) {
+  return managedDepartmentIds.length > 0 ? Number(managedDepartmentIds[0]) : null;
+}
 
 export default function Users() {
   const [users, setUsers] = useState([]);
@@ -47,10 +52,12 @@ export default function Users() {
     setActionAlert(null);
     setSubmitting(true);
     try {
+      const derived = deriveDeptId(form.managedDepartmentIds);
       const created = await usersApi.create({
         ...form,
         roleId: form.roleId ? Number(form.roleId) : undefined,
-        departmentId: form.departmentId ? Number(form.departmentId) : null,
+        departmentId: derived,
+        managedDepartmentIds: form.managedDepartmentIds.map(Number)
       });
       setTempPasswordFor(created);
       setForm(EMPTY_FORM);
@@ -70,6 +77,8 @@ export default function Users() {
     setActionAlert(null);
     setSubmitting(true);
     try {
+      const derived = deriveDeptId(editForm.managedDepartmentIds);
+      await usersApi.updateRole(editUser.userId, Number(editForm.roleId), derived, editForm.managedDepartmentIds.map(Number));
       await usersApi.update(editUser.userId, {
         name: editForm.name,
         email: editForm.email,
@@ -86,10 +95,10 @@ export default function Users() {
     }
   }
 
-  async function changeRole(userId, roleId, departmentId) {
+  async function changeRole(userId, roleId, departmentId, managedDepartmentIds = []) {
     setActionAlert(null);
     try {
-      await usersApi.updateRole(userId, Number(roleId), departmentId ? Number(departmentId) : null);
+      await usersApi.updateRole(userId, Number(roleId), departmentId ? Number(departmentId) : null, managedDepartmentIds);
       setActionAlert({ type: 'success', message: 'User role/department updated successfully.' });
       refresh();
     } catch (err) {
@@ -114,6 +123,26 @@ export default function Users() {
       setActionAlert({
         type: 'error',
         message: err.response?.data?.error || 'Failed to update user status.',
+      });
+    }
+  }
+
+  async function handleDeleteUser(user) {
+    if (!window.confirm(`Are you sure you want to permanently remove "${user.name}"? This action cannot be undone.`)) {
+      return;
+    }
+    setActionAlert(null);
+    try {
+      await usersApi.remove(user.userId);
+      setActionAlert({
+        type: 'success',
+        message: `User "${user.name}" removed successfully.`,
+      });
+      refresh();
+    } catch (err) {
+      setActionAlert({
+        type: 'error',
+        message: err.response?.data?.error || 'Failed to delete user.',
       });
     }
   }
@@ -249,16 +278,49 @@ export default function Users() {
                 <option key={r.roleId} value={r.roleId}>{r.roleName}</option>
               ))}
             </select>
-            <select
-              value={form.departmentId}
-              onChange={(e) => setForm((f) => ({ ...f, departmentId: e.target.value }))}
-              className="rounded border border-line px-3 py-2 text-sm"
-            >
-              <option value="">No department</option>
-              {departments.map((d) => (
-                <option key={d.departmentId} value={d.departmentId}>{d.departmentName}</option>
-              ))}
-            </select>
+            <div className="col-span-2 sm:col-span-3">
+              <label className="block text-xs font-semibold text-ink/70 mb-1">
+                Departments
+                {form.managedDepartmentIds.length > 0 && (
+                  <span className="ml-2 text-[10px] font-normal text-navy">
+                    ({form.managedDepartmentIds.length} selected — first is primary)
+                  </span>
+                )}
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3 bg-paper/50 rounded-lg border border-line max-h-52 overflow-y-auto">
+                {departments.map((d) => {
+                  const isChecked = form.managedDepartmentIds.some(id => String(id) === String(d.departmentId));
+                  const isPrimary = String(form.managedDepartmentIds[0]) === String(d.departmentId);
+                  return (
+                    <label
+                      key={d.departmentId}
+                      className={`flex items-center gap-2 p-2 rounded border cursor-pointer text-xs transition-colors ${
+                        isChecked ? 'bg-navy/5 border-navy/40 font-medium text-navy' : 'bg-white border-line text-ink/80 hover:bg-paper'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={(e) => {
+                          setForm((f) => {
+                            const updated = e.target.checked
+                              ? [...f.managedDepartmentIds, d.departmentId]
+                              : f.managedDepartmentIds.filter(id => String(id) !== String(d.departmentId));
+                            return { ...f, managedDepartmentIds: updated };
+                          });
+                        }}
+                        className="rounded border-line text-navy focus:ring-navy w-4 h-4 cursor-pointer"
+                      />
+                      <span className="truncate flex-1">{d.departmentName}</span>
+                      {isPrimary && (
+                        <span className="text-[9px] font-bold uppercase tracking-wide bg-navy text-white px-1 py-0.5 rounded">Primary</span>
+                      )}
+                    </label>
+                  );
+                })}
+              </div>
+              <p className="text-[11px] text-ink/50 mt-1">Check all departments. The first selected becomes the primary department.</p>
+            </div>
           </div>
 
           {error && <p className="mt-4 rounded bg-brick-light px-3 py-2 text-sm text-brick">{error}</p>}
@@ -292,13 +354,21 @@ export default function Users() {
               <tr key={u.userId} className="hover:bg-paper/30">
                 <td className="px-4 py-3 font-medium text-ink">{u.name}</td>
                 <td className="px-4 py-3 text-ink/60">
-                  <div className="font-mono text-xs">{u.phone}</div>
+                  <div className="font-mono text-xs">
+                    {u.phone === '0000000000' || !u.phone ? (
+                      <span className="inline-flex items-center gap-1 rounded bg-amber/15 px-1.5 py-0.5 text-[11px] font-sans text-amber-800">
+                        Not added yet
+                      </span>
+                    ) : (
+                      u.phone
+                    )}
+                  </div>
                   {u.email && <div className="text-xs text-ink/40">{u.email}</div>}
                 </td>
                 <td className="px-4 py-3">
                   <select
                     value={u.roleId || ''}
-                    onChange={(e) => changeRole(u.userId, e.target.value, u.departmentId)}
+                    onChange={(e) => changeRole(u.userId, e.target.value, u.departmentId, u.managedDepartments?.map(d => d.departmentId) || [])}
                     className="rounded border border-line px-2 py-1 text-xs"
                   >
                     {roles.map((r) => (
@@ -309,7 +379,7 @@ export default function Users() {
                 <td className="px-4 py-3">
                   <select
                     value={u.departmentId || ''}
-                    onChange={(e) => changeRole(u.userId, u.roleId, e.target.value)}
+                    onChange={(e) => changeRole(u.userId, u.roleId, e.target.value, u.managedDepartments?.map(d => d.departmentId) || [])}
                     className="rounded border border-line px-2 py-1 text-xs max-w-[180px] truncate"
                   >
                     <option value="">No department</option>
@@ -317,6 +387,15 @@ export default function Users() {
                       <option key={d.departmentId} value={d.departmentId}>{d.departmentName}</option>
                     ))}
                   </select>
+                  {u.roleId === 3 && u.managedDepartments?.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1 max-w-[200px]">
+                      {u.managedDepartments.map(d => (
+                        <span key={d.departmentId} className="inline-block px-1.5 py-0.5 rounded text-[10px] bg-paper text-navy font-medium border border-line" title={d.departmentName}>
+                          {d.branchCode || d.departmentName}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </td>
                 <td className="px-4 py-3">
                   <span className={u.status === 'Active' ? 'text-forest font-medium' : 'text-ink/40'}>{u.status}</span>
@@ -326,7 +405,16 @@ export default function Users() {
                     <button
                       onClick={() => {
                         setEditUser(u);
-                        setEditForm({ name: u.name, email: u.email || '', phone: u.phone, roleId: u.roleId, departmentId: u.departmentId });
+                        // Build unified list: merge departmentId + managedDepartments (deduped)
+                        const deptIds = u.managedDepartments?.map(d => d.departmentId) || [];
+                        if (u.departmentId && !deptIds.includes(u.departmentId)) deptIds.unshift(u.departmentId);
+                        setEditForm({ 
+                          name: u.name, 
+                          email: u.email || '', 
+                          phone: u.phone, 
+                          roleId: u.roleId, 
+                          managedDepartmentIds: deptIds
+                        });
                       }}
                       className="text-xs font-semibold text-navy hover:underline"
                     >
@@ -345,6 +433,13 @@ export default function Users() {
                     </button>
                     <button onClick={() => toggleStatus(u)} className="text-xs font-medium text-navy hover:underline">
                       {u.status === 'Active' ? 'Deactivate' : 'Reactivate'}
+                    </button>
+                    <button
+                      onClick={() => handleDeleteUser(u)}
+                      className="text-xs font-medium text-brick hover:underline"
+                      title="Permanently remove user"
+                    >
+                      Delete
                     </button>
                   </div>
                 </td>
@@ -369,7 +464,15 @@ export default function Users() {
                 <div>
                   <h3 className="font-semibold text-navy text-base">{u.name}</h3>
                   <p className="mt-0.5 text-xs text-ink/60">{u.email}</p>
-                  <p className="mt-0.5 font-mono text-xs text-ink/50">{u.phone}</p>
+                  <p className="mt-0.5 font-mono text-xs text-ink/50">
+                    {u.phone === '0000000000' || !u.phone ? (
+                      <span className="inline-flex items-center gap-1 rounded bg-amber/15 px-1.5 py-0.5 text-[10px] font-sans text-amber-800">
+                        Phone not added
+                      </span>
+                    ) : (
+                      u.phone
+                    )}
+                  </p>
                 </div>
                 <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${u.status === 'Active' ? 'bg-forest-light text-forest' : 'bg-ink/10 text-ink/50'}`}>
                   {u.status}
@@ -381,7 +484,7 @@ export default function Users() {
                   <label className="block text-[10px] uppercase font-bold text-ink/50 mb-1 tracking-wide">Role</label>
                   <select
                     value={u.roleId || ''}
-                    onChange={(e) => changeRole(u.userId, e.target.value, u.departmentId)}
+                    onChange={(e) => changeRole(u.userId, e.target.value, u.departmentId, u.managedDepartments?.map(d => d.departmentId) || [])}
                     className="w-full rounded border border-line px-2 py-1.5 text-xs focus:border-navy"
                   >
                     {roles.map((r) => (
@@ -393,7 +496,7 @@ export default function Users() {
                   <label className="block text-[10px] uppercase font-bold text-ink/50 mb-1 tracking-wide">Department</label>
                   <select
                     value={u.departmentId || ''}
-                    onChange={(e) => changeRole(u.userId, u.roleId, e.target.value)}
+                    onChange={(e) => changeRole(u.userId, u.roleId, e.target.value, u.managedDepartments?.map(d => d.departmentId) || [])}
                     className="w-full rounded border border-line px-2 py-1.5 text-xs focus:border-navy"
                   >
                     <option value="">No department</option>
@@ -401,6 +504,15 @@ export default function Users() {
                       <option key={d.departmentId} value={d.departmentId}>{d.departmentName}</option>
                     ))}
                   </select>
+                  {u.roleId === 3 && u.managedDepartments?.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1.5">
+                      {u.managedDepartments.map(d => (
+                        <span key={d.departmentId} className="inline-block px-1.5 py-0.5 rounded text-[10px] bg-paper text-navy font-medium border border-line">
+                          {d.branchCode || d.departmentName}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -408,7 +520,14 @@ export default function Users() {
                 <button
                   onClick={() => {
                     setEditUser(u);
-                    setEditForm({ name: u.name, email: u.email || '', phone: u.phone, roleId: u.roleId, departmentId: u.departmentId });
+                    setEditForm({ 
+                      name: u.name, 
+                      email: u.email || '', 
+                      phone: u.phone, 
+                      roleId: u.roleId, 
+                      departmentId: u.departmentId,
+                      managedDepartmentIds: u.managedDepartments?.map(d => d.departmentId) || []
+                    });
                   }}
                   className="text-xs font-semibold text-navy hover:underline"
                 >
@@ -427,6 +546,12 @@ export default function Users() {
                 </button>
                 <button onClick={() => toggleStatus(u)} className="text-xs font-medium text-navy hover:underline">
                   {u.status === 'Active' ? 'Deactivate' : 'Reactivate'}
+                </button>
+                <button
+                  onClick={() => handleDeleteUser(u)}
+                  className="text-xs font-medium text-brick hover:underline"
+                >
+                  Delete
                 </button>
               </div>
             </div>
@@ -549,6 +674,63 @@ export default function Users() {
                   onChange={(e) => setEditForm((f) => ({ ...f, phone: e.target.value }))}
                   className="w-full rounded border border-line p-2 text-xs focus:border-navy focus:outline-none"
                 />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-ink/70 mb-1">Role</label>
+                <select
+                  value={editForm.roleId || ''}
+                  onChange={(e) => setEditForm((f) => ({ ...f, roleId: e.target.value }))}
+                  className="w-full rounded border border-line p-2 text-xs focus:border-navy focus:outline-none"
+                >
+                  {roles.map((r) => (
+                    <option key={r.roleId} value={r.roleId}>{r.roleName}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="col-span-2">
+                <label className="block text-xs font-semibold text-ink/70 mb-1">
+                  Departments
+                  {editForm.managedDepartmentIds.length > 0 && (
+                    <span className="ml-2 text-[10px] font-normal text-navy">
+                      ({editForm.managedDepartmentIds.length} selected — first is primary)
+                    </span>
+                  )}
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3 bg-paper/50 rounded-lg border border-line max-h-52 overflow-y-auto">
+                  {departments.map((d) => {
+                    const isChecked = editForm.managedDepartmentIds.some(id => String(id) === String(d.departmentId));
+                    const isPrimary = String(editForm.managedDepartmentIds[0]) === String(d.departmentId);
+                    return (
+                      <label
+                        key={d.departmentId}
+                        className={`flex items-center gap-2 p-2 rounded border cursor-pointer text-xs transition-colors ${
+                          isChecked ? 'bg-navy/5 border-navy/40 font-medium text-navy' : 'bg-white border-line text-ink/80 hover:bg-paper'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(e) => {
+                            setEditForm((f) => {
+                              const updated = e.target.checked
+                                ? [...f.managedDepartmentIds, d.departmentId]
+                                : f.managedDepartmentIds.filter(id => String(id) !== String(d.departmentId));
+                              return { ...f, managedDepartmentIds: updated };
+                            });
+                          }}
+                          className="rounded border-line text-navy focus:ring-navy w-4 h-4 cursor-pointer"
+                        />
+                        <span className="truncate flex-1">{d.departmentName}</span>
+                        {isPrimary && (
+                          <span className="text-[9px] font-bold uppercase tracking-wide bg-navy text-white px-1 py-0.5 rounded">Primary</span>
+                        )}
+                      </label>
+                    );
+                  })}
+                </div>
+                <p className="text-[11px] text-ink/50 mt-1">Check all departments. The first selected becomes the primary department.</p>
               </div>
 
               <div className="mt-5 flex justify-end gap-3">

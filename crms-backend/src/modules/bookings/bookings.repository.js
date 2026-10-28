@@ -50,25 +50,64 @@ function findById(bookingId) {
   });
 }
 
-function list({ requesterUserId, resourceId, status, departmentId }) {
+// departmentIds: restrict to resources owned by these departments
+// (an empty array matches nothing).
+function list({
+  requesterUserId,
+  resourceId,
+  status,
+  departmentIds,
+  blockId,
+  resourceTypeId,
+  dateFrom,
+  dateTo,
+  search,
+}) {
   const where = {};
   if (requesterUserId !== undefined) where.requesterUserId = Number(requesterUserId);
   if (resourceId !== undefined) where.resourceId = resourceId;
   if (status !== undefined) where.status = status;
-  if (departmentId !== undefined) {
-    where.resource = { departmentId: departmentId === -1 ? null : Number(departmentId) };
+
+  const resourceWhere = {};
+  if (departmentIds !== undefined) resourceWhere.departmentId = { in: departmentIds.map(Number) };
+  if (blockId !== undefined) resourceWhere.blockId = Number(blockId);
+  if (resourceTypeId !== undefined) resourceWhere.resourceTypeId = Number(resourceTypeId);
+  if (Object.keys(resourceWhere).length > 0) where.resource = resourceWhere;
+
+  if (dateFrom !== undefined || dateTo !== undefined) {
+    where.bookingDate = {
+      ...(dateFrom !== undefined && { gte: new Date(dateFrom) }),
+      ...(dateTo !== undefined && { lte: new Date(dateTo) }),
+    };
+  }
+
+  if (search) {
+    const contains = { contains: search, mode: 'insensitive' };
+    where.OR = [
+      { resourceId: contains },
+      { purpose: contains },
+      { resource: { resourceName: contains } },
+      { requester: { name: contains } },
+      { requester: { email: contains } },
+      { requester: { phone: contains } },
+    ];
   }
 
   return prisma.booking.findMany({
     where,
     include: {
-      resource: { 
-        select: { 
+      resource: {
+        select: {
           resourceId: true,
-          resourceName: true, 
+          resourceName: true,
+          resourceTypeId: true,
+          departmentId: true,
+          blockId: true,
+          floor: true,
           resourceType: { select: { typeName: true } },
-          department: { select: { departmentName: true } }
-        } 
+          department: { select: { departmentName: true } },
+          block: { select: { blockCode: true, blockName: true } }
+        }
       },
       requester: { 
         select: { 
@@ -86,7 +125,7 @@ function list({ requesterUserId, resourceId, status, departmentId }) {
         orderBy: { approvalId: 'desc' },
       },
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: [{ createdAt: 'desc' }, { bookingId: 'desc' }],
   });
 }
 

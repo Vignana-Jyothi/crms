@@ -3,10 +3,50 @@ const ApiError = require('../../utils/ApiError');
 const repo = require('./bookings.repository');
 const resourcesService = require('../resources/resources.service');
 const auditService = require('../audit/audit.service');
-const { ROLES } = require('../../middleware/authorizeRole');
+const { ROLES, departmentScopeOf } = require('../../middleware/authorizeRole');
 const notifications = require('../notifications/notifications.service');
+const { getCached, setCached, invalidateKeys } = require('../../config/redis');
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+// Booking and timetable TIME columns hold campus wall-clock time (IST),
+// while the server itself runs in UTC — so "now" must be shifted to IST
+// before comparing it with anything stored in the database.
+const IST_OFFSET_MINUTES = 330;
+
+// A free gap shorter than this (e.g. the 5 minutes between back-to-back
+// periods) isn't bookable, so it doesn't stop a room counting as full.
+const MIN_FREE_GAP_MINUTES = 15;
+
+function nowInIST() {
+  const ist = new Date(Date.now() + IST_OFFSET_MINUTES * 60000);
+  return {
+    dateStr: ist.toISOString().slice(0, 10),
+    minutes: ist.getUTCHours() * 60 + ist.getUTCMinutes(),
+  };
+}
+
+function addDays(dateStr, days) {
+  const d = new Date(`${dateStr}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+function hhmmToMinutes(hhmm) {
+  const [h, m] = hhmm.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function minutesToHHMM(mins) {
+  return `${String(Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
+}
+
+// Prisma returns TIME columns as Dates on 1970-01-01 with the stored
+// wall-clock time in the UTC fields.
+function timeValueToMinutes(timeVal) {
+  const d = new Date(timeVal);
+  return d.getUTCHours() * 60 + d.getUTCMinutes();
+}
 
 // Prisma @db.Time() columns want a Date object; the actual calendar
 // date part is ignored by Postgres for a TIME column, so 1970-01-01
@@ -42,35 +82,26 @@ async function createBooking({ resourceId, bookingDate, startTime, endTime, purp
     throw ApiError.badRequest('End time must be strictly after start time');
   }
 
-  const [year, month, day] = bookingDate.split('-');
-  const [hours, minutes] = startTime.split(':');
-  const bookingStartLocal = new Date(year, month - 1, day, hours, minutes);
-  const now = new Date();
-  
-  // Set "today" to start of day for date-only comparison
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const bookingDateObj = new Date(year, month - 1, day);
-  
-  if (bookingDateObj < today) {
+  // YYYY-MM-DD strings compare correctly as plain strings.
+  const now = nowInIST();
+  if (
+    bookingDate < now.dateStr ||
+    (bookingDate === now.dateStr && hhmmToMinutes(startTime) < now.minutes)
+  ) {
     throw ApiError.badRequest('Cannot book a time slot in the past');
   }
 
-  // Same-day checks
-  if (bookingDateObj.getTime() === today.getTime() && bookingStartLocal < now) {
-    throw ApiError.badRequest('Cannot book a time slot in the past');
-  }
-
-  const maxDate = new Date(today.getTime());
-  maxDate.setDate(maxDate.getDate() + 15);
-  
-  if (bookingDateObj > maxDate) {
+  if (bookingDate > addDays(now.dateStr, 15)) {
     throw ApiError.badRequest('Cannot book more than 15 days in advance');
   }
 
   const dayOfWeek = dayOfWeekFor(bookingDate);
 
-  return prisma.$transaction(
+  const result = await prisma.$transaction(
     async (tx) => {
+      // Row lock on the resource to strictly serialize concurrent bookings on this specific room
+      await tx.$queryRaw`SELECT 1 FROM resources WHERE resource_id = ${resourceId} FOR UPDATE`;
+
       const resource = await tx.resource.findUnique({
         where: { resourceId },
         include: { resourceType: true },
@@ -167,9 +198,19 @@ async function createBooking({ resourceId, bookingDate, startTime, endTime, purp
     },
     { isolationLevel: 'Serializable' }
   );
+
+  // Awaited so the requester's immediate availability refresh can't
+  // read the stale cached strip (invalidateKeys never throws).
+  await invalidateKeys(`avail:${resourceId}:*`);
+
+  return result;
 }
 
 async function getAvailability(resourceId, date) {
+  const cacheKey = `avail:${resourceId}:${date}`;
+  const cached = await getCached(cacheKey);
+  if (cached) return cached;
+
   const resource = await prisma.resource.findUnique({ where: { resourceId } });
   if (!resource) throw ApiError.notFound(`Resource ${resourceId} not found`);
 
@@ -185,7 +226,7 @@ async function getAvailability(resourceId, date) {
     }),
   ]);
 
-  return {
+  const availability = {
     resourceId,
     date,
     dayOfWeek,
@@ -197,6 +238,7 @@ async function getAvailability(resourceId, date) {
       facultyName: t.facultyName, 
       section: t.section,
       studentYear: t.studentYear,
+      program: t.program,
       branchCode: t.department?.branchCode || null
     })),
     blockedByBookings: bookings.map((b) => ({ 
@@ -207,6 +249,11 @@ async function getAvailability(resourceId, date) {
       requester: b.requester
     })),
   };
+
+  // Cache for 120 seconds in Redis
+  await setCached(cacheKey, availability, 120);
+
+  return availability;
 }
 
 async function getById(bookingId, auth) {
@@ -219,7 +266,7 @@ async function getById(bookingId, auth) {
     const isInstituteAdmin = auth.roleId === ROLES.INSTITUTE_ADMIN || auth.roleId === 2;
     const isMatchingDeptAdmin =
       (auth.roleId === ROLES.DEPARTMENT_ADMIN || auth.roleId === 3) &&
-      booking.resource?.departmentId === auth.departmentId;
+      departmentScopeOf(auth).includes(booking.resource?.departmentId);
 
     if (!isOwner && !isSuperAdmin && !isInstituteAdmin && !isMatchingDeptAdmin) {
       throw ApiError.forbidden('You are not authorized to view this booking');
@@ -249,7 +296,7 @@ async function cancel(bookingId, actingUserId, auth, reason = null) {
     throw ApiError.conflict(`Booking is already ${booking.status}, cannot cancel`);
   }
 
-  return prisma.$transaction(
+  const cancelled = await prisma.$transaction(
     async (tx) => {
       const updated = await repo.updateStatusIfCurrent(tx, bookingId, 'Cancelled', ['Pending', 'Approved']);
       if (!updated) {
@@ -293,163 +340,177 @@ async function cancel(bookingId, actingUserId, auth, reason = null) {
     },
     { isolationLevel: 'Serializable' }
   );
+
+  // Invalidate cached availability for the room
+  if (booking.resourceId) {
+    await invalidateKeys(`avail:${booking.resourceId}:*`);
+  }
+
+  return cancelled;
 }
 
-async function getLiveStatus(dateInput, startTimeInput, endTimeInput) {
-  console.log('getLiveStatus inputs:', { dateInput, startTimeInput, endTimeInput });
-  let dateStr = dateInput;
-  if (!dateStr) {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    dateStr = `${year}-${month}-${day}`;
+function classLabel(t, resource) {
+  const branch = t.department?.branchCode || resource.allocatedBranch || resource.department?.branchCode || 'Unknown Branch';
+  const section = t.section || resource.allocatedSection || '';
+  const sectionStr = section ? ` - Sec ${section}` : '';
+  let yearPrefix = '';
+  if (t.studentYear) {
+    if (t.studentYear == 1) yearPrefix = '1st Year ';
+    else if (t.studentYear == 2) yearPrefix = '2nd Year ';
+    else if (t.studentYear == 3) yearPrefix = '3rd Year ';
+    else if (t.studentYear == 4) yearPrefix = '4th Year ';
+    else yearPrefix = `${t.studentYear} Year `;
+    if (t.program === 'MTECH') yearPrefix = `M.Tech ${yearPrefix}`;
+    else if (t.program === 'MCA') yearPrefix = `MCA ${yearPrefix}`;
   }
+  return `${yearPrefix}${branch}${sectionStr}`;
+}
 
-  const dayOfWeek = dayOfWeekFor(dateStr);
-  
-  let startVal, endVal, startValIST, endValIST;
-  
-  if (startTimeInput && endTimeInput) {
-    const IST_OFFSET_MINUTES = 330;
-    const toUTCTimeValue = (hhmm) => {
-      const [h, m] = hhmm.split(':').map(Number);
-      let totalMins = h * 60 + m - IST_OFFSET_MINUTES;
-      totalMins = ((totalMins % 1440) + 1440) % 1440;
-      const utcH = String(Math.floor(totalMins / 60)).padStart(2, '0');
-      const utcM = String(totalMins % 60).padStart(2, '0');
-      return new Date(`1970-01-01T${utcH}:${utcM}:00Z`);
+function describeOccupancy(entry, resource) {
+  const startTime = minutesToHHMM(entry.start);
+  const endTime = minutesToHHMM(entry.end);
+  if (entry.kind === 'class') {
+    const t = entry.row;
+    return {
+      type: 'class',
+      startTime,
+      endTime,
+      courseCode: t.courseCode,
+      courseName: t.courseName || '',
+      branchStr: classLabel(t, resource),
+      facultyName: t.facultyName || '',
     };
-    const toISTTimeValue = (hhmm) => {
-      const [h, m] = hhmm.split(':').map(Number);
-      const isth = String(h).padStart(2, '0');
-      const istm = String(m).padStart(2, '0');
-      return new Date(`1970-01-01T${isth}:${istm}:00Z`);
-    }
-    startVal = toUTCTimeValue(startTimeInput);
-    endVal = toUTCTimeValue(endTimeInput);
-    startValIST = toISTTimeValue(startTimeInput);
-    endValIST = toISTTimeValue(endTimeInput);
-  } else {
-    const now = new Date();
-    const utcH = String(now.getUTCHours()).padStart(2, '0');
-    const utcM = String(now.getUTCMinutes()).padStart(2, '0');
-    startVal = new Date(`1970-01-01T${utcH}:${utcM}:00Z`);
-    
-    const istNow = new Date(now.getTime() + (330 * 60000));
-    const istH = String(istNow.getUTCHours()).padStart(2, '0');
-    const istM = String(istNow.getUTCMinutes()).padStart(2, '0');
-    startValIST = new Date(`1970-01-01T${istH}:${istM}:00Z`);
-    
-    endVal = startVal;
-    endValIST = startValIST;
   }
+  const b = entry.row;
+  return {
+    type: 'event',
+    status: b.status,
+    startTime,
+    endTime,
+    purpose: b.purpose,
+    requesterName: b.requester?.name,
+  };
+}
 
-  const [resources, activeTimetables, activeBookings] = await Promise.all([
+// Gaps inside [bookableFrom, windowEnd) not covered by any entry
+// (entries sorted by start), keeping only gaps long enough to book.
+// bookableFrom is the window start, or "now" for the rest of today.
+function freeGaps(entries, windowStart, windowEnd, bookableFrom = windowStart) {
+  const minGap = Math.min(MIN_FREE_GAP_MINUTES, windowEnd - windowStart);
+  const gaps = [];
+  let cursor = Math.max(windowStart, bookableFrom);
+  for (const e of entries) {
+    if (e.start > cursor) gaps.push({ start: cursor, end: Math.min(e.start, windowEnd) });
+    cursor = Math.max(cursor, e.end);
+    if (cursor >= windowEnd) break;
+  }
+  if (cursor < windowEnd) gaps.push({ start: cursor, end: windowEnd });
+  return gaps.filter((g) => g.end - g.start >= minGap);
+}
+
+// Room occupancy for one date and time window (campus time, HH:MM).
+// With no times — or equal start and end — it checks a single instant,
+// defaulting to right now. Each room comes back as:
+//   status: 'Free' (nothing in the window), 'Partial' (some bookable
+//           time left) or 'Full' (no bookable time left / busy at that instant)
+//   occupantList: the classes and Pending/Approved bookings in the window
+//   freeSlots: the bookable gaps left in the window (for today, only
+//           the part of each gap that is still in the future)
+//   inUseNow / currentOccupant: what is happening in the room right now,
+//           whatever window was asked for (only when the date is today)
+async function getLiveStatus(dateInput, startTimeInput, endTimeInput) {
+  const now = nowInIST();
+  const dateStr = dateInput || now.dateStr;
+  const dayOfWeek = dayOfWeekFor(dateStr);
+  const isToday = dateStr === now.dateStr;
+
+  let windowStart = now.minutes;
+  let windowEnd = now.minutes;
+  if (startTimeInput && endTimeInput) {
+    windowStart = hhmmToMinutes(startTimeInput);
+    windowEnd = hhmmToMinutes(endTimeInput);
+  }
+  const isInstant = windowEnd <= windowStart;
+
+  // Whole-day rows are fetched (not just the window) so "in use right
+  // now" can be reported even when the requested window is later today.
+  const [resources, classes, bookings] = await Promise.all([
     prisma.resource.findMany({
       where: { status: 'Active' },
-      select: { 
-        resourceId: true, 
-        resourceName: true, 
+      select: {
+        resourceId: true,
+        resourceName: true,
         resourceType: { select: { typeName: true } },
-        department: { select: { branchCode: true } }, 
+        department: { select: { branchCode: true } },
         block: { select: { blockCode: true } },
         allocatedBranch: true,
         allocatedSection: true,
         allocatedSemester: true,
-        capacityOrAreaSqm: true
-      }
+        capacityOrAreaSqm: true,
+      },
     }),
     prisma.timetable.findMany({
-      where: { 
-        dayOfWeek, 
-        startTime: { lt: endTimeInput ? endValIST : new Date(startValIST.getTime() + 60000) },
-        endTime: { gt: startValIST }
-      },
-      include: { department: true }
+      where: { dayOfWeek, resourceId: { not: null } },
+      include: { department: { select: { branchCode: true } } },
     }),
     prisma.booking.findMany({
-      where: { 
-        bookingDate: new Date(dateStr), 
-        status: 'Approved', 
-        startTime: { lt: endTimeInput ? endVal : new Date(startVal.getTime() + 60000) }, 
-        endTime: { gt: startVal } 
-      },
-      include: { requester: { select: { name: true, email: true, phone: true } } }
-    })
+      where: { bookingDate: new Date(dateStr), status: { in: repo.ACTIVE_STATUSES } },
+      include: { requester: { select: { name: true, email: true, phone: true } } },
+    }),
   ]);
 
-  const timetableMap = {};
-  for (let t of activeTimetables) {
-    if (!timetableMap[t.resourceId]) timetableMap[t.resourceId] = [];
-    timetableMap[t.resourceId].push(t);
+  const entriesByResource = {};
+  const addEntry = (resourceId, entry) => {
+    // Skip malformed rows such as an 11:00 -> 00:00 class.
+    if (entry.end <= entry.start) return;
+    (entriesByResource[resourceId] ||= []).push(entry);
+  };
+  for (const t of classes) {
+    addEntry(t.resourceId, {
+      kind: 'class',
+      start: timeValueToMinutes(t.startTime),
+      end: timeValueToMinutes(t.endTime),
+      row: t,
+    });
+  }
+  for (const b of bookings) {
+    addEntry(b.resourceId, {
+      kind: 'booking',
+      start: timeValueToMinutes(b.startTime),
+      end: timeValueToMinutes(b.endTime),
+      row: b,
+    });
   }
 
-  const bookingMap = {};
-  for (let b of activeBookings) {
-    if (!bookingMap[b.resourceId]) bookingMap[b.resourceId] = [];
-    bookingMap[b.resourceId].push(b);
-  }
+  const inWindow = (e) =>
+    isInstant
+      ? e.start <= windowStart && windowStart < e.end
+      : e.start < windowEnd && e.end > windowStart;
 
-  return resources.map(r => {
-    let isFree = true;
-    let occupant = null;
-    let occupantContact = null;
-    let occupantList = [];
-    let since = null;
-    let until = null;
+  return resources.map((r) => {
+    const entries = (entriesByResource[r.resourceId] || []).sort(
+      (a, b) => a.start - b.start || a.end - b.end
+    );
+    const windowEntries = entries.filter(inWindow);
+    const gaps = isInstant
+      ? []
+      : freeGaps(windowEntries, windowStart, windowEnd, isToday ? now.minutes : windowStart);
 
-    if (timetableMap[r.resourceId] && timetableMap[r.resourceId].length > 0) {
-      isFree = false;
-      const overlaps = timetableMap[r.resourceId].sort((a,b) => new Date(a.startTime) - new Date(b.startTime));
-      
-      occupantList = overlaps.map(t => {
-        const branch = t.department?.branchCode || r.allocatedBranch || r.department?.branchCode || 'Unknown Branch';
-        const section = t.section || r.allocatedSection || '';
-        const sectionStr = section ? ` - Sec ${section}` : '';
-        let yearPrefix = '';
-        if (t.studentYear) {
-          if (t.studentYear == 1) yearPrefix = '1st Year ';
-          else if (t.studentYear == 2) yearPrefix = '2nd Year ';
-          else if (t.studentYear == 3) yearPrefix = '3rd Year ';
-          else if (t.studentYear == 4) yearPrefix = '4th Year ';
-          else yearPrefix = `${t.studentYear} Year `;
-        }
-        
-        const startTimeStr = new Date(t.startTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' });
-        const endTimeStr = new Date(t.endTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' });
-        
-        return {
-           type: 'class',
-           startTime: startTimeStr,
-           endTime: endTimeStr,
-           courseCode: t.courseCode,
-           courseName: t.courseName || '',
-           branchStr: `${yearPrefix}${branch}${sectionStr}`,
-           facultyName: t.facultyName || ''
-        };
-      });
-      
-      occupant = occupantList.map(item => `[${item.startTime} - ${item.endTime}] Class: ${item.courseCode} (${item.branchStr})${item.facultyName ? ` • Faculty: ${item.facultyName}` : ''}`).join(' | ');
-      
-      since = overlaps[0].startTime;
-      until = overlaps[overlaps.length - 1].endTime;
-    } else if (bookingMap[r.resourceId] && bookingMap[r.resourceId].length > 0) {
-      isFree = false;
-      const b = bookingMap[r.resourceId][0];
-      const req = b.requester;
-      occupant = `Event: ${b.purpose} (${req?.name})`;
-      occupantContact = { name: req?.name, email: req?.email, phone: req?.phone };
-      since = b.startTime;
-      until = b.endTime;
-      occupantList = [{
-         type: 'event',
-         purpose: b.purpose,
-         requesterName: req?.name,
-         startTime: new Date(b.startTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' }),
-         endTime: new Date(b.endTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' })
-      }];
-    }
+    let status = 'Free';
+    if (windowEntries.length > 0) status = isInstant || gaps.length === 0 ? 'Full' : 'Partial';
+
+    // A pending request isn't someone physically using the room.
+    const current = isToday
+      ? entries.find(
+          (e) =>
+            e.start <= now.minutes &&
+            now.minutes < e.end &&
+            (e.kind === 'class' || e.row.status === 'Approved')
+        )
+      : null;
+
+    const occupantList = windowEntries.map((e) => describeOccupancy(e, r));
+    const firstBooking = windowEntries.find((e) => e.kind === 'booking')?.row;
 
     return {
       resourceId: r.resourceId,
@@ -458,12 +519,27 @@ async function getLiveStatus(dateInput, startTimeInput, endTimeInput) {
       department: r.department?.branchCode || 'Shared',
       block: r.block?.blockCode || '-',
       capacity: r.capacityOrAreaSqm ? Number(r.capacityOrAreaSqm) : null,
-      isFree,
-      occupant,
+      status,
+      isFree: status === 'Free',
       occupantList,
-      occupantContact,
-      since,
-      until
+      freeSlots: gaps.map((g) => ({ startTime: minutesToHHMM(g.start), endTime: minutesToHHMM(g.end) })),
+      inUseNow: Boolean(current),
+      currentOccupant: current ? describeOccupancy(current, r) : null,
+      occupant:
+        occupantList
+          .map((o) =>
+            o.type === 'class'
+              ? `[${o.startTime} - ${o.endTime}] Class: ${o.courseCode} (${o.branchStr})`
+              : `[${o.startTime} - ${o.endTime}] Event: ${o.purpose} (${o.requesterName || 'Unknown'})`
+          )
+          .join(' | ') || null,
+      occupantContact: firstBooking
+        ? {
+            name: firstBooking.requester?.name,
+            email: firstBooking.requester?.email,
+            phone: firstBooking.requester?.phone,
+          }
+        : null,
     };
   });
 }

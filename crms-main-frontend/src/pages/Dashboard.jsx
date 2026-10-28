@@ -4,6 +4,7 @@ import { masterDataApi, resourcesApi } from '../api/endpoints';
 import { useAuth } from '../context/authStore';
 import { ROLES } from '../constants/roles';
 import RoomQuickSearchModal from '../components/common/RoomQuickSearchModal';
+import AiRoomRecommenderModal from '../components/common/AiRoomRecommenderModal';
 
 function todayStr() {
   const d = new Date();
@@ -31,6 +32,55 @@ const SEMINAR_HALL_NAMES = {
 const STORAGE_KEY = 'crms_dashboard_filters';
 const QUICK_SEARCH_SHOWN_KEY = 'crms_quick_search_shown';
 
+// Matches the status the live-status API reports for the selected window.
+const AVAILABILITY_VALUES = ['All', 'Free', 'Partial', 'Full'];
+const LIVE_REFRESH_MS = 60 * 1000;
+
+const CARD_STYLES = {
+  Free: 'bg-forest-light/60 border-forest/40',
+  Partial: 'bg-amber-light/50 border-amber/50',
+  Full: 'bg-brick-light/40 border-brick/30',
+};
+
+function toStatusMap(liveData) {
+  const statusMap = {};
+  liveData.forEach((r) => {
+    statusMap[r.resourceId] = r;
+  });
+  return statusMap;
+}
+
+// Back-to-back rows for the same class or booking (e.g. a 3-period lab
+// stored as three rows) read better as one line.
+function mergeOccupants(list = []) {
+  const merged = [];
+  [...list]
+    .sort((a, b) => a.startTime.localeCompare(b.startTime))
+    .forEach((occ) => {
+      const prev = merged.find(
+        (m) =>
+          m.type === occ.type &&
+          m.courseCode === occ.courseCode &&
+          m.branchStr === occ.branchStr &&
+          m.purpose === occ.purpose &&
+          m.endTime === occ.startTime
+      );
+      if (prev) prev.endTime = occ.endTime;
+      else merged.push({ ...occ });
+    });
+  return merged;
+}
+
+function occupantTitle(occ) {
+  if (occ.type === 'class') return occ.courseName || occ.courseCode || 'Class';
+  return occ.purpose || 'Booking';
+}
+
+function occupantSubtitle(occ) {
+  if (occ.type === 'class') return occ.branchStr;
+  return occ.status === 'Pending' ? 'Booking · awaiting approval' : 'Booking';
+}
+
 export default function Dashboard() {
   const { user } = useAuth();
   const isAdmin = user && [ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN].includes(user.roleId);
@@ -43,6 +93,7 @@ export default function Dashboard() {
   const savedFilters = JSON.parse(savedFiltersStr || '{}');
   const hasShownQuickSearch = sessionStorage.getItem(QUICK_SEARCH_SHOWN_KEY) === 'true';
   const [isQuickSearchOpen, setIsQuickSearchOpen] = useState(!hasShownQuickSearch);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
 
   useEffect(() => {
     if (!hasShownQuickSearch) {
@@ -50,8 +101,12 @@ export default function Dashboard() {
     }
   }, [hasShownQuickSearch]);
 
-  const [filters, setFilters] = useState(savedFilters.filters || {
-    resourceTypeId: '', departmentId: '', blockId: '', minCapacity: '', search: '', availability: 'Free'
+  const [filters, setFilters] = useState(() => {
+    const initial = savedFilters.filters || {
+      resourceTypeId: '', departmentId: '', blockId: '', minCapacity: '', search: '', availability: 'Free'
+    };
+    // Older sessions may have saved a value this version no longer offers.
+    return AVAILABILITY_VALUES.includes(initial.availability) ? initial : { ...initial, availability: 'Free' };
   });
   
   const [selectedDate, setSelectedDate] = useState(savedFilters.selectedDate || todayStr());
@@ -124,6 +179,12 @@ export default function Dashboard() {
     return { startTimeParam, endTimeParam };
   }, [filterType, customStart, customEnd]);
 
+  const slotError =
+    filterType === 'Custom' && (!customStart || !customEnd || customStart >= customEnd)
+      ? 'Choose a custom slot whose end time is after its start time.'
+      : '';
+  const isToday = selectedDate === todayStr();
+
   useEffect(() => {
     Promise.all([
       masterDataApi.resourceTypes(),
@@ -142,6 +203,10 @@ export default function Dashboard() {
 
   useEffect(() => {
     let isCancelled = false;
+    if (slotError) {
+      setLoading(false);
+      return undefined;
+    }
     setLoading(true);
 
     const params = {};
@@ -160,11 +225,7 @@ export default function Dashboard() {
         .then(([listData, liveData]) => {
           if (!isCancelled) {
             setResources(listData);
-            const statusMap = {};
-            liveData.forEach(r => {
-              statusMap[r.resourceId] = r;
-            });
-            setLiveStatusMap(statusMap);
+            setLiveStatusMap(toStatusMap(liveData));
           }
         })
         .catch((err) => {
@@ -185,18 +246,30 @@ export default function Dashboard() {
       isCancelled = true;
       clearTimeout(handle);
     };
-  }, [filters.resourceTypeId, filters.departmentId, filters.blockId, filters.search, selectedDate, getFilterTimes]);
+  }, [filters.resourceTypeId, filters.departmentId, filters.blockId, filters.search, selectedDate, getFilterTimes, slotError]);
+
+  // Keep today's view current (new bookings, approvals, rooms coming
+  // into or out of use) without a manual reload or a loading flash.
+  useEffect(() => {
+    if (!isToday || slotError) return undefined;
+    const id = setInterval(() => {
+      const { startTimeParam, endTimeParam } = getFilterTimes();
+      resourcesApi
+        .liveStatus(selectedDate, startTimeParam, endTimeParam)
+        .then((liveData) => setLiveStatusMap(toStatusMap(liveData)))
+        .catch(() => {});
+    }, LIVE_REFRESH_MS);
+    return () => clearInterval(id);
+  }, [isToday, selectedDate, getFilterTimes, slotError]);
 
   const filteredResources = resources.filter((r) => {
     if (filters.minCapacity && Number(r.capacityOrAreaSqm || 0) < Number(filters.minCapacity)) return false;
-    
+
     if (filters.availability !== 'All') {
-      const liveData = liveStatusMap[r.resourceId];
-      const isFree = liveData ? liveData.isFree : true;
-      if (filters.availability === 'Free' && !isFree) return false;
-      if (filters.availability === 'In Use' && isFree) return false;
+      const status = liveStatusMap[r.resourceId]?.status || 'Free';
+      if (status !== filters.availability) return false;
     }
-    
+
     return true;
   });
 
@@ -209,6 +282,28 @@ export default function Dashboard() {
         resourceTypes={resourceTypes}
       />
 
+      <AiRoomRecommenderModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        onSelectRoom={(rec) => {
+          if (rec.targetDate) setSelectedDate(rec.targetDate);
+          if (rec.targetStart && rec.targetEnd) {
+            setFilterType('Custom');
+            setCustomStart(rec.targetStart);
+            setCustomEnd(rec.targetEnd);
+          }
+          setFilters(prev => ({
+            ...prev,
+            search: rec.resourceName,
+            availability: 'Free'
+          }));
+          const fullRoom = resources.find(r => r.resourceId === rec.resourceId);
+          if (fullRoom) {
+            setSelectedRoom(fullRoom);
+          }
+        }}
+      />
+
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="font-display text-2xl font-semibold text-navy">Book a Room</h1>
@@ -216,6 +311,16 @@ export default function Dashboard() {
             Search classrooms, labs, seminar halls, and auditoriums across campus.
           </p>
         </div>
+        {/* AI Recommender button disabled for now */}
+        {/* <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setIsAiModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white font-medium text-sm shadow-md hover:shadow-indigo-500/25 hover:opacity-95 transition-all cursor-pointer"
+          >
+            <span>✨ AI Room Recommender</span>
+          </button>
+        </div> */}
       </div>
 
       <div className="mt-6">
@@ -271,8 +376,9 @@ export default function Dashboard() {
           className="rounded border border-line px-3 py-2 text-sm bg-white w-full"
         >
           <option value="All">All Statuses</option>
-          <option value="Free">Free</option>
-          <option value="In Use">In Use</option>
+          <option value="Free">Free for the whole slot</option>
+          <option value="Partial">Partially booked</option>
+          <option value="Full">{filterType === 'Now' ? 'In use' : 'Fully booked'}</option>
         </select>
 
         {/* Custom time slots row (only shows if Custom is selected) */}
@@ -292,6 +398,7 @@ export default function Dashboard() {
               onChange={(e) => setCustomEnd(e.target.value)}
               className="rounded border border-line px-2 py-1 text-sm bg-white"
             />
+            {slotError && <span className="text-xs font-medium text-brick">{slotError}</span>}
           </div>
         )}
 
@@ -353,8 +460,8 @@ export default function Dashboard() {
             setFilters({ resourceTypeId: '', departmentId: '', blockId: '', minCapacity: '', search: '', availability: 'Free' });
             setSelectedDate(todayStr());
             setFilterType('Whole');
-            setCustomStart('');
-            setCustomEnd('');
+            setCustomStart('09:00');
+            setCustomEnd('17:00');
           }}
           className="flex items-center justify-center gap-1.5 rounded px-3 py-2 text-sm font-medium text-navy/60 hover:text-navy hover:bg-black/5 transition-colors w-full sm:col-span-2 lg:col-span-1 xl:col-span-1"
         >
@@ -366,7 +473,11 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {loading ? (
+      {slotError ? (
+        <p className="mt-10 rounded border border-dashed border-brick/40 px-6 py-10 text-center text-sm text-brick">
+          {slotError}
+        </p>
+      ) : loading ? (
         <p className="mt-10 text-sm text-ink/50">Loading resources…</p>
       ) : filteredResources.length === 0 ? (
         <p className="mt-10 rounded border border-dashed border-line px-6 py-10 text-center text-sm text-ink/50">
@@ -375,38 +486,34 @@ export default function Dashboard() {
       ) : (
         <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredResources.map((r) => {
-            const liveData = liveStatusMap[r.resourceId];
-            const isFree = liveData ? liveData.isFree : true;
-            
+            const live = liveStatusMap[r.resourceId];
+            const status = live?.status || 'Free';
+            const { startTimeParam, endTimeParam } = getFilterTimes();
+            // For a partly booked room, open the booking form on its first free gap.
+            const firstFree = status === 'Partial' ? live?.freeSlots?.[0] : null;
+            const cardClass = `block h-full w-full flex flex-col text-left rounded-lg border p-3 transition-shadow hover:shadow-md ${CARD_STYLES[status]}`;
+            const content = (
+              <ResourceCardContent r={r} live={live} status={status} filterType={filterType} showLive={isToday} />
+            );
+
             return (
               <li key={r.resourceId}>
-                {isFree ? (
+                {status === 'Full' ? (
+                  <button type="button" onClick={() => setSelectedRoom(live)} className={`${cardClass} cursor-pointer`}>
+                    {content}
+                  </button>
+                ) : (
                   <Link
                     to={`/resources/${r.resourceId}`}
                     state={{
                       filterDate: selectedDate,
-                      filterStartTime: getFilterTimes().startTimeParam,
-                      filterEndTime: getFilterTimes().endTimeParam
+                      filterStartTime: firstFree ? firstFree.startTime : startTimeParam,
+                      filterEndTime: firstFree ? firstFree.endTime : endTimeParam,
                     }}
-                    className={`block h-full flex flex-col rounded-lg border p-3 transition-shadow hover:shadow-md ${
-                      filters.availability === 'Free' 
-                        ? 'bg-forest-light border-forest/40' 
-                        : 'bg-white border-line'
-                    }`}
+                    className={cardClass}
                   >
-                    <ResourceCardContent r={r} isFree={true} filterType={filterType} />
+                    {content}
                   </Link>
-                ) : isAdmin ? (
-                  <button 
-                    onClick={() => setSelectedRoom(liveData)}
-                    className="w-full h-full flex flex-col text-left block rounded-lg border border-brick/30 bg-brick-light/30 p-3 opacity-75 hover:opacity-100 transition-opacity cursor-pointer"
-                  >
-                    <ResourceCardContent r={r} isFree={false} occupant={liveData?.occupant} since={liveData?.since} until={liveData?.until} filterType={filterType} />
-                  </button>
-                ) : (
-                  <div className="block h-full flex flex-col rounded-lg border border-brick/30 bg-brick-light/30 p-3 opacity-75 cursor-default">
-                    <ResourceCardContent r={r} isFree={false} occupant={liveData?.occupant} since={liveData?.since} until={liveData?.until} filterType={filterType} />
-                  </div>
                 )}
               </li>
             );
@@ -414,94 +521,69 @@ export default function Dashboard() {
         </ul>
       )}
 
-      {/* Modal for Room Details (Admins only) */}
+      {/* Room schedule for the selected slot */}
       {selectedRoom && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/40 backdrop-blur-sm p-4">
           <div className="w-full max-w-md bg-white rounded-xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div className="p-6 border-b bg-brick-light border-brick/20">
-              <div className="flex items-start justify-between">
+              <div className="flex items-start justify-between gap-3">
                 <div>
                   <h2 className="text-2xl font-display font-bold text-navy">{selectedRoom.resourceName}</h2>
                   <p className="text-sm font-mono text-ink/60 mt-1">Block {selectedRoom.block} • {selectedRoom.resourceType}</p>
                 </div>
-                <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-brick/20 text-brick-dark">
-                  In Use
+                <span className="shrink-0 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-brick/20 text-brick">
+                  {filterType === 'Now' ? 'In Use' : 'Fully Booked'}
                 </span>
               </div>
+              {isToday && selectedRoom.inUseNow && selectedRoom.currentOccupant && (
+                <LiveBadge occupant={selectedRoom.currentOccupant} className="mt-3" />
+              )}
             </div>
-            
+
             <div className="p-6 max-h-[70vh] overflow-y-auto">
               <div className="space-y-6">
                 <div>
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-ink/40 mb-2">Current Activity</h4>
-                  {(() => {
-                     if (!selectedRoom.occupantList || selectedRoom.occupantList.length === 0) return null;
-                     const merged = [];
-                     const sorted = [...selectedRoom.occupantList].sort((a, b) => a.startTime.localeCompare(b.startTime));
-                     sorted.forEach(occ => {
-                        let mergedIdx = merged.findIndex(m => 
-                           m.type === occ.type &&
-                           m.courseCode === occ.courseCode &&
-                           m.branchStr === occ.branchStr &&
-                           m.purpose === occ.purpose &&
-                           m.endTime === occ.startTime
-                        );
-                        if (mergedIdx !== -1) {
-                           merged[mergedIdx].endTime = occ.endTime;
-                        } else {
-                           merged.push({ ...occ });
-                        }
-                     });
-                     
-                     return (
-                        <div className="space-y-3">
-                          {merged.map((occ, idx) => (
-                            <div key={idx} className="bg-paper/50 p-4 rounded-lg border border-line">
-                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
-                             <div className="font-semibold text-navy">
-                               {occ.type === 'class' ? (
-                                  <>
-                                     {occ.courseName || occ.courseCode} 
-                                     {occ.courseName && occ.courseName !== occ.courseCode && <span className="text-sm font-normal text-ink/70 ml-1">({occ.courseCode})</span>}
-                                  </>
-                               ) : (
-                                  occ.purpose
-                               )}
-                             </div>
-                             <span className="text-xs font-mono font-semibold bg-brick-light/50 text-brick-dark px-2 py-1 rounded shrink-0">
-                                {occ.startTime} - {occ.endTime}
-                             </span>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-ink/40 mb-2">Schedule in this slot</h4>
+                  <div className="space-y-3">
+                    {mergeOccupants(selectedRoom.occupantList).map((occ, idx) => (
+                      <div key={idx} className="bg-paper/50 p-4 rounded-lg border border-line">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                          <div className="font-semibold text-navy">
+                            {occ.type === 'class' ? (
+                              <>
+                                {occ.courseName || occ.courseCode}
+                                {occ.courseName && occ.courseCode && occ.courseName !== occ.courseCode && (
+                                  <span className="text-sm font-normal text-ink/70 ml-1">({occ.courseCode})</span>
+                                )}
+                              </>
+                            ) : (
+                              occ.purpose
+                            )}
                           </div>
-                          {occ.type === 'class' ? (
-                             <div className="mt-3 text-sm text-ink/80 flex flex-col gap-1.5">
-                                <div><span className="font-medium text-ink mr-1">Class:</span> {occ.branchStr}</div>
-                                {occ.facultyName && <div><span className="font-medium text-ink mr-1">Faculty:</span> {occ.facultyName}</div>}
-                             </div>
-                          ) : (
-                             <div className="mt-3 text-sm text-ink/80">
-                                <div><span className="font-medium text-ink mr-1">Booked by:</span> {occ.requesterName}</div>
-                             </div>
-                          )}
+                          <span className="text-xs font-mono font-semibold bg-brick-light/50 text-brick px-2 py-1 rounded shrink-0">
+                            {occ.startTime} - {occ.endTime}
+                          </span>
                         </div>
-                      ))}
-                    </div>
-                  );
-                  })()}
-                  {(!selectedRoom.occupantList || selectedRoom.occupantList.length === 0) && (
-                    <>
-                      <p className="text-base font-medium text-ink bg-paper/50 p-3 rounded-lg border border-line">
-                        {selectedRoom.occupant}
-                      </p>
-                      {selectedRoom.until && (
-                        <p className="text-sm font-semibold text-brick mt-2">
-                          {selectedRoom.since && selectedRoom.until ? `${selectedRoom.since.substring(11, 16)} to ${selectedRoom.until.substring(11, 16)}` : ''}
-                        </p>
-                      )}
-                    </>
-                  )}
+                        {occ.type === 'class' ? (
+                          <div className="mt-3 text-sm text-ink/80 flex flex-col gap-1.5">
+                            <div><span className="font-medium text-ink mr-1">Class:</span> {occ.branchStr}</div>
+                            {occ.facultyName && <div><span className="font-medium text-ink mr-1">Faculty:</span> {occ.facultyName}</div>}
+                          </div>
+                        ) : (
+                          <div className="mt-3 text-sm text-ink/80 flex flex-col gap-1.5">
+                            <div><span className="font-medium text-ink mr-1">Booked by:</span> {occ.requesterName || '—'}</div>
+                            {occ.status === 'Pending' && <div className="text-xs font-medium text-amber">Awaiting approval</div>}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    {(!selectedRoom.occupantList || selectedRoom.occupantList.length === 0) && (
+                      <p className="text-sm text-ink/60">No schedule details available.</p>
+                    )}
+                  </div>
                 </div>
-                
-                {selectedRoom.occupantContact && (
+
+                {isAdmin && selectedRoom.occupantContact && (
                   <div>
                     <h4 className="text-xs font-bold uppercase tracking-wider text-ink/40 mb-2">Contact Details</h4>
                     <div className="bg-paper/50 p-4 rounded-lg border border-line space-y-3">
@@ -523,9 +605,9 @@ export default function Dashboard() {
                 )}
               </div>
             </div>
-            
+
             <div className="p-4 bg-paper/50 border-t border-line text-right">
-              <button 
+              <button
                 onClick={() => setSelectedRoom(null)}
                 className="px-5 py-2 bg-navy text-white text-sm font-semibold rounded hover:bg-navy-dark transition-colors"
               >
@@ -539,7 +621,35 @@ export default function Dashboard() {
   );
 }
 
-function ResourceCardContent({ r, isFree, occupant, since, until, filterType }) {
+// Blinking "in use right now" marker.
+function LiveBadge({ occupant, className = '' }) {
+  return (
+    <div className={`flex items-center gap-2 rounded bg-brick/10 px-2 py-1 text-[11px] text-brick ${className}`}>
+      <span className="relative flex h-2.5 w-2.5 shrink-0">
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brick opacity-75" />
+        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-brick" />
+      </span>
+      <span className="truncate">
+        <span className="font-semibold">In use now</span> · {occupantTitle(occupant)} until {occupant.endTime}
+      </span>
+    </div>
+  );
+}
+
+const FREE_LABELS = {
+  Whole: 'Available Whole Day',
+  Morning: 'Available Morning',
+  Afternoon: 'Available Afternoon',
+  Custom: 'Available Custom Slot',
+  Now: 'Available Now',
+};
+
+const MAX_CARD_OCCUPANTS = 3;
+
+function ResourceCardContent({ r, live, status, filterType, showLive }) {
+  const occupants = mergeOccupants(live?.occupantList);
+  const current = showLive && live?.inUseNow ? live.currentOccupant : null;
+
   return (
     <>
       <div className="flex items-start justify-between">
@@ -548,24 +658,24 @@ function ResourceCardContent({ r, isFree, occupant, since, until, filterType }) 
             {(() => {
                const rawId = r.resourceId || '';
                const rawName = r.resourceName || '';
-               
+
                const checkStr1 = rawId.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
                const checkStr2 = rawName.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-               
+
                const mappedName = SEMINAR_HALL_NAMES[checkStr1] || SEMINAR_HALL_NAMES[checkStr2];
-               
+
                if (mappedName) {
                   const base = rawId.startsWith('RM-') ? rawName : rawId;
                   return `${base} - ${mappedName}`;
                }
-               
+
                if (rawId.startsWith('RM-')) return r.resourceName;
-               
+
                return (
                   <>
                     {rawId}
                     {r.resourceName && r.resourceName !== rawId && (
-                      <span className="block text-sm font-normal text-ink/70 mt-0.5">{r.resourceName}</span>
+                      <span className="block text-sm font-medium text-ink/90 mt-0.5">{r.resourceName}</span>
                     )}
                   </>
                );
@@ -578,15 +688,21 @@ function ResourceCardContent({ r, isFree, occupant, since, until, filterType }) 
           >
             {r.resourceType?.typeName}
           </span>
-          {!isFree && (
-            <span className="rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wider bg-brick/15 text-brick-dark">
-              In Use
+          {status === 'Partial' && (
+            <span className="flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wider bg-amber/15 text-amber">
+              <span className="h-1.5 w-1.5 rounded-full bg-amber animate-pulse" />
+              Partly booked
+            </span>
+          )}
+          {status === 'Full' && (
+            <span className="rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wider bg-brick/15 text-brick">
+              {filterType === 'Now' ? 'In Use' : 'Fully booked'}
             </span>
           )}
         </div>
       </div>
       <div className="mt-2">
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink/60">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-medium text-ink/80">
           {r.department && <span>{r.department.departmentName}</span>}
           {r.block && <span>{r.block.blockName}{r.floor ? `, Floor ${r.floor}` : ''}</span>}
           {r.capacityOrAreaSqm && (
@@ -596,25 +712,45 @@ function ResourceCardContent({ r, isFree, occupant, since, until, filterType }) 
           )}
         </div>
       </div>
+      {current && <LiveBadge occupant={current} className="mt-2" />}
       <div className="mt-auto pt-3">
-        {isFree ? (
-          <div className="flex h-10 flex-col items-center justify-center rounded border border-forest/20 bg-forest-light/30 px-3 py-1 text-xs font-semibold text-forest-dark">
-            {filterType === 'Whole' ? 'Available Whole Day' :
-             filterType === 'Morning' ? 'Available Morning' :
-             filterType === 'Afternoon' ? 'Available Afternoon' :
-             filterType === 'Custom' ? 'Available Custom Slot' :
-             'Available Now'}
+        {status === 'Free' ? (
+          <div className="flex h-10 flex-col items-center justify-center rounded border border-forest/20 bg-forest-light/30 px-3 py-1 text-xs font-semibold text-forest">
+            {FREE_LABELS[filterType] || 'Available'}
           </div>
-        ) : occupant ? (
-          <div className="flex h-10 flex-col justify-center rounded border border-brick/10 bg-brick/5 px-3 py-1 text-xs font-medium text-brick-dark">
-            <span className="truncate">{occupant}</span>
-            {since && until && (
-              <span className="mt-0.5 font-mono text-[10px] text-brick-dark/70">
-                {new Date(since).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })} to {new Date(until).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })}
-              </span>
+        ) : (
+          <div className="space-y-1.5">
+            {status === 'Partial' && live?.freeSlots?.length > 0 && (
+              <div className="flex flex-wrap items-center gap-1 text-[11px]">
+                <span className="font-semibold text-forest">Free:</span>
+                {live.freeSlots.map((s) => (
+                  <span key={s.startTime} className="rounded bg-forest-light px-1.5 py-0.5 font-mono text-forest">
+                    {s.startTime}–{s.endTime}
+                  </span>
+                ))}
+              </div>
+            )}
+            <ul className="divide-y divide-line rounded border border-line bg-white/70">
+              {occupants.slice(0, MAX_CARD_OCCUPANTS).map((o, i) => (
+                <li key={i} className="flex gap-2 px-2 py-1 text-[11px] text-ink/80">
+                  <span className="shrink-0 font-mono text-ink/60">
+                    {o.startTime}–{o.endTime}
+                  </span>
+                  <span className="min-w-0 truncate">
+                    <span className="font-medium text-ink">{occupantTitle(o)}</span>
+                    {occupantSubtitle(o) && <span className="text-ink/60"> · {occupantSubtitle(o)}</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            {(occupants.length > MAX_CARD_OCCUPANTS || status === 'Full') && (
+              <p className="text-[11px] text-ink/50">
+                {occupants.length > MAX_CARD_OCCUPANTS && `+${occupants.length - MAX_CARD_OCCUPANTS} more · `}
+                {status === 'Full' ? 'Tap for full schedule' : 'Open to see the full day'}
+              </p>
             )}
           </div>
-        ) : null}
+        )}
       </div>
     </>
   );

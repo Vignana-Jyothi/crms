@@ -46,4 +46,14 @@ function authorizeRole(...allowedRoleIds) {
   };
 }
 
-module.exports = { authorizeRole, ROLES, loadRoles };
+// Departments a Department Admin is responsible for: their primary
+// department plus any extra ones assigned via managedDepartments (the
+// same rule the timetable module applies in checkDepartmentAccess).
+function departmentScopeOf(auth) {
+  const ids = [auth?.departmentId, ...(auth?.managedDepartmentIds || [])]
+    .filter((id) => id !== null && id !== undefined)
+    .map(Number);
+  return [...new Set(ids)];
+}
+
+module.exports = { authorizeRole, ROLES, loadRoles, departmentScopeOf };

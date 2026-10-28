@@ -7,6 +7,7 @@ import TimetableUploadModal from '../../components/admin/TimetableUploadModal';
 import BulkGridEditor from '../../components/admin/BulkGridEditor';
 import { Calendar, Search, Edit2, List, LayoutGrid, X, Upload } from 'lucide-react';
 import SearchableSelect from '../../components/common/SearchableSelect';
+import { PROGRAMS, DEFAULT_PROGRAM, yearOptionsFor, sectionLabel } from '../../constants/programs';
 
 const STORAGE_KEY = 'crms_timetables_filters';
 
@@ -21,7 +22,7 @@ export default function TimetablesView() {
 
   const [resourceList, setResourceList] = useState([]);
   const [facultyList, setFacultyList] = useState([]);
-  const [sectionsData, setSectionsData] = useState([]); // [{section, departmentId, studentYear}]
+  const [sectionsData, setSectionsData] = useState([]); // [{section, departmentId, studentYear, program}]
   
   const [timetables, setTimetables] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -30,6 +31,7 @@ export default function TimetablesView() {
   const [selectedResource, setSelectedResource] = useState(savedFilters.selectedResource || '');
   const [selectedFaculty, setSelectedFaculty] = useState(savedFilters.selectedFaculty || '');
   
+  const [selectedProgram, setSelectedProgram] = useState(savedFilters.selectedProgram || DEFAULT_PROGRAM);
   const [selectedStudentYear, setSelectedStudentYear] = useState(savedFilters.selectedStudentYear || '');
   const [selectedDepartment, setSelectedDepartment] = useState(savedFilters.selectedDepartment || '');
   const [selectedSection, setSelectedSection] = useState(savedFilters.selectedSection || '');
@@ -44,10 +46,10 @@ export default function TimetablesView() {
   useEffect(() => {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
       activeTab, viewMode, selectedResource, selectedFaculty,
-      selectedStudentYear, selectedDepartment, selectedSection,
+      selectedProgram, selectedStudentYear, selectedDepartment, selectedSection,
       selectedBlock, selectedDay, selectedDate
     }));
-  }, [activeTab, viewMode, selectedResource, selectedFaculty, selectedStudentYear, selectedDepartment, selectedSection, selectedBlock, selectedDay, selectedDate]);
+  }, [activeTab, viewMode, selectedResource, selectedFaculty, selectedProgram, selectedStudentYear, selectedDepartment, selectedSection, selectedBlock, selectedDay, selectedDate]);
 
   // Load all master data on mount
   useEffect(() => {
@@ -92,6 +94,7 @@ export default function TimetablesView() {
           setLoading(false);
           return;
         }
+        params.program = selectedProgram;
         params.studentYear = selectedStudentYear;
         params.departmentId = selectedDepartment;
         params.section = selectedSection;
@@ -110,6 +113,8 @@ export default function TimetablesView() {
         setLoading(false);
         return;
       }
+      // Program qualifies year/section ("1st Year - A" exists in several programs)
+      if (selectedStudentYear || selectedSection) params.program = selectedProgram;
       if (selectedStudentYear) params.studentYear = selectedStudentYear;
       if (selectedDepartment) params.departmentId = selectedDepartment;
       if (selectedSection) params.section = selectedSection;
@@ -132,7 +137,7 @@ export default function TimetablesView() {
       .finally(() => {
         setLoading(false);
       });
-  }, [activeTab, isEditMode, selectedResource, selectedSection, selectedFaculty, selectedDepartment, selectedBlock, selectedDay, selectedDate, selectedStudentYear]);
+  }, [activeTab, isEditMode, selectedResource, selectedSection, selectedFaculty, selectedDepartment, selectedBlock, selectedDay, selectedDate, selectedProgram, selectedStudentYear]);
 
   // Fetch when selection changes
   useEffect(() => {
@@ -145,8 +150,18 @@ export default function TimetablesView() {
     // Don't reset timetables or filters so state is preserved when switching back
   };
 
+  const handleProgramChange = (val) => {
+    const program = val || DEFAULT_PROGRAM;
+    setSelectedProgram(program);
+    if (Number(selectedStudentYear) > yearOptionsFor(program).length) setSelectedStudentYear('');
+    if (!isEditMode) setSelectedDepartment('');
+    setSelectedSection('');
+  };
+
   const availableSections = sectionsData
     .filter(s => {
+      if ((s.program || DEFAULT_PROGRAM) !== selectedProgram) return false;
+
       // If the DB has null studentYear (legacy data), don't filter it out
       if (selectedStudentYear && s.studentYear && s.studentYear !== selectedStudentYear) return false;
       
@@ -167,13 +182,35 @@ export default function TimetablesView() {
   const sortedDepartments = [...departments].sort((a, b) => {
     if (!selectedStudentYear) return a.departmentName.localeCompare(b.departmentName);
     
-    const aHasData = sectionsData.some(s => s.departmentId === a.departmentId && s.studentYear === selectedStudentYear);
-    const bHasData = sectionsData.some(s => s.departmentId === b.departmentId && s.studentYear === selectedStudentYear);
+    const hasData = (deptId) => sectionsData.some(s =>
+      s.departmentId === deptId && s.studentYear === selectedStudentYear && (s.program || DEFAULT_PROGRAM) === selectedProgram
+    );
+    const aHasData = hasData(a.departmentId);
+    const bHasData = hasData(b.departmentId);
     
     if (aHasData && !bHasData) return -1;
     if (!aHasData && bHasData) return 1;
     return a.departmentName.localeCompare(b.departmentName);
   });
+
+  // PG programs only run in a few branches (e.g. MCA is only under IT), so list just those
+  const programDepartments = selectedProgram === DEFAULT_PROGRAM
+    ? sortedDepartments
+    : sortedDepartments.filter(d => sectionsData.some(s =>
+        s.departmentId === d.departmentId && s.program === selectedProgram &&
+        (!selectedStudentYear || s.studentYear === selectedStudentYear)
+      ));
+
+  const programLabel = PROGRAMS.find(p => p.value === selectedProgram)?.label;
+
+  // Pre-select the branch when the program has only one (MCA -> Information Technology)
+  useEffect(() => {
+    if (isEditMode || activeTab !== 'Sections' || selectedProgram === DEFAULT_PROGRAM) return;
+    if (programDepartments.length === 1) {
+      const onlyId = programDepartments[0].departmentId.toString();
+      if (selectedDepartment !== onlyId) setSelectedDepartment(onlyId);
+    }
+  }, [isEditMode, activeTab, selectedProgram, programDepartments, selectedDepartment]);
 
   return (
     <div className="p-6 bg-slate-50 min-h-full">
@@ -183,7 +220,7 @@ export default function TimetablesView() {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="shrink-0">
             <h1 className="text-2xl font-bold text-navy flex items-center gap-2 whitespace-nowrap">
-              <Calendar className="text-primary" size={24} />
+              <Calendar className="text-navy" size={24} />
               Unified Timetables
             </h1>
             <p className="text-slate-500 mt-1">Manage and view weekly schedules</p>
@@ -197,7 +234,7 @@ export default function TimetablesView() {
                   onClick={() => handleTabChange(tab)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     activeTab === tab && !isEditMode
-                      ? 'bg-indigo-600 text-white shadow-sm'
+                      ? 'bg-navy text-white shadow-sm'
                       : 'text-slate-600 hover:bg-slate-100 hover:text-navy'
                   }`}
                 >
@@ -220,7 +257,7 @@ export default function TimetablesView() {
                   }}
                   className={`flex items-center justify-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl text-sm font-medium transition-colors shadow-sm border ${
                     isUploadModalOpen && uploadModalMode === 'manual'
-                      ? 'bg-indigo-600 text-white border-indigo-600'
+                      ? 'bg-navy text-white border-navy'
                       : 'bg-white text-slate-700 border-line hover:bg-slate-50'
                   }`}
                 >
@@ -242,8 +279,8 @@ export default function TimetablesView() {
               onClick={() => { setIsEditMode(!isEditMode); setActiveTab(''); setIsUploadModalOpen(false); }}
               className={`flex items-center justify-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl text-sm font-medium transition-colors shadow-sm border ml-2 ${
                 isEditMode
-                  ? 'bg-indigo-600 text-white border-indigo-600'
-                  : 'bg-white text-indigo-600 border-line hover:bg-indigo-50'
+                  ? 'bg-navy text-white border-navy'
+                  : 'bg-white text-navy border-line hover:bg-navy/5'
               }`}
             >
               <Edit2 size={18} />
@@ -258,7 +295,14 @@ export default function TimetablesView() {
             <Search size={20} className="text-slate-400" />
           </div>
           
-          <div className={`w-full flex-1 ${isEditMode ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3' : 'flex flex-wrap items-center gap-3'}`}>
+          <div className={`w-full flex-1 ${
+            isEditMode
+              ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3'
+              : activeTab === 'Sections'
+                // One row on desktop: short Program/Year/Day, wide Branch/Section
+                ? 'grid grid-cols-2 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,0.85fr)_minmax(0,1.6fr)_minmax(0,1.9fr)_minmax(0,0.9fr)] gap-3'
+                : 'flex flex-wrap items-center gap-3'
+          }`}>
           {(!isEditMode && activeTab === 'Rooms') && (
             <>
               <SearchableSelect
@@ -299,27 +343,32 @@ export default function TimetablesView() {
           {(!isEditMode && activeTab === 'Sections') && (
             <>
               <SearchableSelect
+                value={selectedProgram}
+                onChange={handleProgramChange}
+                placeholder="Select Program..."
+                options={PROGRAMS.map(p => ({ value: p.value, label: p.label }))}
+                className="min-w-0"
+              />
+              <SearchableSelect
                 value={selectedStudentYear}
                 onChange={val => { setSelectedStudentYear(val); setSelectedSection(''); }}
                 placeholder="Select Year..."
                 options={[
                   { value: '', label: 'Select Year...' },
-                  { value: '1', label: '1st Year' },
-                  { value: '2', label: '2nd Year' },
-                  { value: '3', label: '3rd Year' },
-                  { value: '4', label: '4th Year' }
+                  ...yearOptionsFor(selectedProgram)
                 ]}
-                className="min-w-[140px]"
+                className="min-w-0"
               />
               <SearchableSelect
                 value={selectedDepartment}
                 onChange={val => { setSelectedDepartment(val); setSelectedSection(''); }}
-                placeholder="Select Branch..."
+                placeholder={programDepartments.length === 0 ? `No ${programLabel} timetables yet` : 'Select Branch...'}
                 options={[
                   { value: '', label: 'Select Branch...' },
-                  ...sortedDepartments.map(d => ({ value: d.departmentId.toString(), label: d.departmentName }))
+                  ...programDepartments.map(d => ({ value: d.departmentId.toString(), label: d.departmentName }))
                 ]}
-                className="min-w-[200px]"
+                title={programDepartments.find(d => d.departmentId.toString() === selectedDepartment)?.departmentName}
+                className="min-w-0 col-span-2 lg:col-span-1"
               />
               <SearchableSelect
                 value={selectedSection}
@@ -328,9 +377,10 @@ export default function TimetablesView() {
                 disabled={!selectedStudentYear || !selectedDepartment}
                 allowCreate={true}
                 options={[
-                  ...availableSections.map(s => ({ value: s, label: s }))
+                  ...availableSections.map(s => ({ value: s, label: sectionLabel(s, selectedProgram) }))
                 ]}
-                className="min-w-[150px]"
+                title={selectedSection ? sectionLabel(selectedSection, selectedProgram) : undefined}
+                className="min-w-0 col-span-2 lg:col-span-1"
               />
               <SearchableSelect
                 value={selectedDay}
@@ -340,7 +390,7 @@ export default function TimetablesView() {
                   { value: '', label: 'All Days' },
                   ...['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(d => ({ value: d, label: d }))
                 ]}
-                className="min-w-[140px]"
+                className="min-w-0 col-span-2 lg:col-span-1"
               />
             </>
           )}
@@ -373,15 +423,19 @@ export default function TimetablesView() {
           {isEditMode && (
             <>
               <SearchableSelect
+                value={selectedProgram}
+                onChange={handleProgramChange}
+                placeholder="Program"
+                options={PROGRAMS.map(p => ({ value: p.value, label: p.label }))}
+                className="min-w-[110px]"
+              />
+              <SearchableSelect
                 value={selectedStudentYear}
                 onChange={setSelectedStudentYear}
                 placeholder="All Years"
                 options={[
                   { value: '', label: 'All Years' },
-                  { value: '1', label: '1st Year' },
-                  { value: '2', label: '2nd Year' },
-                  { value: '3', label: '3rd Year' },
-                  { value: '4', label: '4th Year' }
+                  ...yearOptionsFor(selectedProgram)
                 ]}
                 className="min-w-[120px]"
               />
@@ -401,7 +455,7 @@ export default function TimetablesView() {
                 placeholder="Select Section"
                 allowCreate={true}
                 options={[
-                  ...availableSections.map(s => ({ value: s, label: s }))
+                  ...availableSections.map(s => ({ value: s, label: sectionLabel(s, selectedProgram) }))
                 ]}
                 className="min-w-[120px]"
               />
@@ -459,6 +513,7 @@ export default function TimetablesView() {
                   setSelectedDay('');
                   setSelectedDate('');
                 } else if (activeTab === 'Sections') {
+                  setSelectedProgram(DEFAULT_PROGRAM);
                   setSelectedStudentYear('');
                   setSelectedDepartment('');
                   setSelectedSection('');
@@ -482,7 +537,7 @@ export default function TimetablesView() {
             <button
               onClick={() => { setViewMode('grid'); }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                viewMode === 'grid' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-navy'
+                viewMode === 'grid' ? 'bg-white text-navy shadow-sm' : 'text-slate-500 hover:text-navy'
               }`}
             >
               <LayoutGrid size={14} />
@@ -491,7 +546,7 @@ export default function TimetablesView() {
             <button
               onClick={() => { setViewMode('list'); }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                viewMode === 'list' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-navy'
+                viewMode === 'list' ? 'bg-white text-navy shadow-sm' : 'text-slate-500 hover:text-navy'
               }`}
             >
               <List size={14} />
@@ -537,6 +592,7 @@ export default function TimetablesView() {
                   }}
                   onCancel={() => setIsUploadModalOpen(false)}
                   initialDepartment={selectedDepartment}
+                  initialProgram={selectedProgram}
                   initialStudentYear={selectedStudentYear}
                   initialSection={selectedSection}
                   availableSections={availableSections}
@@ -555,6 +611,7 @@ export default function TimetablesView() {
                     setTimetables={setTimetables}
                     selectedDate={selectedDate}
                     selectedDay={selectedDay}
+                    selectedProgram={selectedProgram}
                     selectedStudentYear={selectedStudentYear}
                     selectedDepartment={selectedDepartment}
                     selectedSection={selectedSection}
@@ -587,7 +644,7 @@ export default function TimetablesView() {
           
           {!loading && timetables.length === 0 && !isEditMode && activeTab === 'Sections' && (!selectedSection || !selectedDepartment || !selectedStudentYear) && !(isUploadModalOpen && uploadModalMode === 'manual') && (
             <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
-              Please select a Year, Branch, and Section to view the timetable.
+              Please select a Program, Year, Branch, and Section to view the timetable.
             </div>
           )}
 
@@ -619,6 +676,7 @@ export default function TimetablesView() {
           initialMode={uploadModalMode}
           contextFilters={{
             departmentId: selectedDepartment,
+            program: selectedProgram,
             studentYear: selectedStudentYear,
             section: selectedSection
           }}

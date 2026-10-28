@@ -1,38 +1,40 @@
 const asyncHandler = require('../../utils/asyncHandler');
 const service = require('./bookings.service');
-const { ROLES } = require('../../middleware/authorizeRole');
+const { ROLES, departmentScopeOf } = require('../../middleware/authorizeRole');
 
 const create = asyncHandler(async (req, res) => {
   const booking = await service.createBooking(req.body, req.auth.userId);
   res.status(201).json(booking);
 });
 
-// Requesters see only their own bookings; Department Admins see
-// their department's; Institute Admin/Super Admin see everything
-// (via query params, no special-casing needed in the service).
+// Institute Admin/Super Admin see everything; Department Admins see
+// bookings for the departments they manage; everyone else sees only
+// their own bookings. All filtering happens in the database so the
+// admin table never has to guess at fields the API didn't return.
 const list = asyncHandler(async (req, res) => {
-  const filters = { 
-    status: req.query.status, 
-    resourceId: req.query.resourceId,
-    departmentId: req.query.departmentId
+  const { departmentId, ...rest } = req.query;
+  const filters = {
+    status: rest.status,
+    resourceId: rest.resourceId,
+    blockId: rest.blockId,
+    resourceTypeId: rest.resourceTypeId,
+    dateFrom: rest.dateFrom,
+    dateTo: rest.dateTo,
+    search: rest.search,
   };
 
-  if (req.auth.roleId === ROLES.REQUESTER) {
-    filters.requesterUserId = req.auth.userId;
-  } else if (req.auth.roleId === ROLES.DEPARTMENT_ADMIN) {
-    // Force department admin to only see their own department's bookings
-    // If they have no department assigned yet, they see nothing (we pass -1 explicitly)
-    filters.departmentId = !req.auth.departmentId ? -1 : req.auth.departmentId;
-  } else if (req.query.departmentId) {
-    filters.departmentId = req.query.departmentId;
-  }
+  const seesAll = [ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN].includes(req.auth.roleId);
 
-  require('fs').appendFileSync('/app/src/debug.log', JSON.stringify({
-    time: new Date(),
-    query: req.query,
-    auth: req.auth,
-    filters,
-  }) + '\\n');
+  if (seesAll) {
+    if (departmentId !== undefined) filters.departmentIds = [departmentId];
+  } else if (req.auth.roleId === ROLES.DEPARTMENT_ADMIN) {
+    // A Department Admin with no department assigned sees nothing.
+    const scope = departmentScopeOf(req.auth);
+    filters.departmentIds =
+      departmentId === undefined ? scope : scope.filter((id) => id === departmentId);
+  } else {
+    filters.requesterUserId = req.auth.userId;
+  }
 
   res.json(await service.list(filters));
 });

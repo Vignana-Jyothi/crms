@@ -46,10 +46,15 @@ export default function ResourceDetail() {
     resourcesApi.availability(resourceId, date).then(setAvailability);
   }, [resourceId, date]);
 
-  const TIME_OPTIONS = [
-    '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', 
-    '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'
-  ];
+  // Whole hours plus the campus period boundaries (12:40, 13:40 ...),
+  // plus whatever slot the dashboard handed over, so a preselected time
+  // is always a real option in the dropdown.
+  const TIME_OPTIONS = [...new Set([
+    '08:00', '09:00', '10:00', '11:00', '12:00', '12:40', '13:00', '13:40',
+    '14:00', '14:40', '15:00', '15:40', '16:00', '16:40', '17:00', '17:40',
+    '18:00', '19:00', '20:00', '21:00',
+    form.startTime, form.endTime,
+  ].filter(Boolean))].sort();
 
   async function handleSubmit(e) {
     e.preventDefault();
