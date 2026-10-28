@@ -53,7 +53,19 @@ jobs:
           export BACKEND_PORT=6565
           export MAIN_FRONTEND_PORT=3535
           export ADMIN_FRONTEND_PORT=3536
-          
+
+          # The dev database volume was created with Postgres 17; a different
+          # major version refuses to start on it.
+          export POSTGRES_VERSION=17
+
           # Build images without cache to prevent "failed to prepare extraction snapshot" cache corruption bugs
           docker compose build --no-cache
           docker compose up -d
+
+          # Bring the dev database up to main's schema. The migrations are
+          # idempotent, so this is a no-op once they have been applied.
+          for attempt in 1 2 3 4 5 6; do
+            docker compose exec -T crms-backend node prisma/apply-migrations.js && break
+            if [ "$attempt" = 6 ]; then exit 1; fi
+            sleep 10
+          done

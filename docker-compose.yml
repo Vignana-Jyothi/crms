@@ -1,6 +1,8 @@
 services:
   db:
-    image: postgres:15-alpine
+    # Must match the version the data volume was created with: production
+    # runs 15, the dev server's volume is 17 (set in ci-dev.yml).
+    image: postgres:${POSTGRES_VERSION:-15}-alpine
     container_name: crms-db
     restart: unless-stopped
     env_file:
