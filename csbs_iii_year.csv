@@ -1,0 +1,30 @@
+Day,Start Time,End Time,Subject,Year,Dept,Section,Faculty,Classroom
+Monday,10:00,11:00,ML,3,CSBS,A,Mr. K. Akhil,E106
+Monday,11:00,12:00,PE1,3,CSBS,A,Mr. M. Sandeep / Mr. P. Sudheer Benarji,E119 / E106
+Monday,12:00,13:00,FOE,3,CSBS,A,Mrs. Ch. V L L Kusuma Kumari,E106
+Monday,13:40,16:40,CN LAB / ML LAB,3,CSBS,A,Mrs. N. Sarika / Mr. N. Praveen / Mr. K. Akhil / Mrs. G. Laxmi Deepthi,E001 / E101 / E002 / E102
+Tuesday,10:00,11:00,PE1,3,CSBS,A,Mr. M. Sandeep / Mr. P. Sudheer Benarji,E119 / E106
+Tuesday,11:00,12:00,IOT,3,CSBS,A,Mrs. S. Ambika,E106
+Tuesday,12:00,13:00,CN,3,CSBS,A,Mrs. N. Sarika,E106
+Tuesday,13:40,14:40,FOE,3,CSBS,A,Mrs. Ch. V L L Kusuma Kumari,E106
+Tuesday,14:40,15:40,DT,3,CSBS,A,Mr. M. Venkata Krishna Rao,E-004
+Tuesday,15:40,16:40,DT,3,CSBS,A,Mr. M. Venkata Krishna Rao,E-004
+Wednesday,10:00,11:00,CN,3,CSBS,A,Mrs. N. Sarika,E106
+Wednesday,11:00,12:00,IOT,3,CSBS,A,Mrs. S. Ambika,E106
+Wednesday,12:00,13:00,ML,3,CSBS,A,Mr. K. Akhil,E106
+Wednesday,13:40,16:40,ML LAB / CN LAB,3,CSBS,A,Mr. K. Akhil / Mrs. G. Laxmi Deepthi / Mrs. N. Sarika / Mr. N. Praveen,E002 / E102 / E001 / E101
+Thursday,10:00,11:00,CN,3,CSBS,A,Mrs. N. Sarika,E106
+Thursday,11:00,12:00,IOT,3,CSBS,A,Mrs. S. Ambika,E106
+Thursday,12:00,13:00,ML,3,CSBS,A,Mr. K. Akhil,E106
+Thursday,13:40,14:40,MENTORING,3,CSBS,A,,
+Thursday,14:40,15:40,SPORTS,3,CSBS,A,,
+Thursday,15:40,16:40,LIBRARY,3,CSBS,A,,
+Friday,10:00,11:00,PE1,3,CSBS,A,Mr. M. Sandeep / Mr. P. Sudheer Benarji,E119 / E106
+Friday,11:00,12:00,ML,3,CSBS,A,Mr. K. Akhil,E106
+Friday,12:00,13:00,IOT,3,CSBS,A,Mrs. S. Ambika,E106
+Friday,13:40,16:40,DV LAB,3,CSBS,A,Mr. I. Ravindra Kumar / Mrs. Ch. Sandhya Rani,E-014/015
+Saturday,10:00,11:00,FOE,3,CSBS,A,Mrs. Ch. V L L Kusuma Kumari,E106
+Saturday,11:00,12:00,CN,3,CSBS,A,Mrs. N. Sarika,E106
+Saturday,12:00,13:00,PE1,3,CSBS,A,Mr. M. Sandeep / Mr. P. Sudheer Benarji,E119 / E106
+Saturday,13:40,14:40,DT,3,CSBS,A,Mr. M. Venkata Krishna Rao,E-004
+Saturday,14:40,16:40,GS,3,CSBS,A,Dr. Mary Berifin,E-004

@@ -49,7 +49,6 @@ model Department {
   resources Resource[]
   timetable Timetable[]
   announcements Announcement[]
-  managers User[] @relation("ManagedDepartments")
 
   @@map("departments")
 }
@@ -124,7 +123,6 @@ model User {
   approvalsGiven Approval[] @relation("ApprovalApprover")
   announcementsPosted Announcement[] @relation("AnnouncementPoster")
   auditLogs AuditLog[]
-  managedDepartments Department[] @relation("ManagedDepartments")
 
   @@map("users")
 }
@@ -142,7 +140,6 @@ model Timetable {
   section String? @db.VarChar(20)
   academicYear String? @map("academic_year") @db.VarChar(20)
   studentYear String? @map("student_year") @db.VarChar(20)
-  program String @default("BTECH") @db.VarChar(10)
   facultyName String? @map("faculty_name") @db.VarChar(500)
   uploadedByUserId Int? @map("uploaded_by_user_id")
 
@@ -150,9 +147,6 @@ model Timetable {
   department Department? @relation(fields: [departmentId], references: [departmentId])
   uploadedBy User? @relation("TimetableUploader", fields: [uploadedByUserId], references: [userId])
 
-  @@index([dayOfWeek, resourceId])
-  @@index([departmentId, studentYear, section, dayOfWeek])
-  @@index([program, departmentId, studentYear, section])
   @@map("timetable")
 }
 
@@ -171,9 +165,6 @@ model Booking {
   requester User? @relation("BookingRequester", fields: [requesterUserId], references: [userId])
   approvals Approval[]
 
-  @@index([bookingDate, status])
-  @@index([resourceId, bookingDate])
-  @@index([requesterUserId])
   @@map("bookings")
 }
 

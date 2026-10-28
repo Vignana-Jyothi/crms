@@ -1,0 +1,28 @@
+Day,Start Time,End Time,Subject,Year,Dept,Section,Faculty,Classroom
+Monday,10:00,11:00,UDSA,4,CSBS,A,Mrs. K. Bhagya Rekha,E-038
+Monday,11:00,12:00,FM,4,CSBS,A,Dr. K. Anil Kumar,E-038
+Monday,12:00,13:00,CSA,4,CSBS,A,Mr. K. Akhil,E-038
+Monday,13:40,16:40,DEVOPS LAB,4,CSBS,A,Mr. B. Satyadev / Mrs. J. Pushpa Kumari,E333
+Tuesday,10:00,11:00,IRS,4,CSBS,A,Mr. T. Gnana Prakash,E-038
+Tuesday,11:00,12:00,CSA,4,CSBS,A,Mr. K. Akhil,E-038
+Tuesday,12:00,13:00,HRM,4,CSBS,A,Mr. K. V. L. N. Pavan Kumar,E-038
+Tuesday,13:40,16:40,Major Projects,4,CSBS,A,Dr. S. Nagini / Mr. K. Akhil,
+Wednesday,10:00,11:00,IRS,4,CSBS,A,Mr. T. Gnana Prakash,E-038
+Wednesday,11:00,12:00,CSA,4,CSBS,A,Mr. K. Akhil,E-038
+Wednesday,12:00,13:00,UDSA,4,CSBS,A,Mrs. K. Bhagya Rekha,E-038
+Wednesday,13:40,15:40,Major Projects,4,CSBS,A,Dr. S. Nagini / Mr. K. Akhil,
+Wednesday,15:40,16:40,ECA,4,CSBS,A,,
+Thursday,10:00,11:00,CSA,4,CSBS,A,Mr. K. Akhil,E-038
+Thursday,11:00,12:00,UDSA,4,CSBS,A,Mrs. K. Bhagya Rekha,E-038
+Thursday,12:00,13:00,IRS,4,CSBS,A,Mr. T. Gnana Prakash,E-038
+Thursday,13:40,14:40,MENTORING,4,CSBS,A,,
+Thursday,14:40,15:40,LIB,4,CSBS,A,,
+Thursday,15:40,16:40,CCA,4,CSBS,A,,
+Friday,10:00,11:00,FM,4,CSBS,A,Dr. K. Anil Kumar,E-038
+Friday,11:00,12:00,UDSA,4,CSBS,A,Mrs. K. Bhagya Rekha,E-038
+Friday,12:00,13:00,HRM,4,CSBS,A,Mr. K. V. L. N. Pavan Kumar,E-038
+Friday,13:40,16:40,UDSA LAB,4,CSBS,A,Mrs. K. Bhagya Rekha / Dr. P. Bharath Kumar,E333
+Saturday,10:00,11:00,HRM,4,CSBS,A,Mr. K. V. L. N. Pavan Kumar,E-038
+Saturday,11:00,12:00,FM,4,CSBS,A,Dr. K. Anil Kumar,E-038
+Saturday,12:00,13:00,IRS,4,CSBS,A,Mr. T. Gnana Prakash,E-038
+Saturday,13:40,16:40,Major Projects,4,CSBS,A,Dr. S. Nagini / Mr. K. Akhil,

@@ -4,7 +4,6 @@ const prisma = require('../../config/prisma');
 const eduprimeService = require('../eduprime/eduprime.service');
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const PROGRAMS = ['BTECH', 'MTECH', 'MCA'];
 
 function shouldUnassignRoom(courseCode, courseName) {
   const keywords = ['library', 'lib', 'sports', 'cca', 'eca', 'cva-l', 'mtp'];
@@ -115,7 +114,14 @@ async function syncEduPrime() {
   return { success: true, totalSynced };
 }
 
-async function update(timetableId, data) {
+async function update(timetableId, data, auth) {
+  const existing = await getById(timetableId);
+  if (auth && auth.roleId === 3) {
+    if (!auth.managedDepartmentIds || !auth.managedDepartmentIds.includes(existing.departmentId)) {
+      throw ApiError.forbidden("You are not authorized to update timetables for this department.");
+    }
+  }
+
   const allowedData = {};
   if (data.facultyName !== undefined) allowedData.facultyName = data.facultyName;
   if (data.courseCode !== undefined) allowedData.courseCode = data.courseCode;
@@ -131,7 +137,13 @@ async function update(timetableId, data) {
   });
 }
 
-async function create(data) {
+async function create(data, auth) {
+  if (auth && auth.roleId === 3) {
+    if (!auth.managedDepartmentIds || !auth.managedDepartmentIds.includes(data.departmentId)) {
+      throw ApiError.forbidden("You are not authorized to create timetables for this department.");
+    }
+  }
+
   if (data.startTime) data.startTime = toTimeValue(data.startTime);
   if (data.endTime) data.endTime = toTimeValue(data.endTime);
   return repo.create(data);
@@ -148,8 +160,6 @@ async function batchCreate(entries) {
     if (data.endTime) data.endTime = toTimeValue(data.endTime);
     // Remove the temporary 'id' field used by the frontend
     if (data.id) delete data.id;
-    // Unknown programs fall back to the column default (BTECH)
-    if (!PROGRAMS.includes(data.program)) delete data.program;
     
     if (shouldUnassignRoom(data.courseCode, data.courseName)) {
       data.resourceId = null;

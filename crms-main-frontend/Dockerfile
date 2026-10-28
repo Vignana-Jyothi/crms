@@ -1,6 +1,6 @@
 # Multi-stage: build the static bundle, then serve it with nginx —
 # same shape as your other Vite-based VJ frontends.
-FROM node:24-alpine AS build
+FROM node:20-alpine AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm install

@@ -2,11 +2,6 @@ import React, { useState } from 'react';
 import { X, Check, Edit2 } from 'lucide-react';
 import { fmtTimeSlot } from '../../utils/formatters';
 import { timetableApi } from '../../api/endpoints';
-import { useAuth } from '../../context/authStore';
-import { DEFAULT_PROGRAM, formatClassYear, sectionLabel } from '../../constants/programs';
-
-// The early 9:00 schedule only applies to B.Tech 1st year
-const isBTechFirstYear = (t) => t.studentYear === '1' && (t.program || DEFAULT_PROGRAM) === DEFAULT_PROGRAM;
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const TIME_SLOTS_STANDARD = [
@@ -38,7 +33,6 @@ export default function FullWeekTimetableGrid({
   setTimetables, 
   selectedDate, 
   selectedDay,
-  selectedProgram = DEFAULT_PROGRAM,
   selectedStudentYear,
   selectedDepartment,
   selectedSection,
@@ -50,17 +44,7 @@ export default function FullWeekTimetableGrid({
   const [editForm, setEditForm] = useState({});
   const [saving, setSaving] = useState(false);
   
-  const { user } = useAuth();
-  
-  const allowedDeptIds = user?.roleId === 3 ? [user.departmentId, ...(user.managedDepartments?.map(d => d.departmentId) || [])].filter(Boolean) : null;
-  const canEditDepartment = (deptId) => {
-    if (!user) return false;
-    if (user.roleId === 1 || user.roleId === 2) return true;
-    if (user.roleId === 3 && deptId) return allowedDeptIds.includes(parseInt(deptId));
-    return false;
-  };
-
-  const isFirstYearView = isBTechFirstYear({ studentYear: selectedStudentYear, program: selectedProgram }) || (timetables.length > 0 && timetables.every(isBTechFirstYear));
+  const isFirstYearView = selectedStudentYear === '1' || (timetables.length > 0 && timetables.every(t => t.studentYear === '1'));
   
   const toMins = (t) => {
     if (!t) return 0;
@@ -106,7 +90,7 @@ export default function FullWeekTimetableGrid({
     const startMins = sortedBoundaries[i];
     const endMins = sortedBoundaries[i+1];
     
-    const firstYearClassesCount = timetables.filter(isBTechFirstYear).length;
+    const firstYearClassesCount = timetables.filter(t => t.studentYear === '1').length;
     const seniorClassesCount = timetables.length - firstYearClassesCount;
     const primaryLunchMins = firstYearClassesCount >= seniorClassesCount ? 720 : 780;
     
@@ -181,7 +165,6 @@ export default function FullWeekTimetableGrid({
       if (id === 'new') {
         const payload = {
           ...editForm,
-          program: selectedProgram,
           studentYear: selectedStudentYear || '1',
           departmentId: selectedDepartment,
           startTime: `1970-01-01T${editForm.startTime}:00Z`,
@@ -203,7 +186,7 @@ export default function FullWeekTimetableGrid({
       setEditingId(null);
     } catch (err) {
       console.error('Failed to save:', err);
-      alert(err.response?.data?.error || 'Failed to save changes. Please try again.');
+      alert('Failed to save changes. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -343,7 +326,7 @@ export default function FullWeekTimetableGrid({
 
                   const baseClass = hasClasses ? classesRaw[0] : null;
 
-                  const firstYearClasses = timetables.filter(isBTechFirstYear).length;
+                  const firstYearClasses = timetables.filter(t => t.studentYear === '1').length;
                   const seniorClasses = timetables.length - firstYearClasses;
                   const primaryLunchStart = firstYearClasses >= seniorClasses ? '12:00' : '13:00';
                   
@@ -375,34 +358,28 @@ export default function FullWeekTimetableGrid({
                     <td key={idx} colSpan={colSpan} className={`border-r border-line p-2 text-center align-middle h-full ${!hasClasses && !isEditMode ? (isCellLunch ? 'bg-slate-50/80' : 'bg-slate-50/50') : 'bg-white hover:bg-slate-50 cursor-pointer transition-colors'}`}
                         onClick={() => {
                           if (hasClasses || isEditMode) {
-                            // Only allow adding new classes if a valid department is selected
-                            const canAdd = isEditMode && selectedDepartment && canEditDepartment(selectedDepartment);
-                            
                             setSelectedSlot({ day, start: mergedStart, end: mergedEnd, label: `${day} • ${fmtTimeSlot(`1970-01-01T${mergedStart}:00Z`, `1970-01-01T${mergedEnd}:00Z`)}` });
-                            if (!hasClasses && canAdd) {
+                            if (!hasClasses && isEditMode) {
                               setEditingId('new');
                               setEditForm({
                                 courseCode: '', courseName: '', section: selectedSection || '', facultyName: selectedFaculty || '', resourceId: selectedResource || '',
                                 dayOfWeek: day, startTime: `${mergedStart}:00`, endTime: `${mergedEnd}:00`
                               });
-                            } else if (!hasClasses && isEditMode && !canAdd) {
-                               alert('You must select a Branch/Department that you manage before adding a class.');
-                               setSelectedSlot(null);
                             }
                           }
                         }}>
                       {hasClasses ? (
-                        <div className="flex flex-col items-center justify-center p-2 rounded-lg bg-blue-50/90 border border-blue-200/70 w-full h-[85px] overflow-hidden shadow-xs hover:border-navy/40 transition-colors">
-                          <div className="font-bold text-navy text-[10px] text-center leading-tight line-clamp-2 mb-0.5">
+                        <div className="flex flex-col items-center justify-center p-2 rounded-lg bg-indigo-50 border border-indigo-100 w-full h-[85px] overflow-hidden">
+                          <div className="font-bold text-indigo-900 text-[10px] text-center leading-tight line-clamp-2 mb-0.5">
                             {aggregatedDisplay.courseShortNames.join(' / ')}
                           </div>
                           
                           {viewMode === 'Rooms' && (
                             <>
-                              <div className="text-[9px] text-navy/80 font-medium whitespace-nowrap">
-                                {formatClassYear(baseClass.studentYear, baseClass.program)} {baseClass.department?.branchCode} - {baseClass.section}
+                              <div className="text-[9px] text-indigo-700 font-medium whitespace-nowrap">
+                                {baseClass.studentYear && `${baseClass.studentYear}${baseClass.studentYear === '1' ? 'st' : baseClass.studentYear === '2' ? 'nd' : baseClass.studentYear === '3' ? 'rd' : 'th'} Yr`} {baseClass.department?.branchCode} - {baseClass.section}
                               </div>
-                              <div className="text-[9px] text-slate-600 line-clamp-1">
+                              <div className="text-[9px] text-indigo-600/80 line-clamp-1">
                                 {aggregatedDisplay.facultyNames?.length > 0 ? aggregatedDisplay.facultyNames.join(' / ') : 'Unassigned'}
                               </div>
                             </>
@@ -410,7 +387,7 @@ export default function FullWeekTimetableGrid({
 
                           {viewMode === 'Sections' && (
                             <>
-                              <div className="text-[9px] text-slate-600 line-clamp-2 text-center px-1">
+                              <div className="text-[9px] text-indigo-600/80 line-clamp-2 text-center px-1">
                                 {aggregatedDisplay.resourceNames?.length > 0 ? aggregatedDisplay.resourceNames.join(' / ') : 'No Room'} • {aggregatedDisplay.facultyNames?.length > 0 ? aggregatedDisplay.facultyNames.join(' / ') : 'Unassigned'}
                               </div>
                             </>
@@ -418,10 +395,10 @@ export default function FullWeekTimetableGrid({
 
                           {viewMode === 'Faculty' && (
                             <>
-                              <div className="text-[9px] text-navy/80 font-medium whitespace-nowrap">
-                                {formatClassYear(baseClass.studentYear, baseClass.program)} {baseClass.department?.branchCode} - {baseClass.section}
+                              <div className="text-[9px] text-indigo-700 font-medium whitespace-nowrap">
+                                {baseClass.studentYear && `${baseClass.studentYear}${baseClass.studentYear === '1' ? 'st' : baseClass.studentYear === '2' ? 'nd' : baseClass.studentYear === '3' ? 'rd' : 'th'} Yr`} {baseClass.department?.branchCode} - {baseClass.section}
                               </div>
-                              <div className="text-[9px] text-slate-600 line-clamp-1">
+                              <div className="text-[9px] text-indigo-600/80 line-clamp-1">
                                 {aggregatedDisplay.resourceNames?.length > 0 ? aggregatedDisplay.resourceNames.join(' / ') : 'No Room'}
                               </div>
                             </>
@@ -429,17 +406,17 @@ export default function FullWeekTimetableGrid({
                           
                           {!viewMode && (
                             <>
-                              <div className="text-[9px] text-navy/80 font-medium whitespace-nowrap">
-                                {formatClassYear(baseClass.studentYear, baseClass.program)} {baseClass.department?.branchCode} - {baseClass.section}
+                              <div className="text-[9px] text-indigo-700 font-medium whitespace-nowrap">
+                                {baseClass.studentYear && `${baseClass.studentYear}${baseClass.studentYear === '1' ? 'st' : baseClass.studentYear === '2' ? 'nd' : baseClass.studentYear === '3' ? 'rd' : 'th'} Yr`} {baseClass.department?.branchCode} - {baseClass.section}
                               </div>
-                              <div className="text-[9px] text-slate-600 line-clamp-1 text-center px-1">
+                              <div className="text-[9px] text-indigo-600/80 line-clamp-1 text-center px-1">
                                 {aggregatedDisplay.resourceNames?.length > 0 ? aggregatedDisplay.resourceNames.join(' / ') : 'No Room'} • {aggregatedDisplay.facultyNames?.length > 0 ? aggregatedDisplay.facultyNames.join(' / ') : 'Unassigned'}
                               </div>
                             </>
                           )}
                         </div>
                       ) : (
-                        <div className={`flex items-center justify-center h-full w-full py-4 ${isEditMode ? 'text-navy/60 font-medium hover:text-navy text-xs' : (isCellLunch ? 'text-slate-500 font-medium text-xs' : 'text-slate-400 italic text-xs')}`}>
+                        <div className={`flex items-center justify-center h-full w-full py-4 ${isEditMode ? 'text-indigo-400 font-medium hover:text-indigo-600 text-xs' : (isCellLunch ? 'text-slate-500 font-medium text-xs' : 'text-slate-400 italic text-xs')}`}>
                           {isEditMode ? '+ Add' : (isCellLunch ? 'Lunch' : 'Free')}
                         </div>
                       )}
@@ -505,7 +482,7 @@ export default function FullWeekTimetableGrid({
                       </div>
                       <div className="flex justify-end gap-2 mt-2 pt-2 border-t border-line">
                         <button onClick={handleCancel} disabled={saving} className="px-3 py-1.5 rounded text-xs font-medium text-slate-600 hover:bg-slate-100">Cancel</button>
-                        <button onClick={() => handleSave(c.timetableId)} disabled={saving} className="px-3 py-1.5 rounded flex items-center gap-1.5 text-xs font-medium bg-navy text-white hover:bg-navy-dark">
+                        <button onClick={() => handleSave(c.timetableId)} disabled={saving} className="px-3 py-1.5 rounded flex items-center gap-1.5 text-xs font-medium bg-indigo-600 text-white hover:bg-indigo-700">
                           {saving ? <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Check size={14} />}
                           Save
                         </button>
@@ -515,19 +492,19 @@ export default function FullWeekTimetableGrid({
                     <>
                       <div className="flex items-start justify-between gap-4">
                         <div className="pr-4">
-                          <h4 className="font-bold text-navy mb-1">
+                          <h4 className="font-bold text-indigo-900 mb-1">
                             {c.courseName && c.courseName !== c.courseCode ? `${c.courseName} (${c.courseCode})` : c.courseCode}
                           </h4>
-                          <p className="text-xs text-navy/80 font-medium mb-2">
-                            {formatClassYear(c.studentYear, c.program, 'Year')} {c.department?.branchCode} - {sectionLabel(c.section, c.program)}
+                          <p className="text-xs text-indigo-700 font-medium mb-2">
+                            {c.studentYear && `${c.studentYear}${c.studentYear === '1' ? 'st' : c.studentYear === '2' ? 'nd' : c.studentYear === '3' ? 'rd' : 'th'} Year`} {c.department?.branchCode} - {c.section}
                           </p>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
-                          <div className="bg-blue-50 text-navy px-2.5 py-1 rounded-md text-xs font-bold border border-blue-200/60 whitespace-nowrap">
+                          <div className="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-md text-xs font-bold border border-indigo-100 whitespace-nowrap">
                             {c.resource?.resourceName || 'No Room Assigned'}
                           </div>
-                          {isEditMode && canEditDepartment(c.departmentId) && (
-                            <button onClick={() => handleEdit(c)} className="p-1.5 text-slate-400 hover:text-navy hover:bg-blue-50 rounded-md transition-colors shadow-sm border border-transparent hover:border-blue-200">
+                          {isEditMode && (
+                            <button onClick={() => handleEdit(c)} className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors shadow-sm border border-transparent hover:border-indigo-100">
                               <Edit2 size={16} />
                             </button>
                           )}
@@ -544,8 +521,8 @@ export default function FullWeekTimetableGrid({
               ))}
               
               {isEditMode && editingId === 'new' && (
-                <div className="bg-white p-4 rounded-xl border border-navy/30 shadow-sm relative">
-                  <h4 className="text-sm font-bold text-navy mb-3 border-b border-line pb-2">Add New Class</h4>
+                <div className="bg-white p-4 rounded-xl border border-indigo-300 shadow-sm relative">
+                  <h4 className="text-sm font-bold text-indigo-900 mb-3 border-b border-line pb-2">Add New Class</h4>
                   <div className="flex flex-col gap-3">
                     <div className="grid grid-cols-2 gap-3">
                       <div>
@@ -578,7 +555,7 @@ export default function FullWeekTimetableGrid({
                     </div>
                     <div className="flex justify-end gap-2 mt-2 pt-2 border-t border-line">
                       <button onClick={handleCancel} disabled={saving} className="px-3 py-1.5 rounded text-xs font-medium text-slate-600 hover:bg-slate-100">Cancel</button>
-                      <button onClick={() => handleSave('new')} disabled={saving} className="px-3 py-1.5 rounded flex items-center gap-1.5 text-xs font-medium bg-navy text-white hover:bg-navy-dark">
+                      <button onClick={() => handleSave('new')} disabled={saving} className="px-3 py-1.5 rounded flex items-center gap-1.5 text-xs font-medium bg-indigo-600 text-white hover:bg-indigo-700">
                         {saving ? <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Check size={14} />}
                         Save
                       </button>
@@ -587,7 +564,7 @@ export default function FullWeekTimetableGrid({
                 </div>
               )}
               
-              {isEditMode && editingId !== 'new' && selectedDepartment && canEditDepartment(selectedDepartment) && getClassesForSlot(selectedSlot.day, selectedSlot.start, selectedSlot.end).length > 0 && (
+              {isEditMode && editingId !== 'new' && getClassesForSlot(selectedSlot.day, selectedSlot.start, selectedSlot.end).length > 0 && (
                 <button 
                   onClick={() => {
                     setEditingId('new');
@@ -596,7 +573,7 @@ export default function FullWeekTimetableGrid({
                       dayOfWeek: selectedSlot.day, startTime: `${selectedSlot.start}:00`, endTime: `${selectedSlot.end}:00`
                     });
                   }}
-                  className="w-full py-2.5 rounded-xl border border-dashed border-blue-200 text-navy font-semibold text-sm hover:bg-blue-50 hover:border-blue-300 transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-2.5 rounded-xl border border-dashed border-indigo-200 text-indigo-600 font-semibold text-sm hover:bg-indigo-50 hover:border-indigo-300 transition-colors flex items-center justify-center gap-2"
                 >
                   + Add Another Class
                 </button>

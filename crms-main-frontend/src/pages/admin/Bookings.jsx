@@ -1,8 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { bookingsApi, masterDataApi, resourcesApi } from '../../api/endpoints';
 import { fmtDate, fmtTimeSlot } from '../../utils/formatters';
-import { useAuth } from '../../context/authStore';
-import { ROLES } from '../../constants/roles';
 
 const STATUS_STYLE = {
   Pending: 'bg-amber/15 text-amber',
@@ -12,9 +10,6 @@ const STATUS_STYLE = {
 };
 
 export default function Bookings() {
-  const { user } = useAuth();
-  const isDeptAdmin = user?.roleId === ROLES.DEPARTMENT_ADMIN;
-
   const [status, setStatus] = useState('');
   const [departmentId, setDepartmentId] = useState('');
   const [resourceId, setResourceId] = useState('');
@@ -23,7 +18,6 @@ export default function Bookings() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const [departments, setDepartments] = useState([]);
@@ -45,47 +39,48 @@ export default function Bookings() {
     resourcesApi.list({}).then(setResources).catch(() => {});
   }, []);
 
-  useEffect(() => {
-    const handle = setTimeout(() => setDebouncedSearch(search.trim()), 300);
-    return () => clearTimeout(handle);
-  }, [search]);
-
-  // Every filter is applied by the API, so results stay correct no
-  // matter how many bookings exist.
-  const refresh = useCallback(() => {
-    let isCancelled = false;
+  function refresh() {
     setLoading(true);
     setError('');
     const params = {};
     if (status) params.status = status;
     if (departmentId) params.departmentId = departmentId;
     if (resourceId) params.resourceId = resourceId;
-    if (blockId) params.blockId = blockId;
-    if (resourceTypeId) params.resourceTypeId = resourceTypeId;
-    if (startDate) params.dateFrom = startDate;
-    if (endDate) params.dateTo = endDate;
-    if (debouncedSearch) params.search = debouncedSearch;
 
     bookingsApi
       .list(params)
-      .then((data) => !isCancelled && setBookings(data))
-      .catch((err) => !isCancelled && setError(err.response?.data?.error || 'Failed to load bookings.'))
-      .finally(() => !isCancelled && setLoading(false));
+      .then(setBookings)
+      .catch((err) => setError(err.response?.data?.error || 'Failed to load bookings.'))
+      .finally(() => setLoading(false));
+  }
 
-    return () => {
-      isCancelled = true;
-    };
-  }, [status, departmentId, resourceId, blockId, resourceTypeId, startDate, endDate, debouncedSearch]);
+  useEffect(refresh, [status, departmentId, resourceId]);
 
-  useEffect(refresh, [refresh]);
-
-  // Department Admins only ever get bookings for the departments they manage.
-  const scopedDepartmentIds = new Set(
-    [user?.departmentId, ...(user?.managedDepartments || []).map((d) => d.departmentId)].filter(Boolean)
-  );
-  const departmentOptions = isDeptAdmin
-    ? departments.filter((d) => scopedDepartmentIds.has(d.departmentId))
-    : departments;
+  const filteredBookings = bookings.filter((b) => {
+    if (startDate) {
+      const bDate = fmtDate(b.bookingDate);
+      if (bDate < startDate) return false;
+    }
+    if (endDate) {
+      const bDate = fmtDate(b.bookingDate);
+      if (bDate > endDate) return false;
+    }
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      const matchResource =
+        b.resource?.resourceName?.toLowerCase().includes(q) ||
+        b.resourceId?.toLowerCase().includes(q);
+      const matchRequester =
+        b.requester?.name?.toLowerCase().includes(q) ||
+        b.requester?.email?.toLowerCase().includes(q) ||
+        b.requester?.phone?.toLowerCase().includes(q);
+      const matchPurpose = b.purpose?.toLowerCase().includes(q);
+      if (!matchResource && !matchRequester && !matchPurpose) return false;
+    }
+    if (blockId && b.resource?.blockId !== parseInt(blockId)) return false;
+    if (resourceTypeId && b.resource?.resourceTypeId !== parseInt(resourceTypeId)) return false;
+    return true;
+  });
 
   async function handleConfirmCancel() {
     if (!cancelModalBooking) return;
@@ -160,8 +155,8 @@ export default function Bookings() {
               onChange={(e) => setDepartmentId(e.target.value)}
               className="w-full rounded border border-line px-3 py-2 text-xs focus:border-navy focus:outline-none"
             >
-              <option value="">{isDeptAdmin ? 'All my departments' : 'All departments'}</option>
-              {departmentOptions.map((d) => (
+              <option value="">All departments</option>
+              {departments.map((d) => (
                 <option key={d.departmentId} value={d.departmentId}>
                   {d.departmentName}
                 </option>
@@ -193,7 +188,7 @@ export default function Bookings() {
               <option value="">All blocks</option>
               {blocks.map((b) => (
                 <option key={b.blockId} value={b.blockId}>
-                  {b.blockName || b.blockCode}
+                  {b.blockCode}
                 </option>
               ))}
             </select>
@@ -218,7 +213,6 @@ export default function Bookings() {
             <input
               type="date"
               value={startDate}
-              max={endDate || undefined}
               onChange={(e) => setStartDate(e.target.value)}
               className="w-full rounded border border-line px-3 py-2 text-xs focus:border-navy focus:outline-none"
             />
@@ -228,7 +222,6 @@ export default function Bookings() {
             <input
               type="date"
               value={endDate}
-              min={startDate || undefined}
               onChange={(e) => setEndDate(e.target.value)}
               className="w-full rounded border border-line px-3 py-2 text-xs focus:border-navy focus:outline-none"
             />
@@ -283,11 +276,8 @@ export default function Bookings() {
         <p className="mt-6 text-sm text-ink/50">Loading bookings…</p>
       ) : (
         <>
-          <p className="mt-6 text-xs text-ink/50">
-            {bookings.length} booking{bookings.length === 1 ? '' : 's'} found
-          </p>
           {/* Desktop Table View */}
-          <div className="mt-2 hidden md:block overflow-x-auto rounded-lg border border-line bg-white shadow-sm">
+          <div className="mt-6 hidden md:block overflow-x-auto rounded-lg border border-line bg-white shadow-sm">
             <table className="w-full min-w-[1000px] text-left text-sm">
             <thead className="border-b border-line bg-paper text-xs uppercase tracking-wide text-ink/50">
               <tr>
@@ -301,7 +291,7 @@ export default function Bookings() {
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
-              {bookings.map((b) => (
+              {filteredBookings.map((b) => (
                 <tr key={b.bookingId} className="hover:bg-paper/40">
                   <td className="px-4 py-3 font-medium text-ink">
                     <div>{b.resource?.resourceName || b.resourceId || '—'}</div>
@@ -359,7 +349,7 @@ export default function Bookings() {
                   </td>
                 </tr>
               ))}
-              {bookings.length === 0 && (
+              {filteredBookings.length === 0 && (
                 <tr>
                   <td colSpan={7} className="px-4 py-10 text-center text-sm text-ink/50">
                     No bookings match the selected filters.
@@ -371,8 +361,8 @@ export default function Bookings() {
           </div>
 
           {/* Mobile Card View */}
-          <div className="mt-2 block md:hidden space-y-4">
-            {bookings.map((b) => (
+          <div className="mt-6 block md:hidden space-y-4">
+            {filteredBookings.map((b) => (
               <div key={b.bookingId} className="rounded-lg border border-line bg-white p-4 shadow-sm flex flex-col gap-3">
                 <div className="flex justify-between items-start">
                   <div>
@@ -418,7 +408,7 @@ export default function Bookings() {
                 )}
               </div>
             ))}
-            {bookings.length === 0 && (
+            {filteredBookings.length === 0 && (
               <div className="px-4 py-10 text-center text-sm text-ink/50 bg-white rounded-lg border border-line shadow-sm">
                 No bookings match the selected filters.
               </div>

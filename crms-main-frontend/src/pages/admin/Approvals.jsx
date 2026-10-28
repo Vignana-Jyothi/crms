@@ -115,17 +115,6 @@ export default function Approvals() {
                   <p className="mt-0.5 text-xs text-ink/50">
                     {fmtDate(a.booking?.bookingDate)} · {fmtTimeSlot(a.booking?.startTime, a.booking?.endTime)}
                   </p>
-                  {a.booking?.createdAt && (
-                    <p className="mt-0.5 text-[11px] text-ink/40">
-                      Requested{' '}
-                      {new Date(a.booking.createdAt).toLocaleString('en-IN', {
-                        day: '2-digit',
-                        month: 'short',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </p>
-                  )}
                   <p className="mt-2 text-sm text-ink/80">{a.booking?.purpose || 'No purpose specified'}</p>
                   <p className="mt-2 text-xs text-ink/50">
                     Requested by <span className="font-medium text-ink/70">{a.booking?.requester?.name || 'Unknown'}</span>

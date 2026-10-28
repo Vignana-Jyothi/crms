@@ -1,24 +1,32 @@
-import client from './client';
+import client, { setTokens, clearTokens } from './client';
 
 export const authApi = {
-  checkAuth: () => client.get(`${import.meta.env.VITE_AUTH_URL || 'https://auth.vjstartup.com'}/check-auth`).then(r => r.data),
-  logout: () => client.post(`${import.meta.env.VITE_AUTH_URL || 'https://auth.vjstartup.com'}/logout`).then(r => r.data),
+  async login(email, password) {
+    const { data } = await client.post('/auth/login', { email, password });
+    setTokens(data);
+    return data.user;
+  },
+  async signup(payload) {
+    const { data } = await client.post('/auth/signup', payload);
+    setTokens(data);
+    return data.user;
+  },
+  logout() {
+    clearTokens();
+  },
+  setPassword: (data) => client.post('/auth/set-password', data).then((r) => r.data),
 };
 
 export const usersApi = {
   me: () => client.get('/users/me').then((r) => r.data),
   list: (departmentId) => client.get('/users', { params: { departmentId } }).then((r) => r.data),
   create: (payload) => client.post('/users', payload).then((r) => r.data),
-  updateRole: (userId, roleId, departmentId, managedDepartmentIds = []) =>
-    client.patch(`/users/${userId}/role`, { roleId, departmentId, managedDepartmentIds }).then((r) => r.data),
+  updateRole: (userId, roleId, departmentId) =>
+    client.patch(`/users/${userId}/role`, { roleId, departmentId }).then((r) => r.data),
   updateStatus: (userId, status) =>
     client.patch(`/users/${userId}/status`, { status }).then((r) => r.data),
   update: (userId, data) => 
     client.put(`/users/${userId}`, data).then((r) => r.data),
-  updateProfile: (data) =>
-    client.patch('/users/me', data).then((r) => r.data),
-  remove: (userId) =>
-    client.delete(`/users/${userId}`).then((r) => r.data),
 };
 
 export const masterDataApi = {
@@ -33,7 +41,6 @@ export const masterDataApi = {
 export const resourcesApi = {
   list: (params) => client.get('/resources', { params }).then((r) => r.data),
   liveStatus: (date, startTime, endTime) => client.get('/resources/live-status', { params: { date, startTime, endTime } }).then((r) => r.data),
-  aiRecommend: (params) => client.get('/resources/ai-recommend', { params }).then((r) => r.data),
   availability: (resourceId, date) => client.get(`/resources/${resourceId}/availability`, { params: { date } }).then((r) => r.data),
   get: (resourceId) => client.get(`/resources/${resourceId}`).then((r) => r.data),
   create: (payload) => client.post('/resources', payload).then((r) => r.data),

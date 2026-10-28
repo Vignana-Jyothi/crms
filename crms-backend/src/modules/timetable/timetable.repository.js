@@ -1,6 +1,6 @@
 const prisma = require('../../config/prisma');
 
-function list({ departmentId, resourceId, dayOfWeek, academicYear, courseCode, section, facultyName, startTime, endTime, studentYear, program }) {
+function list({ departmentId, resourceId, dayOfWeek, academicYear, courseCode, section, facultyName, startTime, endTime, studentYear }) {
   return prisma.timetable.findMany({
     where: {
       ...(departmentId && { departmentId: Number(departmentId) }),
@@ -13,7 +13,6 @@ function list({ departmentId, resourceId, dayOfWeek, academicYear, courseCode, s
       ...(startTime && { endTime: { gt: startTime } }),
       ...(endTime && { startTime: { lt: endTime } }),
       ...(studentYear && { studentYear }),
-      ...(program && { program }),
     },
     include: {
       resource: {

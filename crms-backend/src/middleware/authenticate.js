@@ -1,67 +1,26 @@
-const axios = require('axios');
 const ApiError = require('../utils/ApiError');
-const prisma = require('../config/prisma');
+const { verifyAccessToken } = require('../utils/jwt');
 
 // "Who are you?" — Section 13 of the architecture doc.
-// Verifies the SSO token via auth-server and fetches/provisions the user.
-module.exports = async function authenticate(req, res, next) {
-  let token = req.cookies?.userToken;
-  if (!token) {
-    const header = req.headers.authorization || '';
-    const [scheme, hToken] = header.split(' ');
-    if (scheme === 'Bearer' && hToken) token = hToken;
-  }
+// Verifies the JWT and attaches { userId, roleId, departmentId }
+// to req.auth. Does NOT check permissions — that's authorizeRole.
+module.exports = function authenticate(req, res, next) {
+  const header = req.headers.authorization || '';
+  const [scheme, token] = header.split(' ');
 
-  if (!token) {
-    return next(ApiError.unauthorized('Missing authentication token'));
+  if (scheme !== 'Bearer' || !token) {
+    return next(ApiError.unauthorized('Missing or malformed Authorization header'));
   }
 
   try {
-    const authUrl = process.env.AUTH_URL || 'https://auth.vjstartup.com';
-    // Send token to auth-server for verification
-    const response = await axios.post(`${authUrl}/verify-token`, { token }, {
-      headers: { 'x-app-name': 'crms' }
-    });
-
-    if (!response.data || !response.data.valid) {
-      return next(ApiError.unauthorized('Invalid or expired token via auth-server'));
-    }
-
-    const email = response.data.user.email;
-    if (!email) {
-      return next(ApiError.unauthorized('Token did not contain an email address'));
-    }
-
-    // Lookup user by email in the local database
-    let user = await prisma.user.findUnique({ 
-      where: { email },
-      include: { managedDepartments: true }
-    });
-
-    // Only allow pre-registered users. Unknown emails are rejected.
-    if (!user) {
-      const err = new Error('Email not registered in CRMS');
-      err.statusCode = 403;
-      err.code = 'EMAIL_NOT_REGISTERED';
-      return res.status(403).json({
-        error: 'Access denied. Your email is not registered in CRMS.',
-        code: 'EMAIL_NOT_REGISTERED'
-      });
-    }
-
-    if (user.status !== 'Active') {
-      return next(ApiError.forbidden('Your account has been deactivated'));
-    }
-
+    const payload = verifyAccessToken(token);
     req.auth = {
-      userId: user.userId,
-      roleId: user.roleId,
-      departmentId: user.departmentId,
-      managedDepartmentIds: user.managedDepartments ? user.managedDepartments.map(d => d.departmentId) : []
+      userId: payload.sub,
+      roleId: payload.roleId,
+      departmentId: payload.departmentId,
     };
     next();
   } catch (err) {
-    console.error("SSO Auth verification failed:", err.message);
-    return next(ApiError.unauthorized('Authentication failed or token invalid'));
+    next(ApiError.unauthorized('Invalid or expired token'));
   }
 };

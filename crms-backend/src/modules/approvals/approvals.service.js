@@ -4,8 +4,7 @@ const repo = require('./approvals.repository');
 const bookingsRepo = require('../bookings/bookings.repository');
 const auditService = require('../audit/audit.service');
 const notifications = require('../notifications/notifications.service');
-const { ROLES, departmentScopeOf } = require('../../middleware/authorizeRole');
-const { invalidateKeys } = require('../../config/redis');
+const { ROLES } = require('../../middleware/authorizeRole');
 
 // Section 21: Booking Created -> Pending Approval -> read ownership
 // -> route to Dept Admin or Institute Admin -> Approve/Reject ->
@@ -17,16 +16,16 @@ async function listPending(auth) {
   return repo.listPendingFor({
     approverUserId: auth.userId,
     roleId: auth.roleId,
-    departmentIds: departmentScopeOf(auth),
+    departmentId: auth.departmentId,
   });
 }
 
 function canDecide(approval, auth) {
   if (approval.approverUserId === auth.userId) return true;
   if (approval.approverRoleId === auth.roleId) {
-    // Department Admin: only within the departments they manage
+    // Department Admin: only within their own department
     if (auth.roleId === ROLES.DEPARTMENT_ADMIN) {
-      return departmentScopeOf(auth).includes(approval.booking?.resource?.departmentId);
+      return approval.booking?.resource?.departmentId === auth.departmentId;
     }
     return true; // Super Admin or Institute Admin acting on an assigned approval
   }
@@ -46,7 +45,7 @@ async function decide(approvalId, decision, remarks, auth) {
     throw ApiError.badRequest('Remarks are required when rejecting a booking request');
   }
 
-  const result = await prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx) => {
     const updated = await repo.recordDecision(tx, approvalId, {
       approverUserId: auth.userId,
       decision, // 'Approved' | 'Rejected'
@@ -90,13 +89,6 @@ async function decide(approvalId, decision, remarks, auth) {
 
     return updated;
   });
-
-  // The room's cached availability strip still shows this booking as
-  // Pending until it is invalidated.
-  const resourceId = approval.booking?.resourceId;
-  if (resourceId) await invalidateKeys(`avail:${resourceId}:*`);
-
-  return result;
 }
 
 module.exports = { listPending, decide };

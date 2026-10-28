@@ -5,7 +5,6 @@ const SAFE_SELECT = {
   departmentId: true, notes: true, roomNo: true, status: true,
   role: { select: { roleName: true } },
   department: { select: { departmentName: true, branchCode: true } },
-  managedDepartments: { select: { departmentId: true, departmentName: true, branchCode: true } }
 }; // deliberately excludes passwordHash / refreshToken
 
 const list = (departmentId) =>
@@ -17,18 +16,8 @@ const list = (departmentId) =>
 
 const findById = (userId) => prisma.user.findUnique({ where: { userId }, select: SAFE_SELECT });
 
-const updateRole = (userId, roleId, departmentId, managedDepartmentIds = []) =>
-  prisma.user.update({
-    where: { userId },
-    data: {
-      roleId,
-      departmentId,
-      managedDepartments: {
-        set: managedDepartmentIds.map(id => ({ departmentId: id }))
-      }
-    },
-    select: SAFE_SELECT
-  });
+const updateRole = (userId, roleId, departmentId) =>
+  prisma.user.update({ where: { userId }, data: { roleId, departmentId }, select: SAFE_SELECT });
 
 const updateStatus = (userId, status) =>
   prisma.user.update({ where: { userId }, data: { status }, select: SAFE_SELECT });
@@ -38,7 +27,4 @@ const create = (data) => prisma.user.create({ data, select: SAFE_SELECT });
 const update = (userId, data) => 
   prisma.user.update({ where: { userId }, data, select: SAFE_SELECT });
 
-const deleteUser = (userId) =>
-  prisma.user.delete({ where: { userId } });
-
-module.exports = { list, findById, updateRole, updateStatus, create, update, deleteUser };
+module.exports = { list, findById, updateRole, updateStatus, create, update };

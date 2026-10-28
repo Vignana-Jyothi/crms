@@ -1,0 +1,244 @@
+Day,Start Time,End Time,Subject,Year,Dept,Section,Faculty,Classroom
+Monday,10:00,11:00,FM&HM,2,ME,A,Dr. K. Balashowry,D314
+Monday,11:00,12:00,MT&M,2,ME,A,Dr. M. S. Srinivasa Rao,D314
+Monday,12:00,13:00,MMS,2,ME,A,Dr. G. Srinivasa Gupta,D314
+Monday,13:40,14:40,MOS,2,ME,A,Dr. K. Ajay Kumar,D314
+Monday,14:40,16:40,H & W,2,ME,A,Dr. Sailaja Simma,KS Audi
+Monday,14:40,16:40,H & W,2,ME,A,Sri. S. R. Somayajulu,KS Audi
+Tuesday,10:00,11:00,KOM,2,ME,A,Dr. H. Naresh,D314
+Tuesday,11:00,13:00,M&MOS LAB,2,ME,A,Dr. G. Srinivasa Gupta,D316/D002/1
+Tuesday,11:00,13:00,M&MOS LAB,2,ME,A,Dr. H. Naresh,D316/D002/1
+Tuesday,11:00,13:00,MT&M LAB,2,ME,A,Dr. M. S. Srinivasa Rao,A006
+Tuesday,11:00,13:00,MT&M LAB,2,ME,A,Sri. P. Narendra,A006
+Tuesday,13:40,14:40,MMS,2,ME,A,Dr. G. Srinivasa Gupta,D314
+Tuesday,14:40,15:40,MT&M,2,ME,A,Dr. M. S. Srinivasa Rao,D314
+Tuesday,15:40,16:40,ECA,2,ME,A,,
+Tuesday,15:40,16:40,CCA,2,ME,A,,
+Wednesday,10:00,11:00,KOM,2,ME,A,Dr. H. Naresh,D314
+Wednesday,11:00,12:00,FM&HM,2,ME,A,Dr. K. Balashowry,D314
+Wednesday,12:00,13:00,MMS,2,ME,A,Dr. G. Srinivasa Gupta,D314
+Wednesday,13:40,14:40,MOS,2,ME,A,Dr. K. Ajay Kumar,D314
+Wednesday,14:40,16:40,MT&M LAB,2,ME,A,Dr. M. S. Srinivasa Rao,A006
+Wednesday,14:40,16:40,MT&M LAB,2,ME,A,Sri. P. Narendra,A006
+Wednesday,14:40,16:40,FM&HM LAB,2,ME,A,Dr. K. Balashowry,A012
+Wednesday,14:40,16:40,FM&HM LAB,2,ME,A,Dr. G.V. Subash,A012
+Thursday,10:00,11:00,MOS,2,ME,A,Dr. K. Ajay Kumar,D314
+Thursday,11:00,12:00,KOM,2,ME,A,Dr. H. Naresh,D314
+Thursday,12:00,13:00,FM&HM,2,ME,A,Dr. K. Balashowry,D314
+Thursday,13:40,15:40,PP LAB,2,ME,A,Dr. L. Sandeep Raj,D313
+Thursday,13:40,15:40,PP LAB,2,ME,A,Dr. Jayashri Nair,D313
+Thursday,13:40,15:40,PP LAB,2,ME,A,Dr. B. Satyanarayana,D313
+Thursday,15:40,16:40,LIBRARY,2,ME,A,,
+Friday,10:00,11:00,MT&M,2,ME,A,Dr. M. S. Srinivasa Rao,D314
+Friday,11:00,13:00,FM&HM LAB,2,ME,A,Dr. K. Balashowry,A012
+Friday,11:00,13:00,FM&HM LAB,2,ME,A,Dr. G.V. Subash,A012
+Friday,11:00,13:00,M&MOS LAB,2,ME,A,Dr. G. Srinivasa Gupta,D316/D002/1
+Friday,11:00,13:00,M&MOS LAB,2,ME,A,Dr. H. Naresh,D316/D002/1
+Friday,13:40,16:40,Q & QA,2,ME,A,Dr. A. Syam Prasad,D314
+Saturday,10:00,11:00,KOM,2,ME,A,Dr. H. Naresh,D314
+Saturday,11:00,12:00,MOS,2,ME,A,Dr. K. Ajay Kumar,D314
+Saturday,12:00,13:00,FM&HM,2,ME,A,Dr. K. Balashowry,D314
+Saturday,13:40,16:40,DT,2,ME,A,Dr. Ch. Naveen Reddy,E507
+Saturday,13:40,16:40,DT,2,ME,A,Dr. S. Bhanu Murthy,E507
+Monday,10:00,11:00,FM&HM,2,ME,B,Dr. G.V. Subash,D315
+Monday,11:00,12:00,MMS,2,ME,B,Dr. D. Sarath Chandra,D315
+Monday,12:00,13:00,MT&M,2,ME,B,Dr. K. Jaya Prakash,D315
+Monday,13:40,14:40,KOM,2,ME,B,Dr. A. Syam Prasad,D315
+Monday,14:40,16:40,M&MOS LAB,2,ME,B,Dr. D. Sarath Chandra,D316/D002/1
+Monday,14:40,16:40,M&MOS LAB,2,ME,B,Dr. A. Syam Prasad,D316/D002/1
+Monday,14:40,16:40,MT&M LAB,2,ME,B,Dr. K. Jaya Prakash,A006
+Monday,14:40,16:40,MT&M LAB,2,ME,B,Dr. M. S. Srinivasa Rao,A006
+Tuesday,10:00,12:00,PP LAB,2,ME,B,Dr. Jayashri Nair,D313
+Tuesday,10:00,12:00,PP LAB,2,ME,B,Dr. L. Sandeep Raj,D313
+Tuesday,10:00,12:00,PP LAB,2,ME,B,Dr. B. Satyanarayana,D313
+Tuesday,12:00,13:00,MMS,2,ME,B,Dr. D. Sarath Chandra,D315
+Tuesday,13:40,16:40,DT,2,ME,B,Dr. Ch. Naveen Reddy,E507
+Tuesday,13:40,16:40,DT,2,ME,B,Dr. B. Pratyusha,E507
+Wednesday,10:00,11:00,MT&M,2,ME,B,Dr. K. Jaya Prakash,D315
+Wednesday,11:00,12:00,KOM,2,ME,B,Dr. A. Syam Prasad,D315
+Wednesday,12:00,13:00,MOS,2,ME,B,Dr. K. Kiran Kumar,D315
+Wednesday,13:40,14:40,FM&HM,2,ME,B,Dr. G.V. Subash,D315
+Wednesday,14:40,16:40,H & W,2,ME,B,Dr. Sailaja Simma,KS Audi
+Wednesday,14:40,16:40,H & W,2,ME,B,Sri. S. R. Somayajulu,KS Audi
+Thursday,10:00,11:00,MT&M,2,ME,B,Dr. K. Jaya Prakash,D315
+Thursday,11:00,12:00,FM&HM,2,ME,B,Dr. G.V. Subash,D315
+Thursday,12:00,13:00,KOM,2,ME,B,Dr. A. Syam Prasad,D315
+Thursday,13:40,14:40,MOS,2,ME,B,Dr. K. Kiran Kumar,D315
+Thursday,14:40,16:40,FM&HM LAB,2,ME,B,Dr. G.V. Subash,A012
+Thursday,14:40,16:40,FM&HM LAB,2,ME,B,Dr. K. Balashowry,A012
+Thursday,14:40,16:40,M&MOS LAB,2,ME,B,Dr. D. Sarath Chandra,D316/D002/1
+Thursday,14:40,16:40,M&MOS LAB,2,ME,B,Dr. A. Syam Prasad,D316/D002/1
+Friday,10:00,13:00,Q & QA,2,ME,B,Dr. A. Syam Prasad,D315
+Friday,13:40,14:40,MOS,2,ME,B,Dr. K. Kiran Kumar,D315
+Friday,14:40,16:40,MT&M LAB,2,ME,B,Dr. K. Jaya Prakash,A006
+Friday,14:40,16:40,MT&M LAB,2,ME,B,Dr. M. S. Srinivasa Rao,A006
+Friday,14:40,16:40,FM&HM LAB,2,ME,B,Dr. G.V. Subash,A012
+Friday,14:40,16:40,FM&HM LAB,2,ME,B,Dr. K. Balashowry,A012
+Saturday,10:00,11:00,MMS,2,ME,B,Dr. D. Sarath Chandra,D315
+Saturday,11:00,12:00,KOM,2,ME,B,Dr. A. Syam Prasad,D315
+Saturday,12:00,13:00,MOS,2,ME,B,Dr. K. Kiran Kumar,D315
+Saturday,13:40,14:40,FM&HM,2,ME,B,Dr. G.V. Subash,D315
+Saturday,14:40,15:40,LIBRARY,2,ME,B,,
+Saturday,15:40,16:40,ECA,2,ME,B,,
+Saturday,15:40,16:40,CCA,2,ME,B,,
+Monday,10:00,11:00,TE,3,ME,A,Dr. V. Siva Rama Krishna,D213
+Monday,11:00,13:00,AWLET&ML,3,ME,A,Dr. Sailaja Simma,KS Audi
+Monday,11:00,13:00,AWLET&ML,3,ME,A,Sri. S. R. Somayajulu,KS Audi
+Monday,13:40,14:40,NCS,3,ME,A,Dr. Jayashri Nair,D213
+Monday,13:40,14:40,IEM,3,ME,A,Sri. S. R. Somayajulu,D213
+Monday,14:40,16:40,OE-I,3,ME,A,,
+Tuesday,10:00,13:00,AECS LAB,3,ME,A,Dr. Rachel Irdaya Raj,D507/510
+Tuesday,10:00,13:00,AECS LAB,3,ME,A,Dr. Sudha Rani,D507/510
+Tuesday,13:40,16:40,TE LAB,3,ME,A,Dr. V. Siva Rama Krishna,B007
+Tuesday,13:40,16:40,TE LAB,3,ME,A,Dr. K. Krishna Murthy,B007
+Tuesday,13:40,16:40,A&R LAB,3,ME,A,Dr. S. Bhanu Murthy,D418
+Wednesday,10:00,11:00,MED,3,ME,A,Dr. CH. Rajeswari,D213
+Wednesday,11:00,12:00,TE,3,ME,A,Dr. V. Siva Rama Krishna,D213
+Wednesday,12:00,13:00,NCS,3,ME,A,Dr. Jayashri Nair,D213
+Wednesday,12:00,13:00,IEM,3,ME,A,Sri. S. R. Somayajulu,D213
+Wednesday,13:40,14:40,A&R,3,ME,A,Dr. S. Bhanu Murthy,D213
+Wednesday,14:40,15:40,LIBRARY,3,ME,A,,
+Wednesday,15:40,16:40,ECA,3,ME,A,,
+Thursday,10:00,11:00,TE,3,ME,A,Dr. V. Siva Rama Krishna,D213
+Thursday,11:00,12:00,A&R,3,ME,A,Dr. S. Bhanu Murthy,D213
+Thursday,12:00,13:00,NCS,3,ME,A,Dr. Jayashri Nair,D213
+Thursday,12:00,13:00,IEM,3,ME,A,Sri. S. R. Somayajulu,D213
+Thursday,13:40,14:40,MED,3,ME,A,Dr. CH. Rajeswari,D213
+Thursday,14:40,15:40,MENTORING,3,ME,A,,
+Thursday,15:40,16:40,CCA,3,ME,A,,
+Friday,10:00,12:00,MED,3,ME,A,Dr. CH. Rajeswari,D213
+Friday,12:00,13:00,A&R,3,ME,A,Dr. S. Bhanu Murthy,D213
+Friday,13:40,16:40,A&R LAB,3,ME,A,Dr. S. Bhanu Murthy,D418
+Friday,13:40,16:40,TE LAB,3,ME,A,Dr. V. Siva Rama Krishna,B007
+Friday,13:40,16:40,TE LAB,3,ME,A,Dr. K. Krishna Murthy,B007
+Saturday,10:00,11:00,OE-I,3,ME,A,,
+Saturday,11:00,12:00,TE,3,ME,A,Dr. V. Siva Rama Krishna,D213
+Saturday,12:00,13:00,A&R,3,ME,A,Dr. S. Bhanu Murthy,D213
+Saturday,13:40,14:40,NCS,3,ME,A,Dr. Jayashri Nair,D213
+Saturday,13:40,14:40,IEM,3,ME,A,Sri. S. R. Somayajulu,D213
+Saturday,14:40,15:40,CVA-L3,3,ME,A,,
+Saturday,15:40,16:40,LIBRARY,3,ME,A,,
+Monday,10:00,11:00,A&R,3,ME,B,Dr. S. Bhanu Murthy,D214
+Monday,11:00,13:00,AWLET&ML,3,ME,B,Dr. Sailaja Simma,KS Audi
+Monday,11:00,13:00,AWLET&ML,3,ME,B,Sri. S. R. Somayajulu,KS Audi
+Monday,13:40,14:40,NCS,3,ME,B,Dr. Jayashri Nair,D214
+Monday,13:40,14:40,IEM,3,ME,B,Sri. S. R. Somayajulu,D214
+Monday,14:40,16:40,OE-I,3,ME,B,,
+Tuesday,10:00,11:00,TE,3,ME,B,Dr. K. Krishna Murthy,D214
+Tuesday,11:00,12:00,A&R,3,ME,B,Dr. S. Bhanu Murthy,D214
+Tuesday,12:00,13:00,MED,3,ME,B,Dr. T. Malyadri,D214
+Tuesday,13:40,16:40,AECS LAB,3,ME,B,Dr. Lalitha Sreedevi,D507/510
+Tuesday,13:40,16:40,AECS LAB,3,ME,B,Dr. Somrwita Ghosh,D507/510
+Wednesday,10:00,11:00,MED,3,ME,B,Dr. T. Malyadri,D214
+Wednesday,11:00,12:00,A&R,3,ME,B,Dr. S. Bhanu Murthy,D214
+Wednesday,12:00,13:00,NCS,3,ME,B,Dr. Jayashri Nair,D214
+Wednesday,12:00,13:00,IEM,3,ME,B,Sri. S. R. Somayajulu,D214
+Wednesday,13:40,14:40,TE,3,ME,B,Dr. K. Krishna Murthy,D214
+Wednesday,14:40,15:40,LIBRARY,3,ME,B,,
+Wednesday,15:40,16:40,ECA,3,ME,B,,
+Thursday,10:00,11:00,A&R,3,ME,B,Dr. S. Bhanu Murthy,D214
+Thursday,11:00,12:00,TE,3,ME,B,Dr. K. Krishna Murthy,D214
+Thursday,12:00,13:00,NCS,3,ME,B,Dr. Jayashri Nair,D214
+Thursday,12:00,13:00,IEM,3,ME,B,Sri. S. R. Somayajulu,D214
+Thursday,13:40,16:40,TE LAB,3,ME,B,Dr. K. Krishna Murthy,B007
+Thursday,13:40,16:40,TE LAB,3,ME,B,Dr. V. Siva Rama Krishna,B007
+Thursday,13:40,16:40,A&R LAB,3,ME,B,Dr. S. Bhanu Murthy,D418
+Thursday,13:40,16:40,A&R LAB,3,ME,B,Dr. N. Shiva Kumar,D418
+Friday,10:00,13:00,A&R LAB,3,ME,B,Dr. S. Bhanu Murthy,D418
+Friday,10:00,13:00,A&R LAB,3,ME,B,Dr. N. Shiva Kumar,D418
+Friday,10:00,13:00,TE LAB,3,ME,B,Dr. K. Krishna Murthy,B007
+Friday,10:00,13:00,TE LAB,3,ME,B,Dr. V. Siva Rama Krishna,B007
+Friday,13:40,14:40,MED,3,ME,B,Dr. T. Malyadri,D214
+Friday,14:40,15:40,MENTORING,3,ME,B,,
+Friday,15:40,16:40,CCA,3,ME,B,,
+Saturday,10:00,11:00,OE-I,3,ME,B,,
+Saturday,11:00,12:00,TE,3,ME,B,Dr. K. Krishna Murthy,D214
+Saturday,12:00,13:00,MED,3,ME,B,Dr. T. Malyadri,D214
+Saturday,13:40,14:40,NCS,3,ME,B,Dr. Jayashri Nair,D214
+Saturday,13:40,14:40,IEM,3,ME,B,Sri. S. R. Somayajulu,D214
+Saturday,14:40,15:40,CVA-L3,3,ME,B,,
+Saturday,15:40,16:40,LIBRARY,3,ME,B,,
+Monday,10:00,11:00,TM,4,ME,A,Dr. P. Prasad Kumar,D320
+Monday,11:00,12:00,INDUSTRY 5.0,4,ME,A,Dr. Jayashri Nair,D320
+Monday,12:00,13:00,CFD,4,ME,A,Dr. L. Sandeep Raj,D320
+Monday,12:00,13:00,MCM,4,ME,A,Dr. CH. Rajeswari,D320
+Monday,12:00,13:00,MMP,4,ME,A,Dr. K. Aruna Prabha,D320
+Monday,13:40,14:40,MPP-I,4,ME,A,Dr. S. Bhanu Murthy,D320
+Monday,14:40,15:40,CVA-L3,4,ME,A,,
+Monday,15:40,16:40,LIBRARY,4,ME,A,,
+Tuesday,10:00,11:00,OE-III,4,ME,A,,
+Tuesday,11:00,12:00,TM,4,ME,A,Dr. P. Prasad Kumar,D320
+Tuesday,12:00,13:00,CFD,4,ME,A,Dr. L. Sandeep Raj,D320
+Tuesday,12:00,13:00,MCM,4,ME,A,Dr. CH. Rajeswari,D320
+Tuesday,12:00,13:00,MMP,4,ME,A,Dr. K. Aruna Prabha,D320
+Tuesday,13:40,16:40,PDP LAB,4,ME,A,Sri. S. R. Somayajulu,D319
+Tuesday,13:40,16:40,PDP LAB,4,ME,A,Dr. N. Srilatha,D319
+Tuesday,13:40,16:40,C&S LAB,4,ME,A,Dr. K. Ajay Kumar,D320
+Tuesday,13:40,16:40,C&S LAB,4,ME,A,Dr. V. V. Durga Sahithi,D320
+Wednesday,10:00,11:00,TM,4,ME,A,Dr. P. Prasad Kumar,D320
+Wednesday,11:00,12:00,CFD,4,ME,A,Dr. L. Sandeep Raj,D320
+Wednesday,11:00,12:00,MCM,4,ME,A,Dr. CH. Rajeswari,D320
+Wednesday,11:00,12:00,MMP,4,ME,A,Dr. K. Aruna Prabha,D320
+Wednesday,12:00,13:00,MPP-I,4,ME,A,Dr. S. Bhanu Murthy,D320
+Wednesday,13:40,15:40,NPTEL-MOOCS,4,ME,A,Dr. A. Syam Prasad,D320
+Wednesday,15:40,16:40,ECA,4,ME,A,,
+Thursday,10:00,11:00,INDUSTRY 5.0,4,ME,A,Dr. Jayashri Nair,D304/1
+Thursday,11:00,13:00,MPP-I,4,ME,A,Dr. S. Bhanu Murthy,D304/1
+Thursday,13:40,15:40,OE-III,4,ME,A,,
+Thursday,15:40,16:40,CCA,4,ME,A,,
+Friday,10:00,11:00,TM,4,ME,A,Dr. P. Prasad Kumar,D320
+Friday,11:00,12:00,INDUSTRY 5.0,4,ME,A,Dr. Jayashri Nair,D320
+Friday,12:00,13:00,MPP-I,4,ME,A,Dr. S. Bhanu Murthy,D320
+Friday,13:40,16:40,C&S LAB,4,ME,A,Dr. K. Ajay Kumar,D320
+Friday,13:40,16:40,C&S LAB,4,ME,A,Dr. V. V. Durga Sahithi,D320
+Friday,13:40,16:40,PDP LAB,4,ME,A,Sri. S. R. Somayajulu,D319
+Friday,13:40,16:40,PDP LAB,4,ME,A,Dr. N. Srilatha,D319
+Saturday,10:00,11:00,INDUSTRY 5.0,4,ME,A,Dr. Jayashri Nair,D320
+Saturday,11:00,12:00,CFD,4,ME,A,Dr. L. Sandeep Raj,D320
+Saturday,11:00,12:00,MCM,4,ME,A,Dr. CH. Rajeswari,D320
+Saturday,11:00,12:00,MMP,4,ME,A,Dr. K. Aruna Prabha,D320
+Saturday,12:00,13:00,NPTEL-MOOCS,4,ME,A,Dr. A. Syam Prasad,D320
+Saturday,13:40,14:40,MPP-I,4,ME,A,Dr. S. Bhanu Murthy,D320
+Saturday,14:40,15:40,MENTORING,4,ME,A,,
+Saturday,15:40,16:40,LIBRARY,4,ME,A,,
+Monday,10:00,11:00,INDUSTRY 5.0,4,ME,B,Dr. S.V. Satya Prasad,D304/1
+Monday,11:00,12:00,TM,4,ME,B,Dr. V. Sivaramakrishna,D304/1
+Monday,12:00,13:00,CFD,4,ME,B,Dr. L. Sandeep Raj,D304/1
+Monday,12:00,13:00,MCM,4,ME,B,Dr. CH. Rajeswari,D304/1
+Monday,12:00,13:00,MMP,4,ME,B,Dr. K. Aruna Prabha,D304/1
+Monday,13:40,16:40,PDP LAB,4,ME,B,Dr. B. Chennakesava Rao,D313
+Monday,13:40,16:40,PDP LAB,4,ME,B,Dr. K. Aruna Prabha,D313
+Monday,13:40,16:40,C&S LAB,4,ME,B,Dr. N. Kiran Kumar,D320
+Monday,13:40,16:40,C&S LAB,4,ME,B,Dr. CH. Rajeswari,D320
+Tuesday,10:00,11:00,OE-III,4,ME,B,,
+Tuesday,11:00,12:00,TM,4,ME,B,Dr. V. Sivaramakrishna,D304/1
+Tuesday,12:00,13:00,CFD,4,ME,B,Dr. L. Sandeep Raj,D304/1
+Tuesday,12:00,13:00,MCM,4,ME,B,Dr. CH. Rajeswari,D304/1
+Tuesday,12:00,13:00,MMP,4,ME,B,Dr. K. Aruna Prabha,D304/1
+Tuesday,13:40,15:40,MPP-I,4,ME,B,Dr. N. Shiva Kumar,D304/1
+Tuesday,15:40,16:40,CVA-L3,4,ME,B,,
+Wednesday,10:00,11:00,TM,4,ME,B,Dr. V. Sivaramakrishna,D304/1
+Wednesday,11:00,12:00,CFD,4,ME,B,Dr. L. Sandeep Raj,D304/1
+Wednesday,11:00,12:00,MCM,4,ME,B,Dr. CH. Rajeswari,D304/1
+Wednesday,11:00,12:00,MMP,4,ME,B,Dr. K. Aruna Prabha,D304/1
+Wednesday,12:00,13:00,NPTEL-MOOCS,4,ME,B,Dr. A. Syam Prasad,D304/1
+Wednesday,13:40,15:40,NPTEL-MOOCS,4,ME,B,Dr. A. Syam Prasad,D304/1
+Wednesday,15:40,16:40,LIBRARY,4,ME,B,,
+Thursday,10:00,13:00,C&S LAB,4,ME,B,Dr. N. Kiran Kumar,D320
+Thursday,10:00,13:00,C&S LAB,4,ME,B,Dr. CH. Rajeswari,D320
+Thursday,10:00,13:00,PDP LAB,4,ME,B,Dr. B. Chennakesava Rao,D313
+Thursday,10:00,13:00,PDP LAB,4,ME,B,Dr. K. Aruna Prabha,D313
+Thursday,13:40,15:40,OE-III,4,ME,B,,
+Thursday,15:40,16:40,ECA,4,ME,B,,
+Friday,10:00,12:00,INDUSTRY 5.0,4,ME,B,Dr. S.V. Satya Prasad,D304/1
+Friday,12:00,13:00,MPP-I,4,ME,B,Dr. N. Shiva Kumar,D304/1
+Friday,13:40,15:40,MPP-I,4,ME,B,Dr. N. Shiva Kumar,D304/1
+Friday,15:40,16:40,CCA,4,ME,B,,
+Saturday,10:00,11:00,TM,4,ME,B,Dr. V. Sivaramakrishna,D304/1
+Saturday,11:00,12:00,CFD,4,ME,B,Dr. L. Sandeep Raj,D304/1
+Saturday,11:00,12:00,MCM,4,ME,B,Dr. CH. Rajeswari,D304/1
+Saturday,11:00,12:00,MMP,4,ME,B,Dr. K. Aruna Prabha,D304/1
+Saturday,12:00,13:00,INDUSTRY 5.0,4,ME,B,Dr. S.V. Satya Prasad,D304/1
+Saturday,13:40,14:40,MPP-I,4,ME,B,Dr. N. Shiva Kumar,D304/1
+Saturday,14:40,15:40,MENTORING,4,ME,B,,
+Saturday,15:40,16:40,LIBRARY,4,ME,B,,

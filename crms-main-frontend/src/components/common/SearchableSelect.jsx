@@ -2,7 +2,7 @@ import React from 'react';
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
-export default function SearchableSelect({ options, value, onChange, placeholder, disabled, className, title, allowCreate = false }) {
+export default function SearchableSelect({ options, value, onChange, placeholder, disabled, className, allowCreate = false }) {
   // react-select expects options as { value, label }
   // Find the selected object based on value
   const selectedOption = options.find(opt => opt.value === value) || (allowCreate && value ? { value, label: value } : null);
@@ -13,12 +13,12 @@ export default function SearchableSelect({ options, value, onChange, placeholder
     control: (base, state) => ({
       ...base,
       minHeight: '38px',
-      backgroundColor: state.isDisabled ? '#f1f5f9' : '#ffffff',
-      borderColor: state.isFocused ? '#1e3a5f' : '#e3e1db',
+      backgroundColor: state.isDisabled ? '#f8fafc' : '#f8fafc',
+      borderColor: state.isFocused ? '#4f46e5' : '#e2e8f0',
       borderRadius: '0.5rem',
-      boxShadow: state.isFocused ? '0 0 0 1px #1e3a5f' : 'none',
+      boxShadow: state.isFocused ? '0 0 0 1px #4f46e5' : 'none',
       '&:hover': {
-        borderColor: state.isFocused ? '#1e3a5f' : '#94a3b8'
+        borderColor: state.isFocused ? '#4f46e5' : '#cbd5e1'
       }
     }),
     valueContainer: (base) => ({
@@ -37,19 +37,15 @@ export default function SearchableSelect({ options, value, onChange, placeholder
     }),
     singleValue: (base) => ({
       ...base,
-      color: '#1a1a1a',
+      color: '#1e293b',
       fontSize: '0.875rem',
-      fontWeight: 500,
     }),
     menu: (base) => ({
       ...base,
       borderRadius: '0.5rem',
-      backgroundColor: '#ffffff',
-      border: '1px solid #e3e1db',
-      boxShadow: '0 4px 12px rgba(30, 58, 95, 0.08), 0 2px 4px rgba(0, 0, 0, 0.05)',
+      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
       zIndex: 9999,
       fontSize: '0.875rem',
-      overflow: 'hidden',
     }),
     menuPortal: (base) => ({
       ...base,
@@ -58,20 +54,19 @@ export default function SearchableSelect({ options, value, onChange, placeholder
     option: (base, state) => ({
       ...base,
       backgroundColor: state.isSelected 
-        ? '#1e3a5f' 
+        ? '#4f46e5' 
         : state.isFocused 
-          ? '#e8eff7' 
-          : '#ffffff',
-      color: state.isSelected ? '#ffffff' : '#1a1a1a',
-      cursor: 'pointer',
+          ? '#e0e7ff' 
+          : 'white',
+      color: state.isSelected ? 'white' : '#1e293b',
       '&:active': {
-        backgroundColor: '#d8e5f3'
+        backgroundColor: '#c7d2fe'
       }
     }),
   };
 
   return (
-    <div className={`flex-1 ${className || ''}`} title={title}>
+    <div className={`flex-1 ${className || ''}`}>
       <SelectComponent
         value={selectedOption}
         onChange={(option) => onChange(option ? option.value : '')}
