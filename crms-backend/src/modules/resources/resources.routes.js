@@ -10,10 +10,12 @@ const {
   createResourceSchema,
   updateResourceSchema,
 } = require('./resources.validation');
+const { liveStatusSchema } = require('../bookings/bookings.validation');
 
 const router = Router();
 router.use(authenticate);
-router.get('/live-status', controller.liveStatus);
+router.get('/live-status', validateRequest(liveStatusSchema), controller.liveStatus);
+router.get('/ai-recommend', controller.aiRecommend);
 
 // GET /api/v1/resources?resourceTypeId=&departmentId=&blockId=&status=&search=
 router.get('/', validateRequest(listResourcesSchema), controller.list);

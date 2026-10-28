@@ -11,7 +11,9 @@ function findById(approvalId) {
 
 const { ROLES } = require('../../middleware/authorizeRole');
 
-function listPendingFor({ approverUserId, roleId, departmentId }) {
+// departmentIds: every department a Department Admin manages (see
+// departmentScopeOf); ignored for the other roles.
+function listPendingFor({ approverUserId, roleId, departmentIds = [] }) {
   let where;
   if (roleId === ROLES.SUPER_ADMIN || roleId === 1) {
     where = { decision: null, booking: { status: 'Pending' } };
@@ -27,7 +29,7 @@ function listPendingFor({ approverUserId, roleId, departmentId }) {
         {
           approverRoleId: roleId,
           booking: (roleId === ROLES.DEPARTMENT_ADMIN || roleId === 3)
-            ? (departmentId ? { resource: { departmentId } } : { resource: { departmentId: null } })
+            ? { resource: { departmentId: { in: departmentIds } } }
             : undefined,
         },
       ],
@@ -44,7 +46,8 @@ function listPendingFor({ approverUserId, roleId, departmentId }) {
         },
       },
     },
-    orderBy: { approvalId: 'asc' },
+    // Newest requests first, so fresh ones aren't buried under old ones.
+    orderBy: { approvalId: 'desc' },
   });
 }
 

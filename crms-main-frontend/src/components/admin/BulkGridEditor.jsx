@@ -3,6 +3,7 @@ import { X, Check, Save } from 'lucide-react';
 import { fmtTimeSlot } from '../../utils/formatters';
 import { timetableApi } from '../../api/endpoints';
 import SearchableSelect from '../common/SearchableSelect';
+import { PROGRAMS, DEFAULT_PROGRAM, yearOptionsFor, sectionLabel } from '../../constants/programs';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const TIME_SLOTS_STANDARD = [
@@ -31,10 +32,12 @@ export default function BulkGridEditor({
   onSaveSuccess,
   onCancel,
   initialDepartment = '',
+  initialProgram = DEFAULT_PROGRAM,
   initialStudentYear = '',
   initialSection = '',
   availableSections = []
 }) {
+  const [selectedProgram, setSelectedProgram] = useState(initialProgram);
   const [selectedStudentYear, setSelectedStudentYear] = useState(initialStudentYear);
   const [selectedDepartment, setSelectedDepartment] = useState(initialDepartment);
   const [selectedSection, setSelectedSection] = useState(initialSection);
@@ -47,6 +50,7 @@ export default function BulkGridEditor({
     if (selectedStudentYear && selectedDepartment && selectedSection) {
       setLoadingExisting(true);
       timetableApi.list({
+        program: selectedProgram,
         studentYear: selectedStudentYear,
         departmentId: selectedDepartment,
         section: selectedSection
@@ -60,7 +64,7 @@ export default function BulkGridEditor({
     } else {
       setLocalClasses([]);
     }
-  }, [selectedStudentYear, selectedDepartment, selectedSection]);
+  }, [selectedProgram, selectedStudentYear, selectedDepartment, selectedSection]);
   
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [editForm, setEditForm] = useState({});
@@ -69,7 +73,8 @@ export default function BulkGridEditor({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
-  const isFirstYearView = selectedStudentYear === '1';
+  // The early 9:00 schedule only applies to B.Tech 1st year
+  const isFirstYearView = selectedProgram === DEFAULT_PROGRAM && selectedStudentYear === '1';
   const activeTimeSlots = isFirstYearView ? TIME_SLOTS_FIRST_YEAR : TIME_SLOTS_STANDARD;
 
   // Use the exact same overlap logic as FullWeekTimetableGrid
@@ -113,7 +118,8 @@ export default function BulkGridEditor({
     const newClass = {
       ...editForm,
       // Create a fake unique ID if it's new so we can edit/delete it locally before batch save
-      timetableId: editingId === 'new' ? `temp-${Date.now()}` : editingId, 
+      timetableId: editingId === 'new' ? `temp-${Date.now()}` : editingId,
+      program: selectedProgram,
       studentYear: selectedStudentYear,
       departmentId: selectedDepartment,
       section: editForm.section || selectedSection,
@@ -160,6 +166,7 @@ export default function BulkGridEditor({
         startTime: c.startTime,
         endTime: c.endTime,
         departmentId: selectedDepartment,
+        program: selectedProgram,
         studentYear: selectedStudentYear,
         section: c.section || selectedSection,
         resourceId: c.resourceId || null
@@ -176,13 +183,13 @@ export default function BulkGridEditor({
   };
 
   return (
-    <div className="bg-white rounded-xl border border-indigo-200 shadow-sm overflow-hidden mb-6 flex flex-col animate-in fade-in slide-in-from-top-4 duration-500">
-      <div className="bg-indigo-50 px-6 py-4 border-b border-indigo-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="bg-white rounded-xl border border-navy/20 shadow-sm overflow-hidden mb-6 flex flex-col animate-in fade-in slide-in-from-top-4 duration-500">
+      <div className="bg-blue-50/70 px-6 py-4 border-b border-blue-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h3 className="font-bold text-indigo-900 text-lg">Bulk Grid Editor</h3>
-          <p className="text-sm text-indigo-700/80">Select context below, fill out the grid, and save all at once.</p>
+          <h3 className="font-bold text-navy text-lg">Bulk Grid Editor</h3>
+          <p className="text-sm text-navy/70">Select context below, fill out the grid, and save all at once.</p>
         </div>
-        <button onClick={onCancel} className="p-2 text-indigo-400 hover:text-indigo-700 hover:bg-indigo-100 rounded-full transition-colors">
+        <button onClick={onCancel} className="p-2 text-slate-400 hover:text-navy hover:bg-blue-100/60 rounded-full transition-colors">
           <X size={20} />
         </button>
       </div>
@@ -195,13 +202,23 @@ export default function BulkGridEditor({
         )}
 
         <div className="flex flex-wrap gap-4 p-4 bg-slate-50 rounded-xl border border-line">
+          <div className="flex-1 min-w-[130px]">
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Program <span className="text-red-500">*</span></label>
+            <SearchableSelect
+              value={selectedProgram}
+              onChange={val => setSelectedProgram(val || DEFAULT_PROGRAM)}
+              placeholder="Select Program"
+              options={PROGRAMS.map(p => ({ value: p.value, label: p.label }))}
+              className="w-full"
+            />
+          </div>
           <div className="flex-1 min-w-[150px]">
             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Year <span className="text-red-500">*</span></label>
             <SearchableSelect
               value={selectedStudentYear}
               onChange={setSelectedStudentYear}
               placeholder="Select or Type Year"
-              options={[{value: '1', label: '1st Year'}, {value: '2', label: '2nd Year'}, {value: '3', label: '3rd Year'}, {value: '4', label: '4th Year'}]}
+              options={yearOptionsFor(selectedProgram)}
               allowCreate={true}
               className="w-full"
             />
@@ -222,7 +239,7 @@ export default function BulkGridEditor({
               value={selectedSection}
               onChange={val => setSelectedSection(val ? val.toUpperCase() : '')}
               placeholder="Select or Type Section"
-              options={availableSections.map(s => ({ value: s, label: s }))}
+              options={availableSections.map(s => ({ value: s, label: sectionLabel(s, selectedProgram) }))}
               allowCreate={true}
               className="w-full"
             />
@@ -338,7 +355,7 @@ export default function BulkGridEditor({
                       const { idx, colSpan, hasClasses, classesRaw, mergedStart, mergedEnd } = slotData;
 
                       return (
-                        <td key={idx} colSpan={colSpan} className={`border-r border-line p-2 text-center align-top h-full ${!hasClasses ? 'bg-white hover:bg-indigo-50/50 cursor-pointer transition-colors' : 'bg-white'}`}
+                        <td key={idx} colSpan={colSpan} className={`border-r border-line p-2 text-center align-top h-full ${!hasClasses ? 'bg-white hover:bg-blue-50/50 cursor-pointer transition-colors' : 'bg-white'}`}
                             onClick={() => {
                               if (!hasClasses) {
                                 setSelectedSlot({ day, start: mergedStart, end: mergedEnd, label: `${day} • ${fmtTimeSlot(`1970-01-01T${mergedStart}:00Z`, `1970-01-01T${mergedEnd}:00Z`)}` });
@@ -356,7 +373,7 @@ export default function BulkGridEditor({
                                 const resourceName = c.resource?.resourceName || (resources.find(r => r.resourceId === c.resourceId)?.resourceName) || c.resourceId;
                                 
                                 return (
-                                  <div key={c.timetableId} className="flex flex-col items-center justify-center p-2 rounded-lg bg-indigo-50 border border-indigo-100 w-full relative group/item text-center hover:border-indigo-400 transition-colors cursor-pointer"
+                                  <div key={c.timetableId} className="flex flex-col items-center justify-center p-2 rounded-lg bg-blue-50/90 border border-blue-200/70 w-full relative group/item text-center hover:border-navy/40 transition-colors cursor-pointer"
                                        onClick={(e) => {
                                          e.stopPropagation();
                                          setSelectedSlot({ day, start: mergedStart, end: mergedEnd, label: `${day} • ${fmtTimeSlot(`1970-01-01T${mergedStart}:00Z`, `1970-01-01T${mergedEnd}:00Z`)}` });
@@ -367,10 +384,10 @@ export default function BulkGridEditor({
                                            endTime: c.endTime.length > 5 && c.endTime.includes('T') ? c.endTime.substring(11, 16) : c.endTime.substring(0,5)
                                          });
                                        }}>
-                                    <div className="font-bold text-indigo-900 text-[10px] text-center leading-tight line-clamp-2 mb-0.5">
+                                    <div className="font-bold text-navy text-[10px] text-center leading-tight line-clamp-2 mb-0.5">
                                       {shortName}
                                     </div>
-                                    <div className="text-[9px] text-indigo-600/80 line-clamp-2 text-center px-1">
+                                    <div className="text-[9px] text-slate-600 line-clamp-2 text-center px-1">
                                       {resourceName || 'No Room'} • {c.facultyName || 'Unassigned'}
                                     </div>
                                   </div>
@@ -378,7 +395,7 @@ export default function BulkGridEditor({
                               })}
                             </div>
                           ) : (
-                            <div className="flex items-center justify-center h-full w-full text-xs py-4 text-indigo-400 font-medium hover:text-indigo-600">
+                            <div className="flex items-center justify-center h-full w-full text-xs py-4 text-navy/50 font-medium hover:text-navy">
                               + Add
                             </div>
                           )}
@@ -396,7 +413,7 @@ export default function BulkGridEditor({
           <button
             onClick={handleBatchSave}
             disabled={saving || localClasses.length === 0}
-            className="flex items-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-700 disabled:bg-green-600/50 text-white rounded-lg font-bold shadow-sm transition-all"
+            className="flex items-center gap-2 px-6 py-2.5 bg-forest hover:bg-forest/90 disabled:opacity-50 text-white rounded-lg font-bold shadow-sm transition-all"
           >
             {saving ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -422,27 +439,27 @@ export default function BulkGridEditor({
             </div>
             
             <div className="p-4 bg-slate-50 flex-1 overflow-y-auto">
-              <div className="bg-white p-4 rounded-xl border border-indigo-200 shadow-sm">
+              <div className="bg-white p-4 rounded-xl border border-navy/20 shadow-sm">
                 <div className="flex flex-col gap-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Course Code</label>
-                      <input type="text" value={editForm.courseCode} onChange={e => setEditForm({...editForm, courseCode: e.target.value})} className="w-full p-2 border border-line rounded-lg text-sm bg-slate-50 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all outline-none" placeholder="e.g. CS101" autoFocus />
+                      <input type="text" value={editForm.courseCode} onChange={e => setEditForm({...editForm, courseCode: e.target.value})} className="w-full p-2 border border-line rounded-lg text-sm bg-slate-50 focus:border-navy focus:ring-2 focus:ring-navy/15 transition-all outline-none" placeholder="e.g. CS101" autoFocus />
                     </div>
                     <div>
                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Course Name</label>
-                      <input type="text" value={editForm.courseName} onChange={e => setEditForm({...editForm, courseName: e.target.value})} className="w-full p-2 border border-line rounded-lg text-sm bg-slate-50 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all outline-none" placeholder="e.g. Intro to CS (Optional)" />
+                      <input type="text" value={editForm.courseName} onChange={e => setEditForm({...editForm, courseName: e.target.value})} className="w-full p-2 border border-line rounded-lg text-sm bg-slate-50 focus:border-navy focus:ring-2 focus:ring-navy/15 transition-all outline-none" placeholder="e.g. Intro to CS (Optional)" />
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Faculty Name</label>
-                      <input type="text" value={editForm.facultyName} onChange={e => setEditForm({...editForm, facultyName: e.target.value})} className="w-full p-2 border border-line rounded-lg text-sm bg-slate-50 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all outline-none" placeholder="e.g. Dr. John Doe" />
+                      <input type="text" value={editForm.facultyName} onChange={e => setEditForm({...editForm, facultyName: e.target.value})} className="w-full p-2 border border-line rounded-lg text-sm bg-slate-50 focus:border-navy focus:ring-2 focus:ring-navy/15 transition-all outline-none" placeholder="e.g. Dr. John Doe" />
                     </div>
                     <div>
                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Classroom</label>
-                      <select value={editForm.resourceId} onChange={e => setEditForm({...editForm, resourceId: e.target.value})} className="w-full p-2.5 border border-line rounded-lg text-sm bg-slate-50 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all outline-none">
+                      <select value={editForm.resourceId} onChange={e => setEditForm({...editForm, resourceId: e.target.value})} className="w-full p-2.5 border border-line rounded-lg text-sm bg-slate-50 focus:border-navy focus:ring-2 focus:ring-navy/15 transition-all outline-none">
                         <option value="">No Room / Theory</option>
                         {resources.map(r => (
                           <option key={r.resourceId} value={r.resourceId}>{r.resourceName}</option>
@@ -453,7 +470,7 @@ export default function BulkGridEditor({
 
                   <div className="pt-2 border-t border-line">
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Section Override</label>
-                    <input type="text" value={editForm.section} onChange={e => setEditForm({...editForm, section: e.target.value})} className="w-full max-w-[200px] p-2 border border-line rounded-lg text-sm bg-slate-50 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all outline-none" placeholder="Defaults to top filter" />
+                    <input type="text" value={editForm.section} onChange={e => setEditForm({...editForm, section: e.target.value})} className="w-full max-w-[200px] p-2 border border-line rounded-lg text-sm bg-slate-50 focus:border-navy focus:ring-2 focus:ring-navy/15 transition-all outline-none" placeholder="Defaults to top filter" />
                     <p className="text-[10px] text-slate-400 mt-1">Leave as is unless this specific class is for a different section (e.g. merged labs).</p>
                   </div>
                 </div>
@@ -467,7 +484,7 @@ export default function BulkGridEditor({
                   
                   <div className="flex gap-2">
                     <button onClick={() => setSelectedSlot(null)} className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors">Cancel</button>
-                    <button onClick={handleSaveSlot} className="px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-sm">
+                    <button onClick={handleSaveSlot} className="px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-bold bg-navy text-white hover:bg-navy-dark transition-colors shadow-sm">
                       <Check size={16} /> Save to Grid
                     </button>
                   </div>
