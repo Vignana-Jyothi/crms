@@ -34,9 +34,4 @@ const liveStatus = asyncHandler(async (req, res) => {
   res.json(result);
 });
 
-const aiRecommend = asyncHandler(async (req, res) => {
-  const result = await service.aiRecommend(req.query);
-  res.json(result);
-});
-
-module.exports = { list, getById, create, update, availability, liveStatus, aiRecommend };
+module.exports = { list, getById, create, update, availability, liveStatus };

@@ -30,7 +30,7 @@ router.post(
   '/',
   authorizeRole(ROLES.SUPER_ADMIN),
   asyncHandler(async (req, res) => {
-    const { name, email, phone, roleId, departmentId, managedDepartmentIds, notes, roomNo } = req.body;
+    const { name, email, phone, roleId, departmentId, notes, roomNo } = req.body;
 
     if (!name || !email || !phone || !roleId) {
       throw ApiError.badRequest('name, email, phone, and roleId are required');
@@ -54,9 +54,6 @@ router.post(
       phone,
       roleId,
       departmentId: departmentId ?? null,
-      managedDepartments: managedDepartmentIds && managedDepartmentIds.length > 0 ? {
-        connect: managedDepartmentIds.map(id => ({ departmentId: id }))
-      } : undefined,
       notes: notes || null,
       roomNo: roomNo || null,
       passwordHash,
@@ -117,33 +114,6 @@ router.get(
   })
 );
 
-// Any authenticated user can update their own profile details (phone, name, roomNo)
-router.patch(
-  '/me',
-  asyncHandler(async (req, res) => {
-    const { name, phone, roomNo } = req.body;
-    const data = {};
-    if (name !== undefined) data.name = name.trim();
-    if (roomNo !== undefined) data.roomNo = roomNo;
-    if (phone !== undefined) {
-      if (phone && !PHONE_REGEX.test(phone)) {
-        throw ApiError.badRequest('phone must be a valid 10-digit Indian mobile number');
-      }
-      data.phone = phone;
-    }
-
-    const updated = await repo.update(req.auth.userId, data);
-    await auditService.log({
-      userId: req.auth.userId,
-      action: 'UPDATE_PROFILE',
-      entityType: 'user',
-      entityId: req.auth.userId,
-      details: `Profile updated by user: phone -> ${phone || 'unchanged'}`,
-    });
-    res.json(updated);
-  })
-);
-
 router.get(
   '/:userId',
   asyncHandler(async (req, res) => {
@@ -162,14 +132,14 @@ router.patch(
   '/:userId/role',
   authorizeRole(ROLES.SUPER_ADMIN),
   asyncHandler(async (req, res) => {
-    const { roleId, departmentId, managedDepartmentIds } = req.body;
+    const { roleId, departmentId } = req.body;
     if (!VALID_ROLE_IDS.has(Number(roleId))) {
       throw ApiError.badRequest('roleId must be a valid role');
     }
     if (Number(roleId) === ROLES.DEPARTMENT_ADMIN && !departmentId) {
       throw ApiError.badRequest('departmentId is required for Department Admin users');
     }
-    const updated = await repo.updateRole(Number(req.params.userId), roleId, departmentId ?? null, managedDepartmentIds || []);
+    const updated = await repo.updateRole(Number(req.params.userId), roleId, departmentId ?? null);
     await auditService.log({
       userId: req.auth.userId,
       action: 'CHANGE_USER_ROLE',
@@ -200,32 +170,6 @@ router.put(
     });
     
     res.json(updated);
-  })
-);
-
-// Super Admin can delete a user (e.g. invalid, duplicate, or mock users)
-router.delete(
-  '/:userId',
-  authorizeRole(ROLES.SUPER_ADMIN),
-  asyncHandler(async (req, res) => {
-    const targetUserId = Number(req.params.userId);
-    if (targetUserId === req.auth.userId) {
-      throw ApiError.badRequest('You cannot delete your own admin account');
-    }
-    const targetUser = await repo.findById(targetUserId);
-    if (!targetUser) throw ApiError.notFound('User not found');
-
-    await repo.deleteUser(targetUserId);
-
-    await auditService.log({
-      userId: req.auth.userId,
-      action: 'DELETE_USER',
-      entityType: 'user',
-      entityId: targetUserId,
-      details: `Deleted user: ${targetUser.name} (${targetUser.email || targetUser.phone})`,
-    });
-
-    res.json({ success: true, message: `User "${targetUser.name}" has been removed.` });
   })
 );
 

@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Upload, X, FileText, Image as ImageIcon, Check, Loader2, AlertCircle, Edit2, Trash2 } from 'lucide-react';
 import { timetableApi } from '../../api/endpoints';
-import { DEFAULT_PROGRAM } from '../../constants/programs';
 import SearchableSelect from '../common/SearchableSelect';
 
 export default function TimetableUploadModal({ isOpen, onClose, contextFilters, onSaveSuccess, initialMode = 'upload', departments = [], resources = [], facultyList = [], isInline = false }) {
@@ -108,7 +107,7 @@ export default function TimetableUploadModal({ isOpen, onClose, contextFilters, 
     setIsSaving(true);
     setError('');
     try {
-      await timetableApi.batch(extractedData.map(row => ({ ...row, program: row.program || contextFilters.program || DEFAULT_PROGRAM })));
+      await timetableApi.batch(extractedData);
       onSaveSuccess();
       handleClose();
     } catch (err) {

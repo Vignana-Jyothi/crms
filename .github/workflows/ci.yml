@@ -42,7 +42,7 @@ jobs:
           echo "SMTP_PASS=$SMTP_PASS" >> crms-backend/.env.docker
           echo "SMTP_FROM=$SMTP_FROM" >> crms-backend/.env.docker
           # Bring down any old containers, rebuild the images, and start the new ones
-          docker compose down --remove-orphans
+          docker compose down
           
           # Clean up stopped containers and unused networks to prevent "all predefined address pools have been fully subnetted" error
           # Note: We do NOT use --volumes here to avoid wiping out the database data

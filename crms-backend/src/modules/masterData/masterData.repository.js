@@ -55,8 +55,8 @@ const listFaculty = async () => {
 const listSections = async () => {
   const records = await prisma.timetable.findMany({
     where: { section: { not: null, not: '' } },
-    select: { section: true, departmentId: true, studentYear: true, program: true },
-    distinct: ['section', 'departmentId', 'studentYear', 'program'],
+    select: { section: true, departmentId: true, studentYear: true },
+    distinct: ['section', 'departmentId', 'studentYear'],
     orderBy: [{ departmentId: 'asc' }, { studentYear: 'asc' }, { section: 'asc' }]
   });
   return records;
