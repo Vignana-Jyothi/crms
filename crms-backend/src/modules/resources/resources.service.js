@@ -16,22 +16,28 @@ const { ROLES } = require('../../middleware/authorizeRole');
 //   - resourceType is Seminar Hall or Auditorium -> INSTITUTE-owned,
 //     approver = any active Institute Admin (role_id 2).
 //   - everything else -> DEPARTMENT-owned via resource.departmentId,
-//     approver = the Department Admin (role_id 3) for that department.
+//     approver = the Department Admin (role_id 3) for that department
+//     (the lowest userId if there are several, so routing is stable).
 //   - fallback (no matching admin found, e.g. a department has no
 //     admin configured yet) -> Super Admin, so nothing silently
 //     never gets approved.
 // -----------------------------------------------------------------
 const INSTITUTE_OWNED_TYPES = new Set(['Seminar Hall', 'Auditorium']);
 
+async function findDepartmentAdmin(departmentId) {
+  return prisma.user.findFirst({
+    where: { roleId: ROLES.DEPARTMENT_ADMIN, departmentId, status: 'Active' },
+    orderBy: { userId: 'asc' },
+  });
+}
+
 async function resolveApprover(resource) {
   const isInstituteOwned = !resource.departmentId || INSTITUTE_OWNED_TYPES.has(resource.resourceType.typeName);
 
   const approver = isInstituteOwned
-    ? await prisma.user.findFirst({ where: { roleId: ROLES.INSTITUTE_ADMIN, status: 'Active' } })
+    ? await prisma.user.findFirst({ where: { roleId: ROLES.INSTITUTE_ADMIN, status: 'Active' }, orderBy: { userId: 'asc' } })
     : resource.departmentId
-    ? await prisma.user.findFirst({
-        where: { roleId: ROLES.DEPARTMENT_ADMIN, departmentId: resource.departmentId, status: 'Active' },
-      })
+    ? await findDepartmentAdmin(resource.departmentId)
     : null;
 
   if (approver) return approver;
