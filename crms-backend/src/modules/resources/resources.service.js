@@ -16,22 +16,35 @@ const { ROLES } = require('../../middleware/authorizeRole');
 //   - resourceType is Seminar Hall or Auditorium -> INSTITUTE-owned,
 //     approver = any active Institute Admin (role_id 2).
 //   - everything else -> DEPARTMENT-owned via resource.departmentId,
-//     approver = the Department Admin (role_id 3) for that department.
+//     approver = the Department Admin (role_id 3) for that department:
+//     preferably one explicitly assigned it via managedDepartments
+//     (e.g. csehead.dscs for CSE-DS), otherwise one whose primary
+//     department it is.
 //   - fallback (no matching admin found, e.g. a department has no
 //     admin configured yet) -> Super Admin, so nothing silently
 //     never gets approved.
 // -----------------------------------------------------------------
 const INSTITUTE_OWNED_TYPES = new Set(['Seminar Hall', 'Auditorium']);
 
+async function findDepartmentAdmin(departmentId) {
+  const base = { roleId: ROLES.DEPARTMENT_ADMIN, status: 'Active' };
+  const orderBy = { userId: 'asc' };
+  return (
+    (await prisma.user.findFirst({
+      where: { ...base, managedDepartments: { some: { departmentId } } },
+      orderBy,
+    })) ||
+    (await prisma.user.findFirst({ where: { ...base, departmentId }, orderBy }))
+  );
+}
+
 async function resolveApprover(resource) {
   const isInstituteOwned = !resource.departmentId || INSTITUTE_OWNED_TYPES.has(resource.resourceType.typeName);
 
   const approver = isInstituteOwned
-    ? await prisma.user.findFirst({ where: { roleId: ROLES.INSTITUTE_ADMIN, status: 'Active' } })
+    ? await prisma.user.findFirst({ where: { roleId: ROLES.INSTITUTE_ADMIN, status: 'Active' }, orderBy: { userId: 'asc' } })
     : resource.departmentId
-    ? await prisma.user.findFirst({
-        where: { roleId: ROLES.DEPARTMENT_ADMIN, departmentId: resource.departmentId, status: 'Active' },
-      })
+    ? await findDepartmentAdmin(resource.departmentId)
     : null;
 
   if (approver) return approver;
