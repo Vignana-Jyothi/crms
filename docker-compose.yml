@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:17-alpine
+    image: postgres:15-alpine
     container_name: crms-db
     restart: unless-stopped
     env_file:
@@ -15,6 +15,14 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  redis:
+    image: redis:7-alpine
+    container_name: crms-redis
+    restart: unless-stopped
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+
   crms-backend:
     build:
       context: ./crms-backend
@@ -28,6 +36,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
 
   crms-main-frontend:
     build:
@@ -44,21 +54,9 @@ services:
     depends_on:
       - crms-backend
 
-  crms-admin-frontend:
-    build:
-      context: ./crms-admin-frontend
-      dockerfile: Dockerfile
-      args:
-        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
-    container_name: crms-admin-frontend
-    restart: unless-stopped
-    ports:
-      - "${ADMIN_FRONTEND_PORT:-18433}:80"
-    depends_on:
-      - crms-backend
-
 volumes:
   postgres_data:
+  redis_data:
 
 networks:
   default:

@@ -31,10 +31,21 @@
     outline: 2px solid var(--color-navy);
     outline-offset: 2px;
   }
+
+  /* Universal cross-browser selection color */
+  ::selection {
+    background-color: #d8e5f3;
+    color: #142943;
+  }
 }
 
-/* Custom Scrollbar for Grid Editor */
-.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+/* Custom Scrollbar for Grid Editor across Webkit and Firefox */
+* {
+  scrollbar-color: #cbd5e1 transparent;
+  scrollbar-width: thin;
+}
+
+.custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }

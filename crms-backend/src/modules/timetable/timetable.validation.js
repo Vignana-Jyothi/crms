@@ -24,6 +24,7 @@ const createTimetableSchema = z.object({
       endTime: z.string(),
       departmentId: z.coerce.number().int().positive().optional().nullable(),
       studentYear: z.string().max(20).optional(),
+      program: z.enum(['BTECH', 'MTECH', 'MCA']).optional(),
       academicYear: z.string().max(20).optional(),
       facultyName: z.string().trim().max(500).optional().nullable(),
       courseCode: z.string().trim().max(255).optional().nullable(),

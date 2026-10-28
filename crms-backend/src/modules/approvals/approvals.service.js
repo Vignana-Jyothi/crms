@@ -5,6 +5,7 @@ const bookingsRepo = require('../bookings/bookings.repository');
 const auditService = require('../audit/audit.service');
 const notifications = require('../notifications/notifications.service');
 const { ROLES, departmentScopeOf } = require('../../middleware/authorizeRole');
+const { invalidateKeys } = require('../../config/redis');
 
 // Section 21: Booking Created -> Pending Approval -> read ownership
 // -> route to Dept Admin or Institute Admin -> Approve/Reject ->
@@ -45,7 +46,7 @@ async function decide(approvalId, decision, remarks, auth) {
     throw ApiError.badRequest('Remarks are required when rejecting a booking request');
   }
 
-  return prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     const updated = await repo.recordDecision(tx, approvalId, {
       approverUserId: auth.userId,
       decision, // 'Approved' | 'Rejected'
@@ -89,6 +90,13 @@ async function decide(approvalId, decision, remarks, auth) {
 
     return updated;
   });
+
+  // The room's cached availability strip still shows this booking as
+  // Pending until it is invalidated.
+  const resourceId = approval.booking?.resourceId;
+  if (resourceId) await invalidateKeys(`avail:${resourceId}:*`);
+
+  return result;
 }
 
 module.exports = { listPending, decide };

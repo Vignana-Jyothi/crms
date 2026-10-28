@@ -5,6 +5,9 @@
   "scripts": {
     "test:smoke": "node scripts/smoke-test.js"
   },
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "dependencies": {
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",

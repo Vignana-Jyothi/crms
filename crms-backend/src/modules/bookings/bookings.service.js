@@ -5,6 +5,7 @@ const resourcesService = require('../resources/resources.service');
 const auditService = require('../audit/audit.service');
 const { ROLES, departmentScopeOf } = require('../../middleware/authorizeRole');
 const notifications = require('../notifications/notifications.service');
+const { getCached, setCached, invalidateKeys } = require('../../config/redis');
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -96,8 +97,11 @@ async function createBooking({ resourceId, bookingDate, startTime, endTime, purp
 
   const dayOfWeek = dayOfWeekFor(bookingDate);
 
-  return prisma.$transaction(
+  const result = await prisma.$transaction(
     async (tx) => {
+      // Row lock on the resource to strictly serialize concurrent bookings on this specific room
+      await tx.$queryRaw`SELECT 1 FROM resources WHERE resource_id = ${resourceId} FOR UPDATE`;
+
       const resource = await tx.resource.findUnique({
         where: { resourceId },
         include: { resourceType: true },
@@ -194,9 +198,19 @@ async function createBooking({ resourceId, bookingDate, startTime, endTime, purp
     },
     { isolationLevel: 'Serializable' }
   );
+
+  // Awaited so the requester's immediate availability refresh can't
+  // read the stale cached strip (invalidateKeys never throws).
+  await invalidateKeys(`avail:${resourceId}:*`);
+
+  return result;
 }
 
 async function getAvailability(resourceId, date) {
+  const cacheKey = `avail:${resourceId}:${date}`;
+  const cached = await getCached(cacheKey);
+  if (cached) return cached;
+
   const resource = await prisma.resource.findUnique({ where: { resourceId } });
   if (!resource) throw ApiError.notFound(`Resource ${resourceId} not found`);
 
@@ -212,7 +226,7 @@ async function getAvailability(resourceId, date) {
     }),
   ]);
 
-  return {
+  const availability = {
     resourceId,
     date,
     dayOfWeek,
@@ -224,6 +238,7 @@ async function getAvailability(resourceId, date) {
       facultyName: t.facultyName, 
       section: t.section,
       studentYear: t.studentYear,
+      program: t.program,
       branchCode: t.department?.branchCode || null
     })),
     blockedByBookings: bookings.map((b) => ({ 
@@ -234,6 +249,11 @@ async function getAvailability(resourceId, date) {
       requester: b.requester
     })),
   };
+
+  // Cache for 120 seconds in Redis
+  await setCached(cacheKey, availability, 120);
+
+  return availability;
 }
 
 async function getById(bookingId, auth) {
@@ -321,6 +341,11 @@ async function cancel(bookingId, actingUserId, auth, reason = null) {
     { isolationLevel: 'Serializable' }
   );
 
+  // Invalidate cached availability for the room
+  if (booking.resourceId) {
+    await invalidateKeys(`avail:${booking.resourceId}:*`);
+  }
+
   return cancelled;
 }
 
@@ -335,6 +360,8 @@ function classLabel(t, resource) {
     else if (t.studentYear == 3) yearPrefix = '3rd Year ';
     else if (t.studentYear == 4) yearPrefix = '4th Year ';
     else yearPrefix = `${t.studentYear} Year `;
+    if (t.program === 'MTECH') yearPrefix = `M.Tech ${yearPrefix}`;
+    else if (t.program === 'MCA') yearPrefix = `MCA ${yearPrefix}`;
   }
   return `${yearPrefix}${branch}${sectionStr}`;
 }
