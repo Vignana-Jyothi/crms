@@ -1,6 +1,0 @@
-export const ROLES = {
-  SUPER_ADMIN: 1,
-  INSTITUTE_ADMIN: 2,
-  DEPARTMENT_ADMIN: 3,
-  REQUESTER: 4,
-};

@@ -96,25 +96,25 @@ export default function RoomQuickSearchModal({ isOpen, onClose, onSearch, resour
             <div className="grid grid-cols-4 gap-3">
               <button
                 onClick={() => setRoomType('Room')}
-                className={`py-2.5 rounded-lg text-sm font-bold transition-all border ${roomType === 'Room' ? 'bg-indigo-50 text-indigo-600 border-indigo-200 shadow-sm' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}
+                className={`py-2.5 rounded-lg text-sm font-bold transition-all border ${roomType === 'Room' ? 'bg-blue-50 text-navy border-blue-200 shadow-sm' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}
               >
                 Room
               </button>
               <button
                 onClick={() => setRoomType('Lab')}
-                className={`py-2.5 rounded-lg text-sm font-bold transition-all border ${roomType === 'Lab' ? 'bg-indigo-50 text-indigo-600 border-indigo-200 shadow-sm' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}
+                className={`py-2.5 rounded-lg text-sm font-bold transition-all border ${roomType === 'Lab' ? 'bg-blue-50 text-navy border-blue-200 shadow-sm' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}
               >
                 Lab
               </button>
               <button
                 onClick={() => setRoomType('Seminar')}
-                className={`py-2.5 rounded-lg text-sm font-bold transition-all border ${roomType === 'Seminar' ? 'bg-indigo-50 text-indigo-600 border-indigo-200 shadow-sm' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}
+                className={`py-2.5 rounded-lg text-sm font-bold transition-all border ${roomType === 'Seminar' ? 'bg-blue-50 text-navy border-blue-200 shadow-sm' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}
               >
                 Seminar
               </button>
               <button
                 onClick={() => setRoomType('Size')}
-                className={`py-2.5 rounded-lg text-sm font-bold transition-all border ${roomType === 'Size' ? 'bg-indigo-50 text-indigo-600 border-indigo-200 shadow-sm' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}
+                className={`py-2.5 rounded-lg text-sm font-bold transition-all border ${roomType === 'Size' ? 'bg-blue-50 text-navy border-blue-200 shadow-sm' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}
               >
                 By Size
               </button>
@@ -125,7 +125,7 @@ export default function RoomQuickSearchModal({ isOpen, onClose, onSearch, resour
                 <select
                   value={minCapacity}
                   onChange={e => setMinCapacity(e.target.value)}
-                  className="w-full p-3 rounded-xl border border-slate-200 bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all text-slate-700"
+                  className="w-full p-3 rounded-xl border border-slate-200 bg-white focus:border-navy focus:ring-2 focus:ring-navy/15 outline-none transition-all text-slate-700"
                 >
                   <option value="">Any Size</option>
                   <option value="30">30+ seats</option>
@@ -142,7 +142,7 @@ export default function RoomQuickSearchModal({ isOpen, onClose, onSearch, resour
         <div className="p-6 pt-0 flex flex-col gap-3">
           <button
             onClick={handleSearch}
-            className="w-full py-3.5 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white font-bold shadow-md shadow-indigo-200 flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
+            className="w-full py-3.5 rounded-xl bg-navy hover:bg-navy-dark text-white font-bold shadow-md shadow-navy/20 flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
           >
             <Search size={18} />
             Find Available Rooms

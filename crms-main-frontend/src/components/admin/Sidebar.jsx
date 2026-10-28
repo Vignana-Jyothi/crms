@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/authStore';
 import { ROLES } from '../../constants/roles';
 import { approvalsApi } from '../../api/endpoints';
+import ProfileModal from '../ProfileModal';
 
 const NAV = [
   { 
@@ -52,6 +53,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [pendingCount, setPendingCount] = useState(0);
+  const [showProfile, setShowProfile] = useState(false);
 
   useEffect(() => {
     function refreshCount() {
@@ -133,19 +135,52 @@ export default function Sidebar({ isOpen, setIsOpen }) {
       </nav>
 
       <div className="border-t border-white/10 px-5 py-4">
-        <p className="truncate text-sm font-medium text-white/90">{user?.name}</p>
-        <p className="truncate text-xs text-white/50 mb-3">{user?.email}</p>
-        <button
-          onClick={() => {
-            logout();
-            navigate('/login');
-          }}
-          className="text-xs font-medium text-brick hover:text-brick-light transition-colors"
-        >
-          Sign out
-        </button>
+        <div className="flex items-center justify-between">
+          <div className="min-w-0 pr-2">
+            <p className="truncate text-sm font-medium text-white/90">{user?.name}</p>
+            <p className="truncate text-xs text-white/50">{user?.email}</p>
+          </div>
+          <button
+            onClick={() => setShowProfile(true)}
+            className="p-1.5 text-white/60 hover:text-white hover:bg-white/10 rounded-md transition-colors"
+            title="Edit Profile"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
+          </button>
+        </div>
+        
+        {(!user?.phone || user?.phone === '0000000000') && (
+          <button
+            onClick={() => setShowProfile(true)}
+            className="mt-2.5 w-full flex items-center justify-center gap-1.5 px-2 py-1 rounded bg-amber/20 hover:bg-amber/30 text-amber text-[11px] font-medium border border-amber/30 transition-colors"
+          >
+            <span>⚠️</span> Add Phone Number
+          </button>
+        )}
+
+        <div className="mt-3 flex items-center justify-between">
+          <button
+            onClick={() => setShowProfile(true)}
+            className="text-xs font-medium text-white/70 hover:text-white hover:underline transition-colors"
+          >
+            Profile Info
+          </button>
+          <button
+            onClick={() => {
+              logout();
+              navigate('/login');
+            }}
+            className="text-xs font-medium text-brick hover:text-brick-light transition-colors"
+          >
+            Sign out
+          </button>
+        </div>
       </div>
     </aside>
+
+    <ProfileModal isOpen={showProfile} onClose={() => setShowProfile(false)} />
     </>
   );
 }

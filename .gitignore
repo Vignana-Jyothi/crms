@@ -21,6 +21,7 @@ yarn-error.log*
 # Database backups and temp files
 *.dump
 *.sql
+!crms-backend/prisma/migrations/*.sql
 scratch/
 scratch.*
 
@@ -30,3 +31,30 @@ scratch.*
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Data files (CSV imports/exports are local-only; the app only handles uploaded CSVs)
+*.csv
+
+# One-off / archived files not required by the application
+archive_files/
+OCR.py
+inspect_rooms.js
+test_report.md
+
+# Backend ad-hoc debug, fix and import scripts (not used by src/, the Docker image, or npm scripts)
+crms-backend/add_col.js
+crms-backend/check*.js
+crms-backend/cleanup_*.js
+crms-backend/debug_*.js
+crms-backend/fix-db.js
+crms-backend/fix_*.js
+crms-backend/full_import.js
+crms-backend/import_data.js
+crms-backend/extract_eduprime.js
+crms-backend/map_eduprime.js
+crms-backend/recover_course_names.js
+crms-backend/script_duplicate_sections.js
+crms-backend/seed_csvs.js
+crms-backend/test.js
+crms-backend/test_*.js
+crms-backend/eduprime_1st_year_timetable.txt

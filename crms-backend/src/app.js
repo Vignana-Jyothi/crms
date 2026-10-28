@@ -38,9 +38,12 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 };
 
+const cookieParser = require('cookie-parser');
+
 app.use(helmet());
 app.use(compression());
 app.use(cors(corsOptions));
+app.use(cookieParser());
 app.use(express.json());
 app.use(morgan(env.nodeEnv === 'development' ? 'dev' : 'combined'));
 

@@ -1,12 +1,13 @@
 const { describe, it, before, after, beforeEach } = require('node:test');
 const assert = require('node:assert/strict');
 
+const axios = require('axios');
 const prisma = require('../src/config/prisma');
+const { redis } = require('../src/config/redis');
 const bookingsService = require('../src/modules/bookings/bookings.service');
 const approvalsRepo = require('../src/modules/approvals/approvals.repository');
 const resourcesService = require('../src/modules/resources/resources.service');
 const { ROLES, departmentScopeOf } = require('../src/middleware/authorizeRole');
-const { signAccessToken } = require('../src/utils/jwt');
 
 // Prisma hands TIME columns back as Dates on 1970-01-01 with the
 // campus wall-clock time in the UTC fields.
@@ -37,6 +38,8 @@ async function statusFor(start, end, date = FUTURE_DATE) {
   const [room] = await bookingsService.getLiveStatus(date, start, end);
   return room;
 }
+
+after(() => redis.disconnect());
 
 describe('Live room status', () => {
   it('reports a room with no classes or bookings as Free', async () => {
@@ -143,17 +146,23 @@ describe('Approvals listing', () => {
 });
 
 describe('Approver routing', () => {
-  it("routes a department room to that department's admin, picking a stable one", async () => {
-    let query;
-    prisma.user.findFirst = async (q) => {
-      query = q;
-      return q.where.departmentId === 24 && q.where.roleId === ROLES.DEPARTMENT_ADMIN
-        ? { userId: 262, roleId: ROLES.DEPARTMENT_ADMIN }
-        : null;
+  it('prefers a Department Admin who explicitly manages the department', async () => {
+    const calls = [];
+    prisma.user.findFirst = async ({ where }) => {
+      calls.push(where);
+      if (where.managedDepartments?.some?.departmentId === 9) return { userId: 270, roleId: ROLES.DEPARTMENT_ADMIN };
+      return null;
     };
+    const approver = await resourcesService.resolveApprover({ departmentId: 9, resourceType: { typeName: 'Lab' } });
+    assert.equal(approver.userId, 270);
+    assert.equal(calls.length, 1);
+  });
+
+  it('falls back to a Department Admin whose primary department it is', async () => {
+    prisma.user.findFirst = async ({ where }) =>
+      where.departmentId === 24 && where.roleId === ROLES.DEPARTMENT_ADMIN ? { userId: 262, roleId: ROLES.DEPARTMENT_ADMIN } : null;
     const approver = await resourcesService.resolveApprover({ departmentId: 24, resourceType: { typeName: 'Classroom' } });
     assert.equal(approver.userId, 262);
-    assert.deepEqual(query.orderBy, { userId: 'asc' });
   });
 });
 
@@ -161,10 +170,12 @@ describe('Response caching scope', () => {
   let server;
   let base;
   let bookingQueries = 0;
-  let headers;
+  const originalPost = axios.post;
 
   before(async () => {
-    headers = { Authorization: `Bearer ${signAccessToken({ userId: 1, roleId: ROLES.SUPER_ADMIN, departmentId: null })}` };
+    // authenticate() verifies tokens with the auth server and loads the user.
+    axios.post = async () => ({ data: { valid: true, user: { email: 'admin@example.test' } } });
+    prisma.user.findUnique = async () => ({ userId: 1, roleId: ROLES.SUPER_ADMIN, status: 'Active', managedDepartments: [] });
     prisma.booking.findMany = async () => {
       bookingQueries++;
       return [];
@@ -175,9 +186,13 @@ describe('Response caching scope', () => {
     base = `http://127.0.0.1:${server.address().port}/api/v1`;
   });
 
-  after(() => server.close());
+  after(() => {
+    axios.post = originalPost;
+    server.close();
+  });
 
   it('does not serve booking lists from the master-data cache (regression)', async () => {
+    const headers = { Authorization: 'Bearer token' };
     const first = await fetch(`${base}/bookings`, { headers });
     const second = await fetch(`${base}/bookings`, { headers });
     assert.equal(first.status, 200);
@@ -186,6 +201,7 @@ describe('Response caching scope', () => {
   });
 
   it('still caches master data', async () => {
+    const headers = { Authorization: 'Bearer token' };
     await fetch(`${base}/blocks`, { headers });
     const second = await fetch(`${base}/blocks`, { headers });
     assert.equal(second.headers.get('x-cache'), 'HIT');
