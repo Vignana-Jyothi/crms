@@ -69,3 +69,6 @@ jobs:
             if [ "$attempt" = 6 ]; then exit 1; fi
             sleep 10
           done
+
+          # Dev-only Super Admins. Production's users are managed separately.
+          docker compose exec -T crms-backend node prisma/grant-super-admin.js pavanibandarupalli769@gmail.com "Pavani Bandarupalli"
