@@ -1,12 +1,11 @@
 import client from './client';
 
 export const authApi = {
-  checkAuth: () => client.get(`${import.meta.env.VITE_AUTH_URL || 'https://auth.vjstartup.com'}/check-auth`).then(r => r.data),
   logout: () => client.post(`${import.meta.env.VITE_AUTH_URL || 'https://auth.vjstartup.com'}/logout`).then(r => r.data),
 };
 
 export const usersApi = {
-  me: () => client.get('/users/me').then((r) => r.data),
+  me: (config) => client.get('/users/me', config).then((r) => r.data),
   list: (departmentId) => client.get('/users', { params: { departmentId } }).then((r) => r.data),
   create: (payload) => client.post('/users', payload).then((r) => r.data),
   updateRole: (userId, roleId, departmentId, managedDepartmentIds = []) =>

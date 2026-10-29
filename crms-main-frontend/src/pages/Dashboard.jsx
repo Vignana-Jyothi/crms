@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { masterDataApi, resourcesApi } from '../api/endpoints';
 import { useAuth } from '../context/authStore';
@@ -123,6 +123,7 @@ export default function Dashboard() {
   const [liveStatusMap, setLiveStatusMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const lastSearchRef = useRef(filters.search);
 
   const handleDateChange = (e) => {
     const newDate = e.target.value;
@@ -215,6 +216,11 @@ export default function Dashboard() {
     if (filters.blockId) params.blockId = filters.blockId;
     if (filters.search) params.search = filters.search;
 
+    // Only wait while the search box is being typed in; the first load and
+    // dropdown/date changes fetch straight away.
+    const typing = filters.search !== lastSearchRef.current;
+    lastSearchRef.current = filters.search;
+
     const handle = setTimeout(() => {
       const { startTimeParam, endTimeParam } = getFilterTimes();
 
@@ -240,7 +246,7 @@ export default function Dashboard() {
             setLoading(false);
           }
         });
-    }, 250); // light debounce on the search box
+    }, typing ? 250 : 0); // light debounce on the search box
 
     return () => {
       isCancelled = true;

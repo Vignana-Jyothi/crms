@@ -11,15 +11,11 @@ export function AuthProvider({ children }) {
   async function checkAuthStatus({ silent = true } = {}) {
     setLoading(true);
     try {
-      const data = await authApi.checkAuth();
-      if (data.logged_in) {
-        // Fetch the full local profile (role, department, etc.) from the backend.
-        // authenticate.js middleware will reject unregistered emails with 403 here.
-        const localProfile = await usersApi.me();
-        setUser(localProfile);
-      } else {
-        setUser(null);
-      }
+      // The backend verifies the SSO cookie with the auth server itself, so
+      // one call answers both "signed in?" and "who are you?": signed out
+      // gives 401, an unregistered email 403 (EMAIL_NOT_REGISTERED).
+      const localProfile = await usersApi.me({ skipAuthRedirect: true });
+      setUser(localProfile);
     } catch (err) {
       setUser(null);
       if (!silent) {
