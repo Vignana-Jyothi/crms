@@ -10,7 +10,9 @@ const client = axios.create({
 client.interceptors.response.use(
   (res) => res,
   async (error) => {
-    if (error.response?.status === 401) {
+    // skipAuthRedirect: the caller handles "not signed in" itself (the
+    // initial session check), so don't reload the page onto /login.
+    if (error.response?.status === 401 && !error.config?.skipAuthRedirect) {
       // If we get an unauthorized error, the cookie is either missing or expired.
       // We don't try to refresh it locally because that is handled by Google SSO now.
       // Just redirect to login.

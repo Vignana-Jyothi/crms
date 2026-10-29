@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { lazy, Suspense, useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './context/authStore';
 import { ROLES } from './constants/roles';
@@ -8,17 +9,22 @@ import RequireRole from './components/admin/RequireRole';
 import Sidebar from './components/admin/Sidebar';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import ResourceDetail from './pages/ResourceDetail';
-import MyBookings from './pages/MyBookings';
-import Overview from './pages/admin/Overview';
-import Approvals from './pages/admin/Approvals';
-import Bookings from './pages/admin/Bookings';
-import TimetablesView from './pages/admin/TimetablesView';
+
+// The other pages download when first opened, so the landing page doesn't
+// wait for admin screens (and their libraries) most visitors never see.
+const ResourceDetail = lazy(() => import('./pages/ResourceDetail'));
+const MyBookings = lazy(() => import('./pages/MyBookings'));
+const Overview = lazy(() => import('./pages/admin/Overview'));
+const Approvals = lazy(() => import('./pages/admin/Approvals'));
+const Bookings = lazy(() => import('./pages/admin/Bookings'));
+const TimetablesView = lazy(() => import('./pages/admin/TimetablesView'));
 // Force docker cache invalidation
 
-import Resources from './pages/admin/Resources';
-import Users from './pages/admin/Users';
-import AuditLogs from './pages/admin/AuditLogs';
+const Resources = lazy(() => import('./pages/admin/Resources'));
+const Users = lazy(() => import('./pages/admin/Users'));
+const AuditLogs = lazy(() => import('./pages/admin/AuditLogs'));
+
+const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || 'dummy-client-id';
 
 function MainShell({ children }) {
   const { user } = useAuth();
@@ -53,7 +59,9 @@ function MainShell({ children }) {
           </button>
         </div>
         <div className="flex-1 overflow-x-hidden p-4 md:p-8">
-          {children}
+          <Suspense fallback={<p className="text-sm text-ink/50">Loading…</p>}>
+            {children}
+          </Suspense>
         </div>
       </main>
     </div>
@@ -65,7 +73,8 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route path="/login" element={<Login />} />
+          {/* Google's sign-in script (~100 KB) is only needed here. */}
+          <Route path="/login" element={<GoogleOAuthProvider clientId={googleClientId}><Login /></GoogleOAuthProvider>} />
           
           {/* Main App Routes */}
           <Route path="/" element={<ProtectedRoute><MainShell><Dashboard /></MainShell></ProtectedRoute>} />
