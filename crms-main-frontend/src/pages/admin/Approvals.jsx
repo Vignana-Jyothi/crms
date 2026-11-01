@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
+import { CalendarDays, Check, Clock, Info, Mail, Phone, UserRound, X, CircleCheck } from 'lucide-react';
 import { approvalsApi } from '../../api/endpoints';
-import { fmtDate, fmtTimeSlot } from '../../utils/formatters';
+import { fmtDay, fmtTimeSlot, fmtWhen } from '../../utils/formatters';
 import { useAuth } from '../../context/authStore';
+import PageHeader from '../../components/common/PageHeader';
+import EmptyState from '../../components/common/EmptyState';
+import StatusPill from '../../components/common/StatusPill';
 
 export default function Approvals() {
   const [pending, setPending] = useState([]);
@@ -61,18 +65,29 @@ export default function Approvals() {
   function handleConfirmRejection(e) {
     e.preventDefault();
     if (!rejectionRemarks.trim()) {
-      setRejectionError('Rejection remarks are mandatory.');
+      setRejectionError('Please say why, so the requester knows.');
       return;
     }
     act(rejectModalApproval.approvalId, 'Rejected', rejectionRemarks.trim());
   }
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto">
-      <h1 className="font-display text-2xl font-semibold text-navy">Approvals</h1>
-      <p className="mt-1 text-sm text-ink/60">
-        Requests routed to you, resolved by resource ownership — never a hardcoded list.
-      </p>
+    <div className="mx-auto max-w-7xl">
+      <PageHeader
+        title="Approve Requests"
+        description={
+          isSuperAdmin
+            ? 'Every booking request on campus that is still waiting for an answer.'
+            : 'People are waiting for your answer on these room requests. Approve or reject each one; they see your decision in My Bookings.'
+        }
+      />
+
+      {isSuperAdmin && (
+        <p className="mt-4 flex items-start gap-2 rounded-lg border border-navy/10 bg-navy/5 px-4 py-3 text-sm text-navy">
+          <Info size={17} className="mt-0.5 shrink-0" />
+          You can see every request here, but only the admin in charge of each room can approve or reject it.
+        </p>
+      )}
 
       {error && (
         <div className="mt-4 flex items-center justify-between rounded-lg border border-brick/40 bg-brick-light p-4 text-sm text-brick">
@@ -86,134 +101,137 @@ export default function Approvals() {
       {loading ? (
         <p className="mt-6 text-sm text-ink/50">Loading…</p>
       ) : pending.length === 0 ? (
-        <div className="mt-16 flex flex-col items-center justify-center rounded-xl border border-dashed border-line bg-white/50 px-6 py-20 text-center shadow-sm">
-          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-forest/10 ring-8 ring-forest/5">
-            <svg className="h-8 w-8 text-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path>
-            </svg>
-          </div>
-          <h3 className="font-display text-xl font-semibold text-navy">All Caught Up!</h3>
-          <p className="mt-2 max-w-sm text-sm text-ink/60">
-            You don't have any pending booking requests to review at the moment. Take a break!
-          </p>
+        <div className="mt-6">
+          <EmptyState icon={CircleCheck} title="Nothing to approve">
+            You're all caught up. New requests for your rooms will show up here.
+          </EmptyState>
         </div>
       ) : (
-        <ul className="mt-6 space-y-3">
-          {pending.map((a) => (
-            <li key={a.approvalId} className="rounded-lg border border-line bg-white p-5">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="font-medium text-ink">
-                    {a.booking?.resource?.resourceName || 'Unknown Resource'}{' '}
-                    <span className="font-mono text-xs text-ink/40">
-                      {a.booking?.resource?.resourceId || ''}
-                    </span>
-                  </p>
-                  <p className="mt-0.5 text-[11px] font-bold tracking-wide uppercase text-navy/70">
-                    {a.booking?.resource?.resourceType?.typeName || 'Unknown Type'} • {a.booking?.resource?.department?.departmentName || 'Institute (Shared)'}
-                  </p>
-                  <p className="mt-0.5 text-xs text-ink/50">
-                    {fmtDate(a.booking?.bookingDate)} · {fmtTimeSlot(a.booking?.startTime, a.booking?.endTime)}
-                  </p>
-                  {a.booking?.createdAt && (
-                    <p className="mt-0.5 text-[11px] text-ink/40">
-                      Requested{' '}
-                      {new Date(a.booking.createdAt).toLocaleString('en-IN', {
-                        day: '2-digit',
-                        month: 'short',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
+        <>
+          <h2 className="mt-8 font-sans text-xs font-semibold uppercase tracking-wider text-ink/50">
+            Waiting for an answer · {pending.length}
+          </h2>
+          <ul className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-2">
+            {pending.map((a) => {
+              const b = a.booking || {};
+              const requester = b.requester || {};
+              return (
+                <li key={a.approvalId} className="flex flex-col rounded-lg border border-line border-l-4 border-l-amber bg-white p-4 shadow-sm">
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-ink/50">
+                      {b.resource?.resourceType?.typeName || 'Room'} · {b.resource?.department?.departmentName || 'Institute (Shared)'}
                     </p>
-                  )}
-                  <p className="mt-2 text-sm text-ink/80">{a.booking?.purpose || 'No purpose specified'}</p>
-                  <p className="mt-2 text-xs text-ink/50">
-                    Requested by <span className="font-medium text-ink/70">{a.booking?.requester?.name || 'Unknown'}</span>
-                    {a.booking?.requester?.department?.departmentName && (
-                      <span className="text-ink/60"> ({a.booking.requester.department.departmentName})</span>
-                    )}
-                    {a.booking?.requester?.email && (
-                      <>
-                        {' · '}
-                        <a href={`mailto:${a.booking.requester.email}`} className="text-navy hover:underline">
-                          {a.booking.requester.email}
-                        </a>
-                      </>
-                    )}
-                    {a.booking?.requester?.phone && (
-                      <>
-                        {' · '}
-                        <a href={`tel:${a.booking.requester.phone}`} className="font-mono text-navy hover:underline">
-                          {a.booking.requester.phone}
-                        </a>
-                      </>
-                    )}
-                  </p>
-                </div>
-              </div>
-
-              {isSuperAdmin ? (
-                <div className="mt-4 rounded-lg bg-navy/5 p-3 text-xs text-navy/70 text-center">
-                  Super Admins have universal read-only visibility over pending approvals but cannot approve or reject requests.
-                </div>
-              ) : (
-                <>
-                  <input
-                    type="text"
-                    placeholder="Remarks (optional for approval)"
-                    value={remarksDraft[a.approvalId] || ''}
-                    onChange={(e) => setRemarksDraft((d) => ({ ...d, [a.approvalId]: e.target.value }))}
-                    className="mt-4 w-full rounded border border-line px-3 py-2 text-sm"
-                  />
-
-                  <div className="mt-3 flex gap-3">
-                    <button
-                      onClick={() => act(a.approvalId, 'Approved')}
-                      disabled={actingId === a.approvalId}
-                      className="rounded bg-forest px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
-                    >
-                      {actingId === a.approvalId ? 'Approving…' : 'Approve'}
-                    </button>
-                    <button
-                      onClick={() => handleOpenRejectModal(a)}
-                      disabled={actingId === a.approvalId}
-                      className="rounded bg-brick px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
-                    >
-                      Reject…
-                    </button>
+                    <StatusPill tone="amber">{isSuperAdmin ? 'Waiting for approval' : 'Waiting for you'}</StatusPill>
                   </div>
-                </>
-              )}
-            </li>
-          ))}
-        </ul>
+                  <p className="mt-1 font-display text-lg font-semibold leading-snug text-ink">
+                    {b.resource?.resourceName || 'Unknown room'}
+                  </p>
+                  <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-ink/80">
+                    <span className="inline-flex items-center gap-1.5">
+                      <CalendarDays size={15} className="text-ink/40" />
+                      {fmtDay(b.bookingDate)}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <Clock size={15} className="text-ink/40" />
+                      {fmtTimeSlot(b.startTime, b.endTime)}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm text-ink/80">{b.purpose || 'No purpose given'}</p>
+
+                  <div className="mt-3 rounded-md bg-paper px-3 py-2 text-xs text-ink/70">
+                    <p className="flex items-center gap-1.5">
+                      <UserRound size={14} className="shrink-0 text-ink/40" />
+                      <span>
+                        Asked by <span className="font-semibold text-ink">{requester.name || 'Unknown'}</span>
+                        {requester.department?.departmentName && ` (${requester.department.departmentName})`}
+                        {b.createdAt && <span className="text-ink/50"> on {fmtWhen(b.createdAt)}</span>}
+                      </span>
+                    </p>
+                    {(requester.email || requester.phone) && (
+                      <p className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
+                        {requester.email && (
+                          <a href={`mailto:${requester.email}`} className="inline-flex items-center gap-1.5 text-navy hover:underline">
+                            <Mail size={14} className="shrink-0 text-ink/40" />
+                            {requester.email}
+                          </a>
+                        )}
+                        {requester.phone && (
+                          <a href={`tel:${requester.phone}`} className="inline-flex items-center gap-1.5 font-mono text-navy hover:underline">
+                            <Phone size={14} className="shrink-0 text-ink/40" />
+                            {requester.phone}
+                          </a>
+                        )}
+                      </p>
+                    )}
+                  </div>
+
+                  {!isSuperAdmin && (
+                    <div className="mt-auto pt-4">
+                      <div className="border-t border-line pt-3">
+                        <input
+                          type="text"
+                          aria-label="Note to the requester"
+                          placeholder="Note to the requester (optional)"
+                          value={remarksDraft[a.approvalId] || ''}
+                          onChange={(e) => setRemarksDraft((d) => ({ ...d, [a.approvalId]: e.target.value }))}
+                          className="w-full rounded border border-line px-3 py-2 text-sm"
+                        />
+                        <div className="mt-3 flex gap-3">
+                          <button
+                            onClick={() => act(a.approvalId, 'Approved')}
+                            disabled={actingId === a.approvalId}
+                            className="inline-flex items-center gap-1.5 rounded bg-forest px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
+                          >
+                            <Check size={16} />
+                            {actingId === a.approvalId ? 'Approving…' : 'Approve'}
+                          </button>
+                          <button
+                            onClick={() => handleOpenRejectModal(a)}
+                            disabled={actingId === a.approvalId}
+                            className="inline-flex items-center gap-1.5 rounded border border-brick/40 px-4 py-2 text-sm font-semibold text-brick hover:bg-brick-light disabled:opacity-50"
+                          >
+                            <X size={16} />
+                            Reject…
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </>
       )}
 
       {/* Rejection Modal */}
       {rejectModalApproval && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/40 backdrop-blur-sm p-4">
           <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl border border-line">
-            <h3 className="font-display text-lg font-semibold text-navy">Reject Booking Request</h3>
-            <p className="mt-1 text-xs text-ink/60">
-              Please provide a clear reason for rejecting this booking request. The requester will be notified of these remarks.
+            <h3 className="font-display text-lg font-semibold text-navy">Reject this request?</h3>
+            <p className="mt-1 text-sm text-ink/60">
+              Tell {rejectModalApproval.booking?.requester?.name || 'the requester'} why. They will see your reason in My Bookings.
             </p>
 
-            <div className="mt-3 rounded-lg bg-paper p-3 text-xs text-ink/70">
-              <p className="font-medium text-ink">{rejectModalApproval.booking?.resource?.resourceName}</p>
+            <div className="mt-4 rounded-lg bg-paper p-3 text-sm text-ink/70">
+              <p className="font-semibold text-ink">{rejectModalApproval.booking?.resource?.resourceName}</p>
               <p className="mt-0.5">
-                {fmtDate(rejectModalApproval.booking?.bookingDate)} · {fmtTimeSlot(rejectModalApproval.booking?.startTime, rejectModalApproval.booking?.endTime)}
+                {fmtDay(rejectModalApproval.booking?.bookingDate)} · {fmtTimeSlot(rejectModalApproval.booking?.startTime, rejectModalApproval.booking?.endTime)}
               </p>
-              <p className="mt-0.5 text-ink/50">Requester: {rejectModalApproval.booking?.requester?.name}</p>
+              {rejectModalApproval.booking?.purpose && (
+                <p className="mt-0.5 text-ink/50">{rejectModalApproval.booking.purpose}</p>
+              )}
             </div>
 
             <form onSubmit={handleConfirmRejection} className="mt-4">
-              <label className="block text-xs font-semibold text-ink/70 mb-1">
-                Rejection Remarks <span className="text-brick">*</span>
+              <label htmlFor="rejection-reason" className="block text-sm font-semibold text-ink mb-1">
+                Reason <span className="text-brick">*</span>
               </label>
               <textarea
+                id="rejection-reason"
                 required
                 rows={3}
-                placeholder="e.g. Venue is reserved for scheduled maintenance / academic examination"
+                placeholder="e.g. The hall is reserved for exams that day"
                 value={rejectionRemarks}
                 onChange={(e) => {
                   setRejectionRemarks(e.target.value);
@@ -232,16 +250,16 @@ export default function Approvals() {
                 <button
                   type="button"
                   onClick={() => setRejectModalApproval(null)}
-                  className="rounded-lg border border-line px-4 py-2 text-xs font-medium text-ink hover:bg-paper"
+                  className="rounded-lg border border-line px-4 py-2 text-sm font-medium text-ink hover:bg-paper"
                 >
-                  Cancel
+                  Go back
                 </button>
                 <button
                   type="submit"
                   disabled={actingId === rejectModalApproval.approvalId || !rejectionRemarks.trim()}
-                  className="rounded-lg bg-brick px-4 py-2 text-xs font-semibold text-white hover:bg-brick-dark disabled:opacity-50"
+                  className="rounded-lg bg-brick px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
                 >
-                  {actingId === rejectModalApproval.approvalId ? 'Rejecting…' : 'Confirm Rejection'}
+                  {actingId === rejectModalApproval.approvalId ? 'Rejecting…' : 'Reject request'}
                 </button>
               </div>
             </form>

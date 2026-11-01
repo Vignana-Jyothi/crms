@@ -1,5 +1,33 @@
 import { useEffect, useState } from 'react';
+import { Plus, RefreshCw } from 'lucide-react';
 import { masterDataApi, resourcesApi, timetableApi } from '../../api/endpoints';
+import PageHeader from '../../components/common/PageHeader';
+import StatusPill from '../../components/common/StatusPill';
+
+// Only Active rooms accept new bookings (bookings.service rejects the rest).
+const ROOM_STATUS = {
+  Active: { label: 'Open for booking', tone: 'green' },
+  Inactive: { label: 'Closed', tone: 'grey' },
+  Maintenance: { label: 'Under maintenance', tone: 'amber' },
+};
+
+function RoomStatus({ status }) {
+  const s = ROOM_STATUS[status] || { label: status, tone: 'grey' };
+  return <StatusPill tone={s.tone}>{s.label}</StatusPill>;
+}
+
+function ToggleButton({ resource, onClick }) {
+  const isOpen = resource.status === 'Active';
+  return (
+    <button
+      onClick={onClick}
+      title={isOpen ? 'Stop new bookings for this room' : 'Let people book this room again'}
+      className="whitespace-nowrap rounded border border-line px-2.5 py-1 text-xs font-medium text-ink/70 hover:bg-paper hover:text-ink"
+    >
+      {isOpen ? 'Close' : 'Reopen'}
+    </button>
+  );
+}
 
 const EMPTY_FORM = {
   resourceId: '',
@@ -140,7 +168,7 @@ export default function Resources() {
       await resourcesApi.update(resource.resourceId, { status: nextStatus });
       setActionAlert({
         type: 'success',
-        message: `Resource "${resource.resourceName}" status changed to ${nextStatus}.`,
+        message: `${resource.resourceName} is now ${nextStatus === 'Active' ? 'open for booking' : 'closed, so nobody can book it'}.`,
       });
       refresh();
     } catch (err) {
@@ -160,7 +188,7 @@ export default function Resources() {
       const res = await timetableApi.sync();
       setActionAlert({
         type: 'success',
-        message: `Successfully synced ${res.totalSynced} class schedules from EduPrime!`,
+        message: `Copied ${res.totalSynced} class schedules from EduPrime.`,
       });
     } catch (err) {
       setActionAlert({
@@ -185,16 +213,16 @@ export default function Resources() {
   });
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="font-display text-2xl font-semibold text-navy">Resources</h1>
-          <p className="mt-1 text-sm text-ink/60">{resources.length} resources across campus.</p>
-        </div>
+    <div className="mx-auto max-w-7xl">
+      <PageHeader
+        title="Rooms & Labs"
+        description={`All ${resources.length} rooms, labs and halls people can book. Close a room to stop new bookings for it.`}
+      >
         <div className="flex flex-wrap gap-3 items-center">
           <input
             type="text"
-            placeholder="Search resources..."
+            aria-label="Search rooms"
+            placeholder="Search rooms…"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="rounded border border-line px-3 py-2 text-sm w-full md:w-64"
@@ -203,22 +231,25 @@ export default function Resources() {
             <button
               onClick={handleSync}
               disabled={syncing}
-              className="flex-1 md:flex-none rounded bg-sky-100 px-4 py-2 text-sm font-semibold text-navy hover:bg-sky-200 disabled:opacity-60 whitespace-nowrap text-center"
+              title="Copy the latest class timetables from EduPrime"
+              className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 rounded border border-line bg-white px-4 py-2 text-sm font-semibold text-navy hover:bg-paper disabled:opacity-60 whitespace-nowrap"
             >
-              {syncing ? 'Syncing...' : 'Sync EduPrime'}
+              <RefreshCw size={15} className={syncing ? 'animate-spin' : ''} />
+              {syncing ? 'Syncing…' : 'Sync from EduPrime'}
             </button>
             <button
               onClick={() => {
                 setShowForm((s) => !s);
                 setError('');
               }}
-              className="flex-1 md:flex-none rounded bg-navy px-4 py-2 text-sm font-semibold text-white hover:bg-navy-dark whitespace-nowrap text-center"
+              className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 rounded bg-navy px-4 py-2 text-sm font-semibold text-white hover:bg-navy-dark whitespace-nowrap"
             >
-              {showForm ? 'Cancel' : '+ Add resource'}
+              {!showForm && <Plus size={16} />}
+              {showForm ? 'Cancel' : 'Add room'}
             </button>
           </div>
         </div>
-      </div>
+      </PageHeader>
 
       {actionAlert && (
         <div
@@ -352,9 +383,9 @@ export default function Resources() {
               <th className="px-4 py-3">Department</th>
               <th className="px-4 py-3">Block</th>
               <th className="px-4 py-3">Floor</th>
-              <th className="px-4 py-3">Capacity</th>
+              <th className="px-4 py-3">Seats</th>
               <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3 text-right">Actions</th>
+              <th className="px-4 py-3 text-right"><span className="sr-only">Actions</span></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
@@ -380,24 +411,17 @@ export default function Resources() {
                 <td className="px-4 py-3 text-ink/60">{r.floor || '—'}</td>
                 <td className="px-4 py-3 font-mono text-xs text-ink/70">{r.capacityOrAreaSqm || '—'}</td>
                 <td className="px-4 py-3">
-                  <span className={r.status === 'Active' ? 'text-forest font-medium' : 'text-ink/40'}>
-                    {r.status}
-                  </span>
+                  <RoomStatus status={r.status} />
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <div className="flex items-center justify-end gap-3">
+                  <div className="flex items-center justify-end gap-2">
                     <button
                       onClick={() => handleOpenEdit(r)}
-                      className="text-xs font-semibold text-navy hover:underline"
+                      className="rounded border border-line px-2.5 py-1 text-xs font-semibold text-navy hover:bg-paper"
                     >
                       Edit
                     </button>
-                    <button
-                      onClick={() => toggleStatus(r)}
-                      className="text-xs font-medium text-ink/60 hover:text-ink hover:underline"
-                    >
-                      {r.status === 'Active' ? 'Deactivate' : 'Reactivate'}
-                    </button>
+                    <ToggleButton resource={r} onClick={() => toggleStatus(r)} />
                   </div>
                 </td>
               </tr>
@@ -405,7 +429,7 @@ export default function Resources() {
             {filteredResources.length === 0 && (
               <tr>
                 <td colSpan={9} className="px-4 py-10 text-center text-sm text-ink/50">
-                  No resources match your search.
+                  No rooms match your search.
                 </td>
               </tr>
             )}
@@ -432,9 +456,7 @@ export default function Resources() {
                     )}
                   </h3>
                 </div>
-                <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${r.status === 'Active' ? 'bg-forest-light text-forest' : 'bg-ink/10 text-ink/50'}`}>
-                  {r.status}
-                </span>
+                <RoomStatus status={r.status} />
               </div>
               
               <div className="grid grid-cols-2 gap-2 text-sm text-ink/80 mt-2">
@@ -451,30 +473,25 @@ export default function Resources() {
                   <span className="font-medium">{r.block?.blockCode ? `Blk ${r.block.blockCode}` : '—'} {r.floor ? `· Flr ${r.floor}` : ''}</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] text-ink/50 uppercase tracking-wide">Capacity</span>
+                  <span className="text-[10px] text-ink/50 uppercase tracking-wide">Seats</span>
                   <span className="font-mono font-medium">{r.capacityOrAreaSqm || '—'}</span>
                 </div>
               </div>
 
-              <div className="mt-2 pt-3 border-t border-line flex justify-end gap-3">
+              <div className="mt-2 pt-3 border-t border-line flex justify-end gap-2">
                 <button
                   onClick={() => handleOpenEdit(r)}
-                  className="text-xs font-semibold text-navy hover:underline"
+                  className="rounded border border-line px-2.5 py-1 text-xs font-semibold text-navy hover:bg-paper"
                 >
                   Edit
                 </button>
-                <button
-                  onClick={() => toggleStatus(r)}
-                  className="text-xs font-medium text-ink/60 hover:text-ink hover:underline"
-                >
-                  {r.status === 'Active' ? 'Deactivate' : 'Reactivate'}
-                </button>
+                <ToggleButton resource={r} onClick={() => toggleStatus(r)} />
               </div>
             </div>
           ))}
           {filteredResources.length === 0 && (
             <div className="px-4 py-10 text-center text-sm text-ink/50 bg-white rounded-lg border border-line shadow-sm">
-              No resources match your search.
+              No rooms match your search.
             </div>
           )}
         </div>

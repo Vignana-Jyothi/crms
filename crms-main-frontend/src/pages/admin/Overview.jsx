@@ -1,24 +1,55 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { ArrowRight, Building2, CalendarCheck, CircleCheck, Hourglass } from 'lucide-react';
 import { approvalsApi, bookingsApi, resourcesApi } from '../../api/endpoints';
 import { useAuth } from '../../context/authStore';
 import { ROLES } from '../../constants/roles';
-import { fmtDate, fmtTimeSlot } from '../../utils/formatters';
+import { fmtDay, fmtTimeSlot } from '../../utils/formatters';
+import PageHeader from '../../components/common/PageHeader';
+import StatusPill from '../../components/common/StatusPill';
 
-function StatCard({ label, value, to, color = 'navy' }) {
+const STAT_TONES = {
+  amber: 'bg-amber-light text-amber',
+  green: 'bg-forest-light text-forest',
+  navy: 'bg-navy/5 text-navy',
+};
+
+function StatCard({ icon: Icon, label, value, hint, to, tone = 'navy' }) {
   const content = (
-    <div className={`rounded-lg border border-line bg-white p-6 transition-shadow ${to ? 'hover:shadow-md cursor-pointer hover:border-navy/30' : ''}`}>
-      <p className="text-sm font-medium text-ink/60">{label}</p>
-      <p className={`mt-2 font-display text-4xl font-bold text-${color}`}>{value}</p>
+    <div className={`group flex h-full items-start gap-4 rounded-lg border border-line bg-white p-5 shadow-sm transition-shadow ${to ? 'hover:shadow-md' : ''}`}>
+      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${STAT_TONES[tone]}`}>
+        <Icon size={20} />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-medium text-ink/70">{label}</p>
+        <p className="mt-0.5 font-display text-3xl font-bold text-ink">{value}</p>
+        <p className="mt-1 text-xs text-ink/50">{hint}</p>
+      </div>
+      {to && <ArrowRight size={16} className="mt-1 shrink-0 text-ink/30 transition-transform group-hover:translate-x-0.5 group-hover:text-navy" />}
     </div>
   );
   return to ? <Link to={to}>{content}</Link> : content;
 }
 
+function Panel({ title, to, linkLabel, children }) {
+  return (
+    <div className="flex flex-col overflow-hidden rounded-lg border border-line bg-white shadow-sm">
+      <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
+        <h2 className="font-semibold text-navy">{title}</h2>
+        <Link to={to} className="inline-flex items-center gap-1 text-xs font-semibold text-navy hover:underline">
+          {linkLabel}
+          <ArrowRight size={13} />
+        </Link>
+      </div>
+      <div className="flex-1">{children}</div>
+    </div>
+  );
+}
+
 export default function Overview() {
   const { user } = useAuth();
   const [stats, setStats] = useState({ pending: null, totalResources: null, activeBookings: null });
-  
+
   // Storing full lists for the recent activity sections
   const [pendingApprovals, setPendingApprovals] = useState([]);
   const [recentBookings, setRecentBookings] = useState([]);
@@ -44,16 +75,11 @@ export default function Overview() {
   const canManageResources = user?.roleId === ROLES.SUPER_ADMIN;
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="font-display text-3xl font-semibold text-navy">Welcome back, {user?.name}</h1>
-          <p className="mt-1 text-sm text-ink/60">Here is what is happening across your resources today.</p>
-        </div>
-      </div>
+    <div className="mx-auto max-w-7xl">
+      <PageHeader title={`Welcome back, ${user?.name || ''}`} description="What needs your attention, at a glance." />
 
       {loading ? (
-        <div className="animate-pulse space-y-8">
+        <div className="mt-6 animate-pulse space-y-8">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
             {[1, 2, 3].map(i => <div key={i} className="h-28 bg-line/20 rounded-lg"></div>)}
           </div>
@@ -61,97 +87,88 @@ export default function Overview() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 mb-8">
-            <StatCard label="Pending Approvals" value={stats.pending ?? '0'} to="/admin/approvals" color={stats.pending > 0 ? 'amber' : 'navy'} />
-            <StatCard label="Approved Bookings" value={stats.activeBookings ?? '0'} to="/admin/bookings" color="forest" />
+          <div className="mt-6 mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
             <StatCard
-              label="Total Resources"
-              value={stats.totalResources ?? '0'}
+              icon={Hourglass}
+              label="Waiting for approval"
+              value={stats.pending ?? 0}
+              hint={stats.pending > 0 ? 'Requests waiting for an answer' : 'Nothing waiting right now'}
+              to="/admin/approvals"
+              tone={stats.pending > 0 ? 'amber' : 'navy'}
+            />
+            <StatCard
+              icon={CalendarCheck}
+              label="Approved bookings"
+              value={stats.activeBookings ?? 0}
+              hint="Rooms confirmed for people"
+              to="/admin/bookings"
+              tone="green"
+            />
+            <StatCard
+              icon={Building2}
+              label="Rooms & labs"
+              value={stats.totalResources ?? 0}
+              hint="Places people can book"
               to={canManageResources ? '/admin/resources' : undefined}
             />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Needs Attention Column */}
-            <div className="rounded-xl border border-line bg-white shadow-sm overflow-hidden flex flex-col">
-              <div className="border-b border-line bg-paper/50 px-6 py-4 flex items-center justify-between">
-                <h2 className="font-semibold text-navy">Needs Attention</h2>
-                <Link to="/admin/approvals" className="text-xs font-semibold text-navy hover:underline">View all</Link>
-              </div>
-              <div className="p-0 flex-1">
-                {pendingApprovals.length === 0 ? (
-                  <div className="p-10 flex flex-col items-center justify-center text-center h-full">
-                    <div className="h-12 w-12 rounded-full bg-forest/10 flex items-center justify-center mb-3">
-                      <svg className="w-6 h-6 text-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <p className="text-sm font-medium text-ink">You're all caught up!</p>
-                    <p className="mt-1 text-xs text-ink/50">No pending approvals require your attention.</p>
-                  </div>
-                ) : (
-                  <ul className="divide-y divide-line">
-                    {pendingApprovals.map(a => (
-                      <li key={a.approvalId} className="p-4 hover:bg-paper/30 transition-colors">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <p className="font-medium text-ink text-sm">
-                              {a.booking?.resource?.resourceName || 'Unknown Resource'}
-                            </p>
-                            <p className="mt-0.5 text-xs text-ink/60">
-                              {fmtDate(a.booking?.bookingDate)} • {fmtTimeSlot(a.booking?.startTime, a.booking?.endTime)}
-                            </p>
-                          </div>
-                          <Link to="/admin/approvals" className="text-xs bg-amber/20 text-amber-dark font-medium px-2 py-1 rounded">
-                            Review
-                          </Link>
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <Panel title="Waiting for an answer" to="/admin/approvals" linkLabel="See all">
+              {pendingApprovals.length === 0 ? (
+                <div className="flex h-full flex-col items-center justify-center p-10 text-center">
+                  <CircleCheck size={28} className="mb-2 text-forest" />
+                  <p className="text-sm font-medium text-ink">You're all caught up</p>
+                  <p className="mt-1 text-xs text-ink/50">No requests are waiting for an answer.</p>
+                </div>
+              ) : (
+                <ul className="divide-y divide-line">
+                  {pendingApprovals.map(a => (
+                    <li key={a.approvalId}>
+                      <Link to="/admin/approvals" className="block px-5 py-3.5 hover:bg-paper/50">
+                        <div className="flex items-start justify-between gap-3">
+                          <p className="font-medium text-ink text-sm">
+                            {a.booking?.resource?.resourceName || 'Unknown room'}
+                          </p>
+                          <StatusPill tone="amber">Waiting</StatusPill>
                         </div>
-                        <p className="mt-2 text-xs text-ink/70 line-clamp-1">{a.booking?.purpose}</p>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
+                        <p className="mt-0.5 text-xs text-ink/60">
+                          {fmtDay(a.booking?.bookingDate)} · {fmtTimeSlot(a.booking?.startTime, a.booking?.endTime)}
+                          {a.booking?.requester?.name && ` · ${a.booking.requester.name}`}
+                        </p>
+                        <p className="mt-1 text-xs text-ink/70 line-clamp-1">{a.booking?.purpose}</p>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Panel>
 
-            {/* Upcoming Activity Column */}
-            <div className="rounded-xl border border-line bg-white shadow-sm overflow-hidden flex flex-col">
-              <div className="border-b border-line bg-paper/50 px-6 py-4 flex items-center justify-between">
-                <h2 className="font-semibold text-navy">Recent Approved Bookings</h2>
-                <Link to="/admin/bookings" className="text-xs font-semibold text-navy hover:underline">View all</Link>
-              </div>
-              <div className="p-0 flex-1">
-                {recentBookings.length === 0 ? (
-                  <div className="p-10 flex flex-col items-center justify-center text-center h-full">
-                    <p className="text-sm text-ink/50">No approved bookings found.</p>
-                  </div>
-                ) : (
-                  <ul className="divide-y divide-line">
-                    {recentBookings.map(b => (
-                      <li key={b.bookingId} className="p-4 hover:bg-paper/30 transition-colors">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <p className="font-medium text-ink text-sm">
-                              {b.resource?.resourceName || 'Unknown Resource'}
-                            </p>
-                            <p className="mt-0.5 text-xs text-ink/60">
-                              {fmtDate(b.bookingDate)} • {fmtTimeSlot(b.startTime, b.endTime)}
-                            </p>
-                          </div>
-                          <span className="text-[10px] uppercase font-bold tracking-wider text-ink/40">
-                            {b.resource?.department?.departmentName || 'Shared'}
-                          </span>
-                        </div>
-                        <div className="mt-2 flex items-center justify-between">
-                          <p className="text-xs text-ink/70 truncate mr-4">{b.purpose}</p>
-                          <p className="text-xs font-medium text-ink/50 whitespace-nowrap">{b.requester?.name}</p>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
+            <Panel title="Recently approved" to="/admin/bookings" linkLabel="See all bookings">
+              {recentBookings.length === 0 ? (
+                <div className="flex h-full flex-col items-center justify-center p-10 text-center">
+                  <p className="text-sm text-ink/50">No approved bookings yet.</p>
+                </div>
+              ) : (
+                <ul className="divide-y divide-line">
+                  {recentBookings.map(b => (
+                    <li key={b.bookingId} className="px-5 py-3.5">
+                      <div className="flex items-start justify-between gap-3">
+                        <p className="font-medium text-ink text-sm">
+                          {b.resource?.resourceName || 'Unknown room'}
+                        </p>
+                        <StatusPill tone="green">Approved</StatusPill>
+                      </div>
+                      <p className="mt-0.5 text-xs text-ink/60">
+                        {fmtDay(b.bookingDate)} · {fmtTimeSlot(b.startTime, b.endTime)}
+                        {b.requester?.name && ` · ${b.requester.name}`}
+                      </p>
+                      <p className="mt-1 text-xs text-ink/70 truncate">{b.purpose}</p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Panel>
           </div>
         </>
       )}

@@ -22,9 +22,4 @@ const setPassword = asyncHandler(async (req, res) => {
   res.status(204).send();
 });
 
-const signup = asyncHandler(async (req, res) => {
-  const result = await service.signup(req.body);
-  res.status(201).json(result);
-});
-
-module.exports = { login, refresh, setPassword, signup };
+module.exports = { login, refresh, setPassword };

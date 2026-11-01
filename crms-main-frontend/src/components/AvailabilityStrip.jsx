@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { Check } from 'lucide-react';
 import { formatClassYear, sectionLabel } from '../constants/programs';
+import { fmtTimeSlot } from '../utils/formatters';
 
 // Renders a 24h strip (8am-6pm campus hours shown, rest dimmed)
 // with booked/class blocks marked, so a requester can see at a
@@ -106,23 +108,31 @@ export default function AvailabilityStrip({ availability, date }) {
           );
         })}
       </div>
-      <div className="mt-1 flex justify-between text-[10px] text-ink/40">
-        {hourMarks.map((m) => {
+      {/* Each label sits under its hour; every other one is dropped on phones. */}
+      <div className="relative mt-1 h-4 text-[10px] text-ink/50">
+        {hourMarks.map((m, i) => {
           const hour24 = Math.floor(m / 60);
-          const hour12 = hour24 % 12 || 12;
+          const left = ((m - DAY_START_MIN) / (DAY_END_MIN - DAY_START_MIN)) * 100;
+          const shift = i === 0 ? '0' : i === hourMarks.length - 1 ? '-100%' : '-50%';
           return (
-            <span key={m} className="font-mono">
-              {hour12}
+            <span
+              key={m}
+              className={`absolute top-0 whitespace-nowrap ${i % 2 ? 'hidden sm:block' : ''}`}
+              style={{ left: `${left}%`, transform: `translateX(${shift})` }}
+            >
+              {hour24 % 12 || 12} {hour24 < 12 ? 'AM' : 'PM'}
             </span>
           );
         })}
       </div>
       <div className="mt-2 flex flex-wrap gap-3 text-xs text-ink/60">
-        <Legend swatch="bg-forest-light border border-forest/30" label="Open" />
+        <Legend swatch="bg-forest-light border border-forest/30" label="Free" />
         <Legend swatch="bg-navy" label="Class" />
-        <Legend swatch="bg-amber" label="Pending booking" />
-        <Legend swatch="bg-brick" label="Approved booking" />
+        <Legend swatch="bg-amber" label="Waiting for approval" />
+        <Legend swatch="bg-brick" label="Booked" />
       </div>
+
+      <BusyList blockedByTimetable={blockedByTimetable} blockedByBookings={blockedByBookings} />
 
       {selectedBlock && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/40 backdrop-blur-sm p-4 text-left">
@@ -131,7 +141,9 @@ export default function AvailabilityStrip({ availability, date }) {
               <div className="flex items-start justify-between">
                 <div>
                   <h3 className="text-lg font-display font-semibold text-navy">
-                    {selectedBlock.type === 'class' ? 'Scheduled Class' : `Booking (${selectedBlock.data.status})`}
+                    {selectedBlock.type === 'class'
+                      ? 'Scheduled Class'
+                      : selectedBlock.data.status === 'Approved' ? 'Booked' : 'Booking waiting for approval'}
                   </h3>
                   <p className="text-xs font-mono text-ink/60 mt-0.5">
                     {formatTimeDisplay(selectedBlock.data.startTime)} - {formatTimeDisplay(selectedBlock.data.endTime)}
@@ -201,6 +213,62 @@ export default function AvailabilityStrip({ availability, date }) {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// The strip again in words, for anyone who'd rather read than decode colours.
+// Sections sharing a class in the same slot are listed once.
+function BusyList({ blockedByTimetable, blockedByBookings }) {
+  const seen = new Set();
+  const busy = [
+    ...blockedByTimetable.map((t) => ({
+      startTime: t.startTime,
+      endTime: t.endTime,
+      kind: 'Class',
+      detail: t.courseName || t.courseCode,
+      swatch: 'bg-navy',
+    })),
+    ...blockedByBookings.map((b) => ({
+      startTime: b.startTime,
+      endTime: b.endTime,
+      kind: b.status === 'Approved' ? 'Booked' : 'Waiting for approval',
+      detail: b.purpose,
+      swatch: b.status === 'Approved' ? 'bg-brick' : 'bg-amber',
+    })),
+  ]
+    .filter((x) => {
+      const key = `${toMinutes(x.startTime)}-${toMinutes(x.endTime)}-${x.kind}-${(x.detail || '').toLowerCase()}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .sort((a, b) => toMinutes(a.startTime) - toMinutes(b.startTime));
+
+  if (busy.length === 0) {
+    return (
+      <p className="mt-4 flex items-center gap-1.5 border-t border-line pt-3 text-sm text-forest">
+        <Check size={15} />
+        Free all day. No classes or bookings yet.
+      </p>
+    );
+  }
+
+  return (
+    <div className="mt-4 border-t border-line pt-3">
+      <p className="text-xs font-semibold text-ink/70">Busy at these times</p>
+      <ul className="mt-1.5 space-y-1">
+        {busy.map((x, i) => (
+          <li key={i} className="flex items-start gap-2 text-xs" title={x.detail ? `${x.kind}: ${x.detail}` : x.kind}>
+            <span className={`mt-1 h-2 w-2 shrink-0 rounded-sm ${x.swatch}`} />
+            <span className="w-36 shrink-0 font-mono text-ink/60">{fmtTimeSlot(x.startTime, x.endTime)}</span>
+            <span className="min-w-0 truncate text-ink/80">
+              <span className="font-semibold">{x.kind}</span>
+              {x.detail ? ` · ${x.detail}` : ''}
+            </span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

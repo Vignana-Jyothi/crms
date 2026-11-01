@@ -1,17 +1,22 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { masterDataApi, resourcesApi, timetableApi } from '../../api/endpoints';
+import { useAuth } from '../../context/authStore';
+import { ADMINS } from '../../constants/roles';
 import FullWeekTimetableGrid from '../../components/admin/FullWeekTimetableGrid';
 import EditableTimetableGrid from '../../components/admin/EditableTimetableGrid';
 import TimetableUploadModal from '../../components/admin/TimetableUploadModal';
 import BulkGridEditor from '../../components/admin/BulkGridEditor';
-import { Calendar, Search, Edit2, List, LayoutGrid, X, Upload } from 'lucide-react';
+import { Search, Edit2, List, LayoutGrid, X, Upload } from 'lucide-react';
 import SearchableSelect from '../../components/common/SearchableSelect';
 import { PROGRAMS, DEFAULT_PROGRAM, yearOptionsFor, sectionLabel } from '../../constants/programs';
 
 const STORAGE_KEY = 'crms_timetables_filters';
 
 export default function TimetablesView() {
+  const { user } = useAuth();
+  // Everyone can read timetables; only admins can switch to editing.
+  const canEdit = ADMINS.includes(user?.roleId);
   const savedFilters = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || '{}');
 
   const [activeTab, setActiveTab] = useState(savedFilters.activeTab || 'Rooms'); // Rooms, Sections, Faculty
@@ -213,17 +218,14 @@ export default function TimetablesView() {
   }, [isEditMode, activeTab, selectedProgram, programDepartments, selectedDepartment]);
 
   return (
-    <div className="p-6 bg-slate-50 min-h-full">
+    <div>
       <div className="max-w-7xl mx-auto space-y-6">
         
         {/* Header & Navigation */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="shrink-0">
-            <h1 className="text-2xl font-bold text-navy flex items-center gap-2 whitespace-nowrap">
-              <Calendar className="text-navy" size={24} />
-              Unified Timetables
-            </h1>
-            <p className="text-slate-500 mt-1">Manage and view weekly schedules</p>
+            <h1 className="font-display text-2xl font-semibold text-navy">Timetables</h1>
+            <p className="mt-1 text-sm text-ink/60">The weekly class schedule for any room, class section or faculty member.</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 mt-2 lg:mt-0">
@@ -275,7 +277,7 @@ export default function TimetablesView() {
               </>
             )}
 
-            <button
+            {canEdit && <button
               onClick={() => { setIsEditMode(!isEditMode); setActiveTab(''); setIsUploadModalOpen(false); }}
               className={`flex items-center justify-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl text-sm font-medium transition-colors shadow-sm border ml-2 ${
                 isEditMode
@@ -285,7 +287,7 @@ export default function TimetablesView() {
             >
               <Edit2 size={18} />
               <span className="hidden sm:inline">Edit Timetables</span>
-            </button>
+            </button>}
           </div>
         </div>
 
@@ -644,25 +646,25 @@ export default function TimetablesView() {
           
           {!loading && timetables.length === 0 && !isEditMode && activeTab === 'Sections' && (!selectedSection || !selectedDepartment || !selectedStudentYear) && !(isUploadModalOpen && uploadModalMode === 'manual') && (
             <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
-              Please select a Program, Year, Branch, and Section to view the timetable.
+              Choose a program, year, branch and section above to see that class's timetable.
             </div>
           )}
 
           {!loading && timetables.length === 0 && !isEditMode && activeTab === 'Rooms' && !selectedResource && !(isUploadModalOpen && uploadModalMode === 'manual') && (
             <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
-              Please select a Room / Lab to view the timetable.
+              Choose a room or lab above to see its weekly timetable.
             </div>
           )}
 
           {!loading && timetables.length === 0 && !isEditMode && activeTab === 'Faculty' && !selectedFaculty && !(isUploadModalOpen && uploadModalMode === 'manual') && (
             <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
-              Please select a Faculty Member to view the timetable.
+              Choose a faculty member above to see their weekly timetable.
             </div>
           )}
 
           {!loading && timetables.length === 0 && isEditMode && (!selectedResource && !selectedFaculty && !selectedSection && !selectedDepartment && !selectedStudentYear) && !(isUploadModalOpen && uploadModalMode === 'manual') && (
             <div className="bg-white p-12 rounded-xl border border-line text-center text-slate-500 shadow-sm">
-              Please select any combination of filters above to find the timetables you want to edit.
+              Choose any of the filters above to find the timetables you want to edit.
             </div>
           )}
         </div>
