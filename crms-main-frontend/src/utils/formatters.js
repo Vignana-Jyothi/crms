@@ -59,12 +59,68 @@ export function fmtTime(val) {
  * @returns {string} e.g. "2026-08-16" or "—"
  */
 export function fmtDate(val) {
+  const d = parseDay(val);
+  if (!d) return '—';
+
+  return d.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
+}
+
+/**
+ * Format a date with its weekday, so people don't have to work it out.
+ * Returns "—" for invalid/empty inputs.
+ *
+ * @param {string|Date|number|null|undefined} val
+ * @returns {string} e.g. "Mon, 2 Nov 2026" or "—"
+ */
+export function fmtDay(val) {
+  const d = parseDay(val);
+  if (!d) return '—';
+
+  return d.toLocaleDateString('en-GB', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  });
+}
+
+/**
+ * Format a moment (e.g. when something was requested) in the viewer's own
+ * time zone, unlike fmtDateTime which prints UTC.
+ * Returns "—" for invalid/empty inputs.
+ *
+ * @param {string|Date|number|null|undefined} val
+ * @returns {string} e.g. "31 Oct 2026, 6:40 PM" or "—"
+ */
+export function fmtWhen(val) {
   if (val === null || val === undefined || val === '') return '—';
+
+  const d = val instanceof Date ? val : new Date(val);
+  if (isNaN(d.getTime())) return '—';
+  return d
+    .toLocaleString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    })
+    .replace(/\b(am|pm)\b/, (m) => m.toUpperCase());
+}
+
+// A date-only string is read as a local calendar day, not UTC midnight.
+function parseDay(val) {
+  if (val === null || val === undefined || val === '') return null;
 
   let d;
   if (typeof val === 'string') {
     const trimmed = val.trim();
-    if (!trimmed) return '—';
+    if (!trimmed) return null;
 
     // If it's a date-only string like YYYY-MM-DD, parse it carefully
     const dateMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})/);
@@ -77,13 +133,7 @@ export function fmtDate(val) {
     d = val instanceof Date ? val : new Date(val);
   }
 
-  if (isNaN(d.getTime())) return '—';
-
-  return d.toLocaleDateString('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  });
+  return isNaN(d.getTime()) ? null : d;
 }
 
 /**

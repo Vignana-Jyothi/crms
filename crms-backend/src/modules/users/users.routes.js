@@ -12,7 +12,8 @@ const router = Router();
 router.use(authenticate);
 
 const PHONE_REGEX = /^[6-9]\d{9}$/;
-const VALID_ROLE_IDS = new Set(Object.values(ROLES));
+// Read at call time: loadRoles may remap ids after this file loads.
+const isValidRoleId = (roleId) => Object.values(ROLES).includes(Number(roleId));
 
 function canReadUser(user, auth) {
   if ([ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN].includes(auth.roleId)) return true;
@@ -35,7 +36,7 @@ router.post(
     if (!name || !email || !phone || !roleId) {
       throw ApiError.badRequest('name, email, phone, and roleId are required');
     }
-    if (!VALID_ROLE_IDS.has(Number(roleId))) {
+    if (!isValidRoleId(roleId)) {
       throw ApiError.badRequest('roleId must be a valid role');
     }
     if (Number(roleId) === ROLES.DEPARTMENT_ADMIN && !departmentId) {
@@ -98,11 +99,12 @@ router.patch(
 
 // Super Admin sees everyone; Department Admin sees only their own
 // department's people (Section 15: "Cannot manage other departments").
+// Admins only: the list carries everyone's email and phone number.
 router.get(
   '/',
   asyncHandler(async (req, res) => {
-    if (req.auth.roleId === ROLES.REQUESTER) {
-      throw ApiError.forbidden('Requesters can only view their own profile');
+    if (![ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN].includes(req.auth.roleId)) {
+      throw ApiError.forbidden('Only admins can see the list of users');
     }
     const departmentId =
       req.auth.roleId === ROLES.DEPARTMENT_ADMIN ? req.auth.departmentId : req.query.departmentId;
@@ -163,7 +165,7 @@ router.patch(
   authorizeRole(ROLES.SUPER_ADMIN),
   asyncHandler(async (req, res) => {
     const { roleId, departmentId, managedDepartmentIds } = req.body;
-    if (!VALID_ROLE_IDS.has(Number(roleId))) {
+    if (!isValidRoleId(roleId)) {
       throw ApiError.badRequest('roleId must be a valid role');
     }
     if (Number(roleId) === ROLES.DEPARTMENT_ADMIN && !departmentId) {

@@ -1,52 +1,30 @@
 import { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/authStore';
-import { ROLES } from '../../constants/roles';
+import { ROLES, ADMINS, BOOKERS } from '../../constants/roles';
 import { approvalsApi } from '../../api/endpoints';
+import {
+  Building2, CalendarCheck, CalendarDays, ChevronLeft, CircleCheck, ClipboardList,
+  History, LayoutDashboard, LogOut, Pencil, Search, UserRound, Users,
+} from 'lucide-react';
 import ProfileModal from '../ProfileModal';
 
+// Each label is also the title of the page it opens.
 const NAV = [
-  { 
-    to: '/', label: 'Book a Room', exact: true, roles: null,
-    icon: <svg className="w-5 h-5 opacity-70 group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-  },
-  { 
-    to: '/bookings', label: 'My Bookings', roles: null,
-    icon: <svg className="w-5 h-5 opacity-70 group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-  },
+  { to: '/', label: 'Book a Room', exact: true, roles: BOOKERS, icon: Search },
+  { to: '/', label: 'Room Availability', exact: true, roles: [ROLES.VIEWER], icon: Search },
+  { to: '/bookings', label: 'My Bookings', roles: BOOKERS, icon: CalendarCheck },
+  { to: '/timetables', label: 'Timetables', roles: null, icon: CalendarDays },
 
-  { type: 'divider', roles: [ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN] },
-  { 
-    to: '/admin/overview', label: 'Admin Overview', roles: [ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN],
-    icon: <svg className="w-5 h-5 opacity-70 group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-  },
-  { 
-    to: '/admin/approvals', label: 'Approvals', badge: true, roles: [ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN],
-    icon: <svg className="w-5 h-5 opacity-70 group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-  },
-  { 
-    to: '/admin/bookings', label: 'All Bookings', roles: [ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN],
-    icon: <svg className="w-5 h-5 opacity-70 group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-  },
+  { type: 'heading', label: 'Manage bookings', roles: ADMINS },
+  { to: '/admin/overview', label: 'Overview', roles: ADMINS, icon: LayoutDashboard },
+  { to: '/admin/approvals', label: 'Approve Requests', badge: true, roles: ADMINS, icon: CircleCheck },
+  { to: '/admin/bookings', label: 'All Bookings', roles: ADMINS, icon: ClipboardList },
 
-  { 
-    to: '/admin/timetables', label: 'All Timetables', roles: [ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN],
-    icon: <svg className="w-5 h-5 opacity-70 group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-  },
-
-  { type: 'divider', roles: [ROLES.SUPER_ADMIN] },
-  { 
-    to: '/admin/resources', label: 'Resource Database', roles: [ROLES.SUPER_ADMIN],
-    icon: <svg className="w-5 h-5 opacity-70 group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-  },
-  { 
-    to: '/admin/users', label: 'User Management', roles: [ROLES.SUPER_ADMIN],
-    icon: <svg className="w-5 h-5 opacity-70 group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-  },
-  { 
-    to: '/admin/audit-logs', label: 'Audit Logs', roles: [ROLES.SUPER_ADMIN],
-    icon: <svg className="w-5 h-5 opacity-70 group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-  },
+  { type: 'heading', label: 'Set up', roles: [ROLES.SUPER_ADMIN] },
+  { to: '/admin/resources', label: 'Rooms & Labs', roles: [ROLES.SUPER_ADMIN], icon: Building2 },
+  { to: '/admin/users', label: 'Users', roles: [ROLES.SUPER_ADMIN], icon: Users },
+  { to: '/admin/audit-logs', label: 'Activity Log', roles: [ROLES.SUPER_ADMIN], icon: History },
 ];
 
 export default function Sidebar({ isOpen, setIsOpen }) {
@@ -57,7 +35,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
 
   useEffect(() => {
     function refreshCount() {
-      if (user && [ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN].includes(user.roleId)) {
+      if (user && ADMINS.includes(user.roleId)) {
         approvalsApi.pending().then((list) => setPendingCount(list.length)).catch(() => {});
       }
     }
@@ -97,21 +75,24 @@ export default function Sidebar({ isOpen, setIsOpen }) {
             </div>
           </div>
           {/* Close button visible on both mobile and desktop when sidebar is open */}
-          <button onClick={() => setIsOpen(false)} className="text-white/50 hover:text-white p-1 rounded hover:bg-white/10 transition-colors">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+          <button onClick={() => setIsOpen(false)} title="Hide menu" aria-label="Hide menu" className="text-white/50 hover:text-white p-1 rounded hover:bg-white/10 transition-colors">
+            <ChevronLeft size={20} />
           </button>
         </div>
 
-      <nav className="flex-1 space-y-1 px-3 py-4">
+      <nav className="flex-1 space-y-1 px-3 py-3">
         {visibleNav.map((l, idx) => {
-          if (l.type === 'divider') {
-            return <div key={`div-${idx}`} className="my-4 border-t border-white/10 mx-2" />;
+          if (l.type === 'heading') {
+            return (
+              <p key={`heading-${idx}`} className="px-3 pb-1 pt-5 text-[11px] font-semibold uppercase tracking-wider text-white/40">
+                {l.label}
+              </p>
+            );
           }
+          const Icon = l.icon;
           return (
             <NavLink
-              key={l.to}
+              key={l.label}
               to={l.to}
               end={l.exact}
               className={({ isActive }) =>
@@ -121,7 +102,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
               }
             >
               <div className="flex items-center gap-3">
-                {l.icon}
+                <Icon size={19} className="opacity-70 group-hover:opacity-100" />
                 <span>{l.label}</span>
               </div>
               {l.badge && pendingCount > 0 && (
@@ -143,11 +124,10 @@ export default function Sidebar({ isOpen, setIsOpen }) {
           <button
             onClick={() => setShowProfile(true)}
             className="p-1.5 text-white/60 hover:text-white hover:bg-white/10 rounded-md transition-colors"
-            title="Edit Profile"
+            title="Edit my profile"
+            aria-label="Edit my profile"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-            </svg>
+            <Pencil size={16} />
           </button>
         </div>
         
@@ -163,17 +143,19 @@ export default function Sidebar({ isOpen, setIsOpen }) {
         <div className="mt-3 flex items-center justify-between">
           <button
             onClick={() => setShowProfile(true)}
-            className="text-xs font-medium text-white/70 hover:text-white hover:underline transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-white/70 hover:text-white transition-colors"
           >
-            Profile Info
+            <UserRound size={14} />
+            My profile
           </button>
           <button
             onClick={() => {
               logout();
               navigate('/login');
             }}
-            className="text-xs font-medium text-brick hover:text-brick-light transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-white/70 hover:text-white transition-colors"
           >
+            <LogOut size={14} />
             Sign out
           </button>
         </div>

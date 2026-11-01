@@ -1,10 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { ArrowRight, Check, MapPin, SearchX, Users } from 'lucide-react';
 import { masterDataApi, resourcesApi } from '../api/endpoints';
 import { useAuth } from '../context/authStore';
-import { ROLES } from '../constants/roles';
+import { ROLES, BOOKERS } from '../constants/roles';
 import RoomQuickSearchModal from '../components/common/RoomQuickSearchModal';
 import AiRoomRecommenderModal from '../components/common/AiRoomRecommenderModal';
+import PageHeader from '../components/common/PageHeader';
+import EmptyState from '../components/common/EmptyState';
+import StatusPill from '../components/common/StatusPill';
+import { STRIPE_TONES } from '../constants/status';
 
 function todayStr() {
   const d = new Date();
@@ -36,10 +41,11 @@ const QUICK_SEARCH_SHOWN_KEY = 'crms_quick_search_shown';
 const AVAILABILITY_VALUES = ['All', 'Free', 'Partial', 'Full'];
 const LIVE_REFRESH_MS = 60 * 1000;
 
-const CARD_STYLES = {
-  Free: 'bg-forest-light/60 border-forest/40',
-  Partial: 'bg-amber-light/50 border-amber/50',
-  Full: 'bg-brick-light/40 border-brick/30',
+// Status shows as the card's left stripe and a pill in its header.
+const ROOM_STATUS = {
+  Free: { label: 'Free', tone: 'green' },
+  Partial: { label: 'Partly booked', tone: 'amber' },
+  Full: { label: 'Fully booked', tone: 'red' },
 };
 
 function toStatusMap(liveData) {
@@ -71,6 +77,26 @@ function mergeOccupants(list = []) {
   return merged;
 }
 
+const isAllCaps = (s) => /[A-Z]/.test(s) && s === s.toUpperCase();
+
+// For the card: sections sharing a class in the same slot (often entered
+// with different capitalisation) become one line with a count of the rest.
+function groupOccupants(list = []) {
+  const groups = [];
+  mergeOccupants(list).forEach((occ) => {
+    const title = occupantTitle(occ);
+    const key = `${occ.type}|${occ.startTime}|${occ.endTime}|${title.toLowerCase()}`;
+    const group = groups.find((g) => g.key === key);
+    if (!group) {
+      groups.push({ ...occ, key, title, others: 0 });
+      return;
+    }
+    group.others += 1;
+    if (isAllCaps(group.title) && !isAllCaps(title)) group.title = title;
+  });
+  return groups;
+}
+
 function occupantTitle(occ) {
   if (occ.type === 'class') return occ.courseName || occ.courseCode || 'Class';
   return occ.purpose || 'Booking';
@@ -84,6 +110,7 @@ function occupantSubtitle(occ) {
 export default function Dashboard() {
   const { user } = useAuth();
   const isAdmin = user && [ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN].includes(user.roleId);
+  const canBook = BOOKERS.includes(user?.roleId);
 
   const [resourceTypes, setResourceTypes] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -280,7 +307,7 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto">
+    <div className="mx-auto max-w-7xl">
       <RoomQuickSearchModal
         isOpen={isQuickSearchOpen}
         onClose={() => setIsQuickSearchOpen(false)}
@@ -310,13 +337,12 @@ export default function Dashboard() {
         }}
       />
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="font-display text-2xl font-semibold text-navy">Book a Room</h1>
-          <p className="mt-1 text-sm text-ink/60">
-            Search classrooms, labs, seminar halls, and auditoriums across campus.
-          </p>
-        </div>
+      <PageHeader
+        title={canBook ? 'Book a Room' : 'Room Availability'}
+        description={canBook
+          ? 'Find a free classroom, lab, seminar hall or auditorium, then click it to send a booking request.'
+          : 'See which classrooms, labs, seminar halls and auditoriums are free or booked. Click a room to see its day.'}
+      >
         {/* AI Recommender button disabled for now */}
         {/* <div className="flex items-center gap-2">
           <button
@@ -327,7 +353,7 @@ export default function Dashboard() {
             <span>✨ AI Room Recommender</span>
           </button>
         </div> */}
-      </div>
+      </PageHeader>
 
       <div className="mt-6">
         <div className="flex gap-2">
@@ -484,22 +510,24 @@ export default function Dashboard() {
           {slotError}
         </p>
       ) : loading ? (
-        <p className="mt-10 text-sm text-ink/50">Loading resources…</p>
+        <p className="mt-10 text-sm text-ink/50">Loading rooms…</p>
       ) : filteredResources.length === 0 ? (
-        <p className="mt-10 rounded border border-dashed border-line px-6 py-10 text-center text-sm text-ink/50">
-          No resources match those filters. Try widening your search.
-        </p>
+        <div className="mt-6">
+          <EmptyState icon={SearchX} title="No rooms match">
+            Try a different time or date, or use Clear filters to see every room.
+          </EmptyState>
+        </div>
       ) : (
-        <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredResources.map((r) => {
             const live = liveStatusMap[r.resourceId];
             const status = live?.status || 'Free';
             const { startTimeParam, endTimeParam } = getFilterTimes();
             // For a partly booked room, open the booking form on its first free gap.
             const firstFree = status === 'Partial' ? live?.freeSlots?.[0] : null;
-            const cardClass = `block h-full w-full flex flex-col text-left rounded-lg border p-3 transition-shadow hover:shadow-md ${CARD_STYLES[status]}`;
+            const cardClass = `group block h-full w-full flex flex-col text-left rounded-lg border border-line border-l-4 bg-white p-4 shadow-sm transition-shadow hover:shadow-md ${STRIPE_TONES[ROOM_STATUS[status].tone]}`;
             const content = (
-              <ResourceCardContent r={r} live={live} status={status} filterType={filterType} showLive={isToday} />
+              <ResourceCardContent r={r} live={live} status={status} filterType={filterType} showLive={isToday} canBook={canBook} />
             );
 
             return (
@@ -643,24 +671,34 @@ function LiveBadge({ occupant, className = '' }) {
 }
 
 const FREE_LABELS = {
-  Whole: 'Available Whole Day',
-  Morning: 'Available Morning',
-  Afternoon: 'Available Afternoon',
-  Custom: 'Available Custom Slot',
-  Now: 'Available Now',
+  Whole: 'Available all day',
+  Morning: 'Available all morning',
+  Afternoon: 'Available all afternoon',
+  Custom: 'Available for this slot',
+  Now: 'Available now',
 };
 
 const MAX_CARD_OCCUPANTS = 3;
 
-function ResourceCardContent({ r, live, status, filterType, showLive }) {
-  const occupants = mergeOccupants(live?.occupantList);
+function ResourceCardContent({ r, live, status, filterType, showLive, canBook }) {
+  const occupants = groupOccupants(live?.occupantList);
   const current = showLive && live?.inUseNow ? live.currentOccupant : null;
+  const pill = ROOM_STATUS[status];
+  const location = [r.block?.blockName, r.floor ? `Floor ${r.floor}` : ''].filter(Boolean).join(', ');
 
   return (
     <>
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-ink/50">
+          {r.resourceType?.typeName}
+        </p>
+        <StatusPill tone={pill.tone}>
+          {status === 'Full' && filterType === 'Now' ? 'In use' : pill.label}
+        </StatusPill>
+      </div>
+      <div className="mt-1">
         <div>
-          <p className="font-display text-base font-semibold text-ink">
+          <p className="font-display text-lg font-semibold leading-snug text-ink">
             {(() => {
                const rawId = r.resourceId || '';
                const rawName = r.resourceName || '';
@@ -688,75 +726,81 @@ function ResourceCardContent({ r, live, status, filterType, showLive }) {
             })()}
           </p>
         </div>
-        <div className="flex flex-col items-end gap-2">
-          <span
-            className="rounded-full px-2.5 py-1 text-xs font-medium bg-navy/10 text-navy"
-          >
-            {r.resourceType?.typeName}
-          </span>
-          {status === 'Partial' && (
-            <span className="flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wider bg-amber/15 text-amber">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber animate-pulse" />
-              Partly booked
-            </span>
-          )}
-          {status === 'Full' && (
-            <span className="rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wider bg-brick/15 text-brick">
-              {filterType === 'Now' ? 'In Use' : 'Fully booked'}
-            </span>
-          )}
-        </div>
-      </div>
-      <div className="mt-2">
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-medium text-ink/80">
-          {r.department && <span>{r.department.departmentName}</span>}
-          {r.block && <span>{r.block.blockName}{r.floor ? `, Floor ${r.floor}` : ''}</span>}
-          {r.capacityOrAreaSqm && (
-            <span>
-              Capacity {Math.floor(r.capacityOrAreaSqm)}
-            </span>
-          )}
-        </div>
-      </div>
-      {current && <LiveBadge occupant={current} className="mt-2" />}
-      <div className="mt-auto pt-3">
-        {status === 'Free' ? (
-          <div className="flex h-10 flex-col items-center justify-center rounded border border-forest/20 bg-forest-light/30 px-3 py-1 text-xs font-semibold text-forest">
-            {FREE_LABELS[filterType] || 'Available'}
-          </div>
-        ) : (
-          <div className="space-y-1.5">
-            {status === 'Partial' && live?.freeSlots?.length > 0 && (
-              <div className="flex flex-wrap items-center gap-1 text-[11px]">
-                <span className="font-semibold text-forest">Free:</span>
-                {live.freeSlots.map((s) => (
-                  <span key={s.startTime} className="rounded bg-forest-light px-1.5 py-0.5 font-mono text-forest">
-                    {s.startTime}–{s.endTime}
-                  </span>
-                ))}
-              </div>
-            )}
-            <ul className="divide-y divide-line rounded border border-line bg-white/70">
-              {occupants.slice(0, MAX_CARD_OCCUPANTS).map((o, i) => (
-                <li key={i} className="flex gap-2 px-2 py-1 text-[11px] text-ink/80">
-                  <span className="shrink-0 font-mono text-ink/60">
-                    {o.startTime}–{o.endTime}
-                  </span>
-                  <span className="min-w-0 truncate">
-                    <span className="font-medium text-ink">{occupantTitle(o)}</span>
-                    {occupantSubtitle(o) && <span className="text-ink/60"> · {occupantSubtitle(o)}</span>}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            {(occupants.length > MAX_CARD_OCCUPANTS || status === 'Full') && (
-              <p className="text-[11px] text-ink/50">
-                {occupants.length > MAX_CARD_OCCUPANTS && `+${occupants.length - MAX_CARD_OCCUPANTS} more · `}
-                {status === 'Full' ? 'Tap for full schedule' : 'Open to see the full day'}
-              </p>
-            )}
-          </div>
+        {r.department && (
+          <p className="mt-0.5 truncate text-sm text-ink/70" title={r.department.departmentName}>
+            {r.department.departmentName}
+          </p>
         )}
+        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink/60">
+          {location && (
+            <span className="flex items-center gap-1">
+              <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
+              {location}
+            </span>
+          )}
+          {r.capacityOrAreaSqm && (
+            <span className="flex items-center gap-1">
+              <Users className="h-3.5 w-3.5" aria-hidden="true" />
+              {Math.floor(r.capacityOrAreaSqm)} seats
+            </span>
+          )}
+        </div>
+      </div>
+      {current && <LiveBadge occupant={current} className="mt-3" />}
+      <div className="mt-auto pt-4">
+        <div className="border-t border-line pt-3">
+          {status === 'Free' ? (
+            <div className="flex items-center justify-between gap-2 text-sm">
+              <span className="flex min-w-0 items-center gap-1.5 font-medium text-forest">
+                <Check className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <span className="truncate">{FREE_LABELS[filterType] || 'Available'}</span>
+              </span>
+              <span className="flex shrink-0 items-center gap-1 font-semibold text-navy">
+                {canBook ? 'Book' : 'View'}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+              </span>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {status === 'Partial' && live?.freeSlots?.length > 0 && (
+                <div className="flex flex-wrap items-center gap-1 text-[11px]">
+                  <span className="font-semibold text-forest">Free</span>
+                  {live.freeSlots.map((s) => (
+                    <span key={s.startTime} className="rounded bg-forest-light px-1.5 py-0.5 font-mono text-forest">
+                      {s.startTime}–{s.endTime}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <ul className="space-y-1">
+                {occupants.slice(0, MAX_CARD_OCCUPANTS).map((o) => (
+                  <li
+                    key={o.key}
+                    className="flex gap-2 text-xs"
+                    title={`${o.startTime}–${o.endTime} ${o.title} · ${o.others > 0 ? `${o.others + 1} sections` : occupantSubtitle(o)}`}
+                  >
+                    <span className="shrink-0 font-mono text-ink/50">{o.startTime}–{o.endTime}</span>
+                    <span className="min-w-0 truncate text-ink/60">
+                      <span className="font-medium text-ink">{o.title}</span>
+                      {o.others > 0
+                        ? ` · ${o.others + 1} ${o.type === 'class' ? 'sections' : 'bookings'}`
+                        : occupantSubtitle(o) && ` · ${occupantSubtitle(o)}`}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <p className="flex items-center justify-between gap-2 text-xs">
+                <span className="text-ink/50">
+                  {occupants.length > MAX_CARD_OCCUPANTS && `+${occupants.length - MAX_CARD_OCCUPANTS} more`}
+                </span>
+                <span className="flex items-center gap-1 font-semibold text-navy">
+                  {status === 'Full' ? 'Full schedule' : canBook ? 'Book a free slot' : 'See the day'}
+                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                </span>
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </>
   );

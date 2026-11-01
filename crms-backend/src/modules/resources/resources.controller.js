@@ -1,6 +1,7 @@
 const asyncHandler = require('../../utils/asyncHandler');
 const service = require('./resources.service');
 const bookingsService = require('../bookings/bookings.service');
+const { ROLES } = require('../../middleware/authorizeRole');
 
 const list = asyncHandler(async (req, res) => {
   res.json(await service.list(req.query));
@@ -29,9 +30,12 @@ const availability = asyncHandler(async (req, res) => {
   res.json(result);
 });
 
+// The booker's email and phone are for admins (the "Contact Details"
+// box); everyone else gets the same rooms without them.
 const liveStatus = asyncHandler(async (req, res) => {
   const result = await bookingsService.getLiveStatus(req.query.date, req.query.startTime, req.query.endTime);
-  res.json(result);
+  const isAdmin = [ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN].includes(req.auth.roleId);
+  res.json(isAdmin ? result : result.map(({ occupantContact, ...room }) => room));
 });
 
 const aiRecommend = asyncHandler(async (req, res) => {

@@ -154,6 +154,7 @@ async function main() {
     { roleName: 'Institute Admin', description: 'Campus-level resource & hall approver' },
     { roleName: 'Department Admin', description: 'Departmental resource manager and approver' },
     { roleName: 'Requester', description: 'Faculty, staff, or student requester' },
+    { roleName: 'Viewer', description: 'Sees free and booked rooms and timetables; cannot book' },
   ];
   const roleMap = {};
   for (const r of rolesData) {

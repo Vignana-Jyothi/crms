@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './context/authStore';
-import { ROLES } from './constants/roles';
+import { ROLES, BOOKERS } from './constants/roles';
 import ProtectedRoute from './components/ProtectedRoute';
 import RequireRole from './components/admin/RequireRole';
 import Sidebar from './components/admin/Sidebar';
@@ -52,13 +52,14 @@ function MainShell({ children }) {
         {/* Header - shown on mobile always, shown on desktop only when sidebar is closed */}
         <div className={`${isSidebarOpen ? 'lg:hidden' : ''} flex items-center justify-between bg-navy text-white px-4 py-3 shrink-0 sticky top-0 z-10`}>
           <span className="font-display font-semibold">CRMS</span>
-          <button onClick={() => setIsSidebarOpen(true)} className="p-1 hover:text-white/80">
+          <button onClick={() => setIsSidebarOpen(true)} title="Open menu" aria-label="Open menu" className="p-1 hover:text-white/80">
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
         </div>
-        <div className="flex-1 overflow-x-hidden p-4 md:p-8">
+        {/* The one page margin; pages themselves only cap their width. */}
+        <div className="flex-1 overflow-x-hidden px-4 py-6 md:px-10 md:py-10">
           <Suspense fallback={<p className="text-sm text-ink/50">Loading…</p>}>
             {children}
           </Suspense>
@@ -79,7 +80,9 @@ export default function App() {
           {/* Main App Routes */}
           <Route path="/" element={<ProtectedRoute><MainShell><Dashboard /></MainShell></ProtectedRoute>} />
           <Route path="/resources/:resourceId" element={<ProtectedRoute><MainShell><ResourceDetail /></MainShell></ProtectedRoute>} />
-          <Route path="/bookings" element={<ProtectedRoute><MainShell><MyBookings /></MainShell></ProtectedRoute>} />
+          <Route path="/bookings" element={<ProtectedRoute><RequireRole roles={BOOKERS}><MainShell><MyBookings /></MainShell></RequireRole></ProtectedRoute>} />
+          {/* Everyone can read timetables; only admins see the edit button. */}
+          <Route path="/timetables" element={<ProtectedRoute><MainShell><TimetablesView /></MainShell></ProtectedRoute>} />
           
           {/* Admin Routes */}
           <Route path="/admin" element={<Navigate to="/admin/approvals" replace />} />
@@ -87,7 +90,7 @@ export default function App() {
           <Route path="/admin/approvals" element={<ProtectedRoute><RequireRole roles={[ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN]}><MainShell><Approvals /></MainShell></RequireRole></ProtectedRoute>} />
           <Route path="/admin/bookings" element={<ProtectedRoute><RequireRole roles={[ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN]}><MainShell><Bookings /></MainShell></RequireRole></ProtectedRoute>} />
 
-          <Route path="/admin/timetables" element={<ProtectedRoute><RequireRole roles={[ROLES.SUPER_ADMIN, ROLES.INSTITUTE_ADMIN, ROLES.DEPARTMENT_ADMIN]}><MainShell><TimetablesView /></MainShell></RequireRole></ProtectedRoute>} />
+          <Route path="/admin/timetables" element={<Navigate to="/timetables" replace />} />
 
           <Route path="/admin/resources" element={<ProtectedRoute><RequireRole roles={[ROLES.SUPER_ADMIN]}><MainShell><Resources /></MainShell></RequireRole></ProtectedRoute>} />
           <Route path="/admin/users" element={<ProtectedRoute><RequireRole roles={[ROLES.SUPER_ADMIN]}><MainShell><Users /></MainShell></RequireRole></ProtectedRoute>} />

@@ -1,15 +1,17 @@
 import { useCallback, useEffect, useState } from 'react';
 import { bookingsApi, masterDataApi, resourcesApi } from '../../api/endpoints';
-import { fmtDate, fmtTimeSlot } from '../../utils/formatters';
+import { fmtDay, fmtTimeSlot } from '../../utils/formatters';
 import { useAuth } from '../../context/authStore';
 import { ROLES } from '../../constants/roles';
+import { STRIPE_TONES, bookingTone } from '../../constants/status';
+import PageHeader from '../../components/common/PageHeader';
+import { BookingStatusPill } from '../../components/common/StatusPill';
+import CancelBookingDialog from '../../components/common/CancelBookingDialog';
 
-const STATUS_STYLE = {
-  Pending: 'bg-amber/15 text-amber',
-  Approved: 'bg-forest-light text-forest',
-  Rejected: 'bg-brick-light text-brick',
-  Cancelled: 'bg-ink/10 text-ink/50',
-};
+// The reason recorded when a booking was rejected or cancelled.
+function decisionRemarks(b) {
+  return b.approvals?.find((a) => a.decision === b.status)?.remarks;
+}
 
 export default function Bookings() {
   const { user } = useAuth();
@@ -35,8 +37,8 @@ export default function Bookings() {
   const [error, setError] = useState('');
   const [cancelModalBooking, setCancelModalBooking] = useState(null);
   const [cancelling, setCancelling] = useState(false);
+  const [cancelError, setCancelError] = useState('');
   const [actionAlert, setActionAlert] = useState(null);
-  const [cancelReason, setCancelReason] = useState('');
 
   useEffect(() => {
     masterDataApi.departments().then(setDepartments).catch(() => {});
@@ -87,49 +89,52 @@ export default function Bookings() {
     ? departments.filter((d) => scopedDepartmentIds.has(d.departmentId))
     : departments;
 
-  async function handleConfirmCancel() {
+  function openCancel(b) {
+    setCancelError('');
+    setCancelModalBooking(b);
+  }
+
+  async function handleConfirmCancel(reason) {
     if (!cancelModalBooking) return;
     setCancelling(true);
+    setCancelError('');
     setActionAlert(null);
     try {
-      await bookingsApi.cancel(cancelModalBooking.bookingId, { reason: cancelReason });
+      await bookingsApi.cancel(cancelModalBooking.bookingId, { reason });
       setActionAlert({
         type: 'success',
-        message: `Booking #${cancelModalBooking.bookingId} cancelled successfully.`,
+        message: `Cancelled ${cancelModalBooking.resource?.resourceName || cancelModalBooking.resourceId} on ${fmtDay(cancelModalBooking.bookingDate)}. The slot is free again.`,
       });
       setCancelModalBooking(null);
-      setCancelReason('');
       refresh();
     } catch (err) {
-      setActionAlert({
-        type: 'error',
-        message: err.response?.data?.error || 'Failed to cancel booking. Please try again.',
-      });
+      setCancelError(err.response?.data?.error || 'Failed to cancel booking. Please try again.');
     } finally {
       setCancelling(false);
     }
   }
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto">
-      <div className="flex flex-col gap-1">
-        <h1 className="font-display text-2xl font-semibold text-navy">Bookings</h1>
-        <p className="text-sm text-ink/60">
-          Campus-wide booking records with multi-dimensional filtering and administrative controls.
-        </p>
-      </div>
+    <div className="mx-auto max-w-7xl">
+      <PageHeader
+        title="All Bookings"
+        description="Every room booking on campus, whatever its status. Use the filters to find one."
+      />
 
       <div className="mt-6 rounded-lg border border-line bg-white p-4">
         <div className="flex gap-2">
           <input
             type="text"
-            placeholder="Search bookings…"
+            aria-label="Search bookings"
+            placeholder="Search by room, person, phone or purpose…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full rounded border border-line px-3 py-2 text-xs focus:border-navy focus:outline-none flex-1"
           />
           <button 
             onClick={() => setShowMobileFilters(!showMobileFilters)}
+            title="Show filters"
+            aria-label="Show filters"
             className="md:hidden flex items-center justify-center rounded border border-line bg-white px-3 py-2 text-ink/70 hover:bg-paper"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -146,8 +151,8 @@ export default function Bookings() {
               onChange={(e) => setStatus(e.target.value)}
               className="w-full rounded border border-line px-3 py-2 text-xs focus:border-navy focus:outline-none"
             >
-              <option value="">All statuses</option>
-              <option value="Pending">Pending</option>
+              <option value="">Any status</option>
+              <option value="Pending">Waiting for approval</option>
               <option value="Approved">Approved</option>
               <option value="Rejected">Rejected</option>
               <option value="Cancelled">Cancelled</option>
@@ -169,13 +174,13 @@ export default function Bookings() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-ink/70 mb-1">Resource</label>
+            <label className="block text-xs font-semibold text-ink/70 mb-1">Room</label>
             <select
               value={resourceId}
               onChange={(e) => setResourceId(e.target.value)}
               className="w-full rounded border border-line px-3 py-2 text-xs focus:border-navy focus:outline-none"
             >
-              <option value="">All resources</option>
+              <option value="">All rooms</option>
               {resources.map((r) => (
                 <option key={r.resourceId} value={r.resourceId}>
                   {r.resourceName} ({r.resourceId})
@@ -199,7 +204,7 @@ export default function Bookings() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-ink/70 mb-1">Room Type</label>
+            <label className="block text-xs font-semibold text-ink/70 mb-1">Room type</label>
             <select
               value={resourceTypeId}
               onChange={(e) => setResourceTypeId(e.target.value)}
@@ -214,7 +219,7 @@ export default function Bookings() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-ink/70 mb-1">From Date</label>
+            <label className="block text-xs font-semibold text-ink/70 mb-1">From</label>
             <input
               type="date"
               value={startDate}
@@ -224,7 +229,7 @@ export default function Bookings() {
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-ink/70 mb-1">To Date</label>
+            <label className="block text-xs font-semibold text-ink/70 mb-1">To</label>
             <input
               type="date"
               value={endDate}
@@ -284,20 +289,20 @@ export default function Bookings() {
       ) : (
         <>
           <p className="mt-6 text-xs text-ink/50">
-            {bookings.length} booking{bookings.length === 1 ? '' : 's'} found
+            {bookings.length} booking{bookings.length === 1 ? '' : 's'}
           </p>
           {/* Desktop Table View */}
           <div className="mt-2 hidden md:block overflow-x-auto rounded-lg border border-line bg-white shadow-sm">
             <table className="w-full min-w-[1000px] text-left text-sm">
             <thead className="border-b border-line bg-paper text-xs uppercase tracking-wide text-ink/50">
               <tr>
-                <th className="px-4 py-3">Resource</th>
-                <th className="px-4 py-3">Requester</th>
+                <th className="px-4 py-3">Room</th>
+                <th className="px-4 py-3">Booked by</th>
                 <th className="px-4 py-3">Date</th>
-                <th className="px-4 py-3">Time Slot</th>
+                <th className="px-4 py-3">Time</th>
                 <th className="px-4 py-3">Purpose</th>
                 <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3 text-right">Action</th>
+                <th className="px-4 py-3 text-right"><span className="sr-only">Actions</span></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
@@ -326,32 +331,27 @@ export default function Bookings() {
                       <div className="mt-0.5 text-xs text-ink/50">{b.requester.department.departmentName}</div>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-ink/60">{fmtDate(b.bookingDate)}</td>
-                  <td className="px-4 py-3 font-mono text-xs text-ink/60">
+                  <td className="whitespace-nowrap px-4 py-3 text-ink/70">{fmtDay(b.bookingDate)}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-ink/70">
                     {fmtTimeSlot(b.startTime, b.endTime)}
                   </td>
                   <td className="px-4 py-3 text-ink/70">
                     <div>{b.purpose || '—'}</div>
-                    {b.status === 'Rejected' && (
-                      <div className="mt-1 text-xs text-brick font-medium">
-                        Reason: {b.approvals?.find((a) => a.decision === 'Rejected')?.remarks || 'Rejected'}
+                    {decisionRemarks(b) && ['Rejected', 'Cancelled'].includes(b.status) && (
+                      <div className="mt-1 text-xs text-ink/60">
+                        <span className={`font-semibold ${b.status === 'Rejected' ? 'text-brick' : 'text-ink'}`}>Reason:</span> {decisionRemarks(b)}
                       </div>
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    <span
-                      className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-                        STATUS_STYLE[b.status] || 'bg-ink/10 text-ink/60'
-                      }`}
-                    >
-                      {b.status}
-                    </span>
+                    <BookingStatusPill status={b.status} />
                   </td>
                   <td className="px-4 py-3 text-right">
                     {['Pending', 'Approved'].includes(b.status) && (
                       <button
-                        onClick={() => setCancelModalBooking(b)}
-                        className="rounded border border-brick/30 px-2.5 py-1 text-xs font-medium text-brick hover:bg-brick-light"
+                        onClick={() => openCancel(b)}
+                        title="Cancel this booking"
+                        className="whitespace-nowrap rounded border border-brick/30 px-2.5 py-1 text-xs font-semibold text-brick hover:bg-brick-light"
                       >
                         Cancel
                       </button>
@@ -373,17 +373,15 @@ export default function Bookings() {
           {/* Mobile Card View */}
           <div className="mt-2 block md:hidden space-y-4">
             {bookings.map((b) => (
-              <div key={b.bookingId} className="rounded-lg border border-line bg-white p-4 shadow-sm flex flex-col gap-3">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-semibold text-navy text-base">{b.resource?.resourceName || b.resourceId || '—'}</h3>
-                    <p className="mt-0.5 text-[10px] font-bold tracking-wide uppercase text-navy/70">
-                      {b.resource?.resourceType?.typeName || 'Unknown Type'} • {b.resource?.department?.departmentName || 'Shared'}
+              <div key={b.bookingId} className={`rounded-lg border border-line border-l-4 bg-white p-4 shadow-sm flex flex-col gap-3 ${STRIPE_TONES[bookingTone(b.status)]}`}>
+                <div className="flex justify-between items-start gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-ink/50">
+                      {b.resource?.resourceType?.typeName || 'Room'} · {b.resource?.department?.departmentName || 'Shared'}
                     </p>
+                    <h3 className="mt-0.5 font-display text-lg font-semibold text-ink">{b.resource?.resourceName || b.resourceId || '—'}</h3>
                   </div>
-                  <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${STATUS_STYLE[b.status] || 'bg-ink/10 text-ink/60'}`}>
-                    {b.status}
-                  </span>
+                  <BookingStatusPill status={b.status} />
                 </div>
                 
                 <div className="flex flex-col gap-1.5 text-sm text-ink/80 mt-1">
@@ -393,15 +391,15 @@ export default function Bookings() {
                   </div>
                   <div className="flex items-center gap-2 text-xs text-ink/60">
                     <svg className="w-4 h-4 text-ink/40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                    <span>{fmtDate(b.bookingDate)} • {fmtTimeSlot(b.startTime, b.endTime)}</span>
+                    <span>{fmtDay(b.bookingDate)} · {fmtTimeSlot(b.startTime, b.endTime)}</span>
                   </div>
                   <div className="flex items-start gap-2 text-xs text-ink/60">
                     <svg className="w-4 h-4 text-ink/40 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                     <span className="line-clamp-2">{b.purpose || 'No purpose specified'}</span>
                   </div>
-                  {b.status === 'Rejected' && (
-                    <div className="text-xs text-brick mt-1 font-medium">
-                      Reason: {b.approvals?.find((a) => a.decision === 'Rejected')?.remarks || 'Rejected'}
+                  {decisionRemarks(b) && ['Rejected', 'Cancelled'].includes(b.status) && (
+                    <div className="mt-1 text-xs text-ink/60">
+                      <span className={`font-semibold ${b.status === 'Rejected' ? 'text-brick' : 'text-ink'}`}>Reason:</span> {decisionRemarks(b)}
                     </div>
                   )}
                 </div>
@@ -409,10 +407,10 @@ export default function Bookings() {
                 {['Pending', 'Approved'].includes(b.status) && (
                   <div className="mt-2 pt-3 border-t border-line flex justify-end">
                     <button
-                      onClick={() => setCancelModalBooking(b)}
-                      className="rounded border border-brick/30 px-3 py-1.5 text-xs font-medium text-brick hover:bg-brick-light"
+                      onClick={() => openCancel(b)}
+                      className="rounded border border-brick/30 px-3 py-1.5 text-xs font-semibold text-brick hover:bg-brick-light"
                     >
-                      Cancel Booking
+                      Cancel booking
                     </button>
                   </div>
                 )}
@@ -427,58 +425,15 @@ export default function Bookings() {
         </>
       )}
 
-      {/* Admin Cancel Confirmation Modal */}
       {cancelModalBooking && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/40 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl border border-line">
-            <h3 className="font-display text-lg font-semibold text-navy">Admin Cancel Booking</h3>
-            <p className="mt-1 text-xs text-ink/60 mb-3">
-              Are you sure you want to administratively cancel booking #{cancelModalBooking.bookingId}? This will free up the slot immediately.
-            </p>
-
-            <div className="rounded-lg bg-paper p-3 text-xs text-ink/70">
-              <p className="font-semibold text-ink">
-                {cancelModalBooking.resource?.resourceName || cancelModalBooking.resourceId}
-              </p>
-              <p className="mt-0.5">
-                {fmtDate(cancelModalBooking.bookingDate)} · {fmtTimeSlot(cancelModalBooking.startTime, cancelModalBooking.endTime)}
-              </p>
-              <p className="mt-0.5 text-ink/50">Requester: {cancelModalBooking.requester?.name}</p>
-              <p className="mt-0.5 text-ink/50">Purpose: {cancelModalBooking.purpose}</p>
-            </div>
-
-            <label className="mt-4 mb-1 block text-sm font-semibold text-ink">Reason for cancellation (optional)</label>
-            <textarea
-              value={cancelReason}
-              onChange={(e) => setCancelReason(e.target.value)}
-              rows={3}
-              placeholder="Why is this being cancelled?"
-              className="w-full rounded border border-line bg-paper px-3 py-2 text-sm focus:border-brand focus:outline-none"
-            />
-
-            <div className="mt-5 flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setCancelModalBooking(null);
-                  setCancelReason('');
-                }}
-                disabled={cancelling}
-                className="rounded-lg border border-line px-4 py-2 text-xs font-medium text-ink hover:bg-paper"
-              >
-                Keep Booking
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmCancel}
-                disabled={cancelling}
-                className="rounded-lg bg-brick px-4 py-2 text-xs font-semibold text-white hover:bg-brick-dark disabled:opacity-50"
-              >
-                {cancelling ? 'Cancelling…' : 'Confirm Cancellation'}
-              </button>
-            </div>
-          </div>
-        </div>
+        <CancelBookingDialog
+          booking={cancelModalBooking}
+          note="The slot becomes free for others straight away."
+          busy={cancelling}
+          error={cancelError}
+          onClose={() => setCancelModalBooking(null)}
+          onConfirm={handleConfirmCancel}
+        />
       )}
     </div>
   );

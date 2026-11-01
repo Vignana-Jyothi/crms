@@ -1,5 +1,25 @@
 import { useEffect, useState } from 'react';
 import { masterDataApi, usersApi, authApi } from '../../api/endpoints';
+import { Plus } from 'lucide-react';
+import PageHeader from '../../components/common/PageHeader';
+import StatusPill from '../../components/common/StatusPill';
+import { ROLES } from '../../constants/roles';
+
+const ROLE_HELP = [
+  ['Viewer', "Sees which rooms are free or booked, and reads timetables. Can't book."],
+  ['Requester', 'Books rooms, sees their own bookings, and reads timetables.'],
+  ['Department Admin', "Approves requests for their departments' rooms and sees those bookings and timetables."],
+  ['Institute Admin', 'Approves requests for seminar halls, auditoriums and shared rooms.'],
+  ['Super Admin', 'Sees everything, and manages rooms, users and the activity log.'],
+];
+
+function UserStatus({ status }) {
+  return status === 'Active'
+    ? <StatusPill tone="green">Active</StatusPill>
+    : <StatusPill tone="grey" title="Inactive users can't sign in to CRMS">Inactive</StatusPill>;
+}
+
+const ACTION_BUTTON = 'whitespace-nowrap rounded border border-line px-2.5 py-1 text-xs font-semibold hover:bg-paper';
 
 const EMPTY_FORM = { name: '', email: '', phone: '', roleId: '', managedDepartmentIds: [] };
 
@@ -42,7 +62,10 @@ export default function Users() {
 
   useEffect(() => {
     refresh();
-    masterDataApi.roles().then(setRoles).catch(() => {});
+    // Only offer roles CRMS understands; anything else in the table would be refused.
+    masterDataApi.roles()
+      .then((list) => setRoles(list.filter((r) => Object.values(ROLES).includes(r.roleId))))
+      .catch(() => {});
     masterDataApi.departments().then(setDepartments).catch(() => {});
   }, []);
 
@@ -190,16 +213,16 @@ export default function Users() {
   });
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="font-display text-2xl font-semibold text-navy">Users</h1>
-          <p className="mt-1 text-sm text-ink/60">{users.length} accounts.</p>
-        </div>
+    <div className="mx-auto max-w-7xl">
+      <PageHeader
+        title="Users"
+        description={`The ${users.length} people who can sign in, and what each is allowed to do.`}
+      >
         <div className="flex flex-wrap gap-3 items-center">
           <input
             type="text"
-            placeholder="Search users..."
+            aria-label="Search users"
+            placeholder="Search by name, email, phone…"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="rounded border border-line px-3 py-2 text-sm w-full md:w-64"
@@ -209,12 +232,25 @@ export default function Users() {
               setShowForm((s) => !s);
               setError('');
             }}
-            className="w-full md:w-auto rounded bg-navy px-4 py-2 text-sm font-semibold text-white hover:bg-navy-dark whitespace-nowrap text-center"
+            className="w-full md:w-auto inline-flex items-center justify-center gap-1.5 rounded bg-navy px-4 py-2 text-sm font-semibold text-white hover:bg-navy-dark whitespace-nowrap"
           >
-            {showForm ? 'Cancel' : '+ Add user'}
+            {!showForm && <Plus size={16} />}
+            {showForm ? 'Cancel' : 'Add user'}
           </button>
         </div>
-      </div>
+      </PageHeader>
+
+      <details className="mt-4 rounded-lg border border-line bg-white px-4 py-3 text-sm">
+        <summary className="cursor-pointer font-semibold text-navy">What can each role do?</summary>
+        <dl className="mt-2 grid gap-x-6 gap-y-1.5 sm:grid-cols-[max-content_1fr]">
+          {ROLE_HELP.map(([role, help]) => (
+            <div key={role} className="contents">
+              <dt className="font-medium text-ink">{role}</dt>
+              <dd className="text-ink/70">{help}</dd>
+            </div>
+          ))}
+        </dl>
+      </details>
 
       {actionAlert && (
         <div
@@ -346,7 +382,7 @@ export default function Users() {
               <th className="px-4 py-3">Role</th>
               <th className="px-4 py-3">Department</th>
               <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3 text-right">Actions</th>
+              <th className="px-4 py-3 text-right"><span className="sr-only">Actions</span></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
@@ -398,10 +434,10 @@ export default function Users() {
                   )}
                 </td>
                 <td className="px-4 py-3">
-                  <span className={u.status === 'Active' ? 'text-forest font-medium' : 'text-ink/40'}>{u.status}</span>
+                  <UserStatus status={u.status} />
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <div className="flex items-center justify-end gap-3">
+                  <div className="ml-auto flex max-w-[14rem] flex-wrap items-center justify-end gap-1.5">
                     <button
                       onClick={() => {
                         setEditUser(u);
@@ -416,7 +452,7 @@ export default function Users() {
                           managedDepartmentIds: deptIds
                         });
                       }}
-                      className="text-xs font-semibold text-navy hover:underline"
+                      className={`${ACTION_BUTTON} text-navy`}
                     >
                       Edit
                     </button>
@@ -427,16 +463,20 @@ export default function Users() {
                         setConfirmPassword('');
                         setResetPasswordError('');
                       }}
-                      className="text-xs font-semibold text-amber-700 hover:underline"
+                      className={`${ACTION_BUTTON} text-ink/70`}
                     >
-                      Reset Password
+                      Reset password
                     </button>
-                    <button onClick={() => toggleStatus(u)} className="text-xs font-medium text-navy hover:underline">
+                    <button
+                      onClick={() => toggleStatus(u)}
+                      title={u.status === 'Active' ? 'Stop this person signing in' : 'Let this person sign in again'}
+                      className={`${ACTION_BUTTON} text-ink/70`}
+                    >
                       {u.status === 'Active' ? 'Deactivate' : 'Reactivate'}
                     </button>
                     <button
                       onClick={() => handleDeleteUser(u)}
-                      className="text-xs font-medium text-brick hover:underline"
+                      className={`${ACTION_BUTTON} border-brick/30 text-brick hover:bg-brick-light`}
                       title="Permanently remove user"
                     >
                       Delete
@@ -474,9 +514,7 @@ export default function Users() {
                     )}
                   </p>
                 </div>
-                <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${u.status === 'Active' ? 'bg-forest-light text-forest' : 'bg-ink/10 text-ink/50'}`}>
-                  {u.status}
-                </span>
+                <UserStatus status={u.status} />
               </div>
 
               <div className="flex flex-col gap-3 mt-1">
@@ -516,7 +554,7 @@ export default function Users() {
                 </div>
               </div>
 
-              <div className="mt-2 pt-3 border-t border-line flex justify-end gap-3">
+              <div className="mt-2 pt-3 border-t border-line flex flex-wrap justify-end gap-2">
                 <button
                   onClick={() => {
                     setEditUser(u);
@@ -529,7 +567,7 @@ export default function Users() {
                       managedDepartmentIds: u.managedDepartments?.map(d => d.departmentId) || []
                     });
                   }}
-                  className="text-xs font-semibold text-navy hover:underline"
+                  className={`${ACTION_BUTTON} text-navy`}
                 >
                   Edit
                 </button>
@@ -540,16 +578,16 @@ export default function Users() {
                     setConfirmPassword('');
                     setResetPasswordError('');
                   }}
-                  className="text-xs font-semibold text-amber-700 hover:underline"
+                  className={`${ACTION_BUTTON} text-ink/70`}
                 >
-                  Reset Password
+                  Reset password
                 </button>
-                <button onClick={() => toggleStatus(u)} className="text-xs font-medium text-navy hover:underline">
+                <button onClick={() => toggleStatus(u)} className={`${ACTION_BUTTON} text-ink/70`}>
                   {u.status === 'Active' ? 'Deactivate' : 'Reactivate'}
                 </button>
                 <button
                   onClick={() => handleDeleteUser(u)}
-                  className="text-xs font-medium text-brick hover:underline"
+                  className={`${ACTION_BUTTON} border-brick/30 text-brick hover:bg-brick-light`}
                 >
                   Delete
                 </button>
