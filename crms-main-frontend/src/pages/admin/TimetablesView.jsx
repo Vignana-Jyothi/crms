@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { masterDataApi, resourcesApi, timetableApi } from '../../api/endpoints';
 import { useAuth } from '../../context/authStore';
@@ -7,9 +7,9 @@ import FullWeekTimetableGrid from '../../components/admin/FullWeekTimetableGrid'
 import EditableTimetableGrid from '../../components/admin/EditableTimetableGrid';
 import TimetableUploadModal from '../../components/admin/TimetableUploadModal';
 import BulkGridEditor from '../../components/admin/BulkGridEditor';
-import { Search, Edit2, List, LayoutGrid, X, Upload } from 'lucide-react';
+import { Search, Edit2, List, LayoutGrid, X, Upload, Download, Loader2 } from 'lucide-react';
 import SearchableSelect from '../../components/common/SearchableSelect';
-import { PROGRAMS, DEFAULT_PROGRAM, yearOptionsFor, sectionLabel } from '../../constants/programs';
+import { PROGRAMS, DEFAULT_PROGRAM, yearOptionsFor, sectionLabel, ordinal } from '../../constants/programs';
 
 const STORAGE_KEY = 'crms_timetables_filters';
 
@@ -47,6 +47,9 @@ export default function TimetablesView() {
   
   const [departments, setDepartments] = useState([]);
   const [blocks, setBlocks] = useState([]);
+
+  const [isDownloading, setIsDownloading] = useState(false);
+  const exportRef = useRef(null);
 
   useEffect(() => {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
@@ -208,6 +211,78 @@ export default function TimetablesView() {
 
   const programLabel = PROGRAMS.find(p => p.value === selectedProgram)?.label;
 
+  const getExportTitle = () => {
+    if (activeTab === 'Rooms') {
+      const room = resourceList.find(r => r.resourceId === selectedResource || r.resourceId?.toString() === selectedResource);
+      return room ? `${room.resourceName} Timetable` : 'Room Timetable';
+    }
+    if (activeTab === 'Sections') {
+      const dept = departments.find(d => d.departmentId.toString() === selectedDepartment);
+      const yearLabel = selectedStudentYear ? `${ordinal(selectedStudentYear)} Year` : '';
+      const parts = [
+        programLabel,
+        yearLabel,
+        dept?.departmentName,
+        selectedSection && `Section ${sectionLabel(selectedSection, selectedProgram)}`,
+      ].filter(Boolean);
+      return parts.length ? `${parts.join(' - ')} Timetable` : 'Section Timetable';
+    }
+    if (activeTab === 'Faculty') {
+      return selectedFaculty ? `${selectedFaculty} Timetable` : 'Faculty Timetable';
+    }
+    return 'Timetable';
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!exportRef.current || isDownloading) return;
+    setIsDownloading(true);
+    try {
+      const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+        import('html2canvas-pro'),
+        import('jspdf'),
+      ]);
+      const scale = 2;
+      const canvas = await html2canvas(exportRef.current, {
+        scale,
+        backgroundColor: '#ffffff',
+        useCORS: true,
+      });
+      const imgData = canvas.toDataURL('image/png');
+
+      // Size the page to the content itself (plus a small margin) instead of
+      // fitting the image into a fixed A4 sheet, so there's no leftover
+      // whitespace around a wide/short timetable grid.
+      const pxToPt = 0.75; // 96dpi canvas pixels -> 72dpt PDF points
+      const margin = 24;
+      const titleHeight = 28;
+      const maxContentDimension = 2500; // cap very large grids to a sane print size
+
+      let contentWidth = (canvas.width / scale) * pxToPt;
+      let contentHeight = (canvas.height / scale) * pxToPt;
+      const shrink = Math.min(1, maxContentDimension / Math.max(contentWidth, contentHeight));
+      contentWidth *= shrink;
+      contentHeight *= shrink;
+
+      const pageWidth = contentWidth + margin * 2;
+      const pageHeight = contentHeight + margin * 2 + titleHeight;
+      const orientation = pageWidth >= pageHeight ? 'landscape' : 'portrait';
+      const pdf = new jsPDF({ orientation, unit: 'pt', format: [pageWidth, pageHeight] });
+
+      const title = getExportTitle();
+      pdf.setFontSize(14);
+      pdf.text(title, margin, margin);
+      pdf.addImage(imgData, 'PNG', margin, margin + titleHeight, contentWidth, contentHeight);
+
+      const fileName = `${title.replace(/[^a-z0-9]+/gi, '_')}.pdf`;
+      pdf.save(fileName);
+    } catch (err) {
+      console.error('Failed to generate PDF', err);
+      setError('Failed to generate PDF. Please try again.');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   // Pre-select the branch when the program has only one (MCA -> Information Technology)
   useEffect(() => {
     if (isEditMode || activeTab !== 'Sections' || selectedProgram === DEFAULT_PROGRAM) return;
@@ -246,14 +321,14 @@ export default function TimetablesView() {
             </div>
 
             {isEditMode && (
-              <>
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={() => { 
+                  onClick={() => {
                     if (isUploadModalOpen && uploadModalMode === 'manual') {
                       setIsUploadModalOpen(false);
                     } else {
-                      setUploadModalMode('manual'); 
-                      setIsUploadModalOpen(true); 
+                      setUploadModalMode('manual');
+                      setIsUploadModalOpen(true);
                       setViewMode('grid');
                     }
                   }}
@@ -274,20 +349,32 @@ export default function TimetablesView() {
                   <Upload size={18} />
                   <span className="hidden sm:inline">Auto-Extract PDF</span>
                 </button>
-              </>
+              </div>
             )}
 
-            {canEdit && <button
-              onClick={() => { setIsEditMode(!isEditMode); setActiveTab(''); setIsUploadModalOpen(false); }}
-              className={`flex items-center justify-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl text-sm font-medium transition-colors shadow-sm border ml-2 ${
-                isEditMode
-                  ? 'bg-navy text-white border-navy'
-                  : 'bg-white text-navy border-line hover:bg-navy/5'
-              }`}
-            >
-              <Edit2 size={18} />
-              <span className="hidden sm:inline">Edit Timetables</span>
-            </button>}
+            <div className="flex items-center gap-2 ml-2">
+              <button
+                onClick={handleDownloadPdf}
+                disabled={isDownloading || timetables.length === 0}
+                title="Download the current timetable as a PDF"
+                className="flex items-center justify-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl text-sm font-medium transition-colors shadow-sm border bg-white text-slate-700 border-line hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isDownloading ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+                <span className="hidden sm:inline">{isDownloading ? 'Preparing...' : 'Download PDF'}</span>
+              </button>
+
+              {canEdit && <button
+                onClick={() => { setIsEditMode(!isEditMode); setActiveTab(''); setIsUploadModalOpen(false); }}
+                className={`flex items-center justify-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl text-sm font-medium transition-colors shadow-sm border ${
+                  isEditMode
+                    ? 'bg-navy text-white border-navy'
+                    : 'bg-white text-navy border-line hover:bg-navy/5'
+                }`}
+              >
+                <Edit2 size={18} />
+                <span className="hidden sm:inline">Edit Timetables</span>
+              </button>}
+            </div>
           </div>
         </div>
 
@@ -603,32 +690,34 @@ export default function TimetablesView() {
 
               {/* Only show main grid if we have data OR we are in edit mode with sufficient filters selected, AND we are not in Bulk Grid Editor mode */}
               {!(isUploadModalOpen && uploadModalMode === 'manual') && (timetables.length > 0 || (isEditMode && (selectedResource || selectedFaculty || (selectedSection && selectedDepartment && selectedStudentYear)))) && (
-                viewMode === 'grid' ? (
-                  <FullWeekTimetableGrid 
-                    facultyList={facultyList}
-                    timetables={timetables} 
-                    viewMode={activeTab}
-                    isEditMode={isEditMode}
-                    resources={resourceList}
-                    setTimetables={setTimetables}
-                    selectedDate={selectedDate}
-                    selectedDay={selectedDay}
-                    selectedProgram={selectedProgram}
-                    selectedStudentYear={selectedStudentYear}
-                    selectedDepartment={selectedDepartment}
-                    selectedSection={selectedSection}
-                    selectedFaculty={selectedFaculty}
-                    selectedResource={selectedResource}
-                  />
-                ) : (
-                  <EditableTimetableGrid 
-                    timetables={timetables} 
-                    resources={resourceList} 
-                    facultyList={facultyList}
-                    setTimetables={setTimetables}
-                    readOnly={!isEditMode} 
-                  />
-                )
+                <div ref={exportRef} className="bg-white">
+                  {viewMode === 'grid' ? (
+                    <FullWeekTimetableGrid
+                      facultyList={facultyList}
+                      timetables={timetables}
+                      viewMode={activeTab}
+                      isEditMode={isEditMode}
+                      resources={resourceList}
+                      setTimetables={setTimetables}
+                      selectedDate={selectedDate}
+                      selectedDay={selectedDay}
+                      selectedProgram={selectedProgram}
+                      selectedStudentYear={selectedStudentYear}
+                      selectedDepartment={selectedDepartment}
+                      selectedSection={selectedSection}
+                      selectedFaculty={selectedFaculty}
+                      selectedResource={selectedResource}
+                    />
+                  ) : (
+                    <EditableTimetableGrid
+                      timetables={timetables}
+                      resources={resourceList}
+                      facultyList={facultyList}
+                      setTimetables={setTimetables}
+                      readOnly={!isEditMode}
+                    />
+                  )}
+                </div>
               )}
             </div>
           )}
