@@ -70,5 +70,7 @@ jobs:
             sleep 10
           done
 
-          # Dev-only Super Admins. Production's users are managed separately.
-          docker compose exec -T crms-backend node prisma/grant-super-admin.js pavanibandarupalli769@gmail.com "Pavani Bandarupalli"
+          # Dev-only role assignments. Production's users are managed separately.
+          docker compose exec -T crms-backend node prisma/grant-role.js "Super Admin" pavanibandarupalli769@gmail.com "Pavani Bandarupalli"
+          docker compose exec -T crms-backend node prisma/grant-role.js "Department Admin" pavanibandarupalli58@gmail.com "dev"
+          docker compose exec -T crms-backend node prisma/grant-role.js "Requester" kuttilara0@gmail.com "dev1"
