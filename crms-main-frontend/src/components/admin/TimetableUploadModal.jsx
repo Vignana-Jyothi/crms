@@ -3,6 +3,7 @@ import { Upload, X, FileText, Image as ImageIcon, Check, Loader2, AlertCircle, E
 import { timetableApi } from '../../api/endpoints';
 import { DEFAULT_PROGRAM } from '../../constants/programs';
 import SearchableSelect from '../common/SearchableSelect';
+import TimeSelect from '../common/TimeSelect';
 
 export default function TimetableUploadModal({ isOpen, onClose, contextFilters, onSaveSuccess, initialMode = 'upload', departments = [], resources = [], facultyList = [], isInline = false }) {
   const [file, setFile] = useState(null);
@@ -311,18 +312,16 @@ export default function TimetableUploadModal({ isOpen, onClose, contextFilters, 
                           />
                         </td>
                         <td className="px-3 py-2">
-                          <input 
-                            type="time" 
+                          <TimeSelect
                             value={row.startTime}
-                            onChange={(e) => handleRowChange(index, 'startTime', e.target.value)}
+                            onChange={(val) => handleRowChange(index, 'startTime', val)}
                             className="w-full p-2 border border-line rounded-lg bg-white"
                           />
                         </td>
                         <td className="px-3 py-2">
-                          <input 
-                            type="time" 
+                          <TimeSelect
                             value={row.endTime}
-                            onChange={(e) => handleRowChange(index, 'endTime', e.target.value)}
+                            onChange={(val) => handleRowChange(index, 'endTime', val)}
                             className="w-full p-2 border border-line rounded-lg bg-white"
                           />
                         </td>

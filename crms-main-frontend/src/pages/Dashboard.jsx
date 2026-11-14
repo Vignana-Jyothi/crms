@@ -9,6 +9,7 @@ import AiRoomRecommenderModal from '../components/common/AiRoomRecommenderModal'
 import PageHeader from '../components/common/PageHeader';
 import EmptyState from '../components/common/EmptyState';
 import StatusPill from '../components/common/StatusPill';
+import TimeSelect from '../components/common/TimeSelect';
 import { STRIPE_TONES } from '../constants/status';
 
 function todayStr() {
@@ -417,19 +418,9 @@ export default function Dashboard() {
         {filterType === 'Custom' && (
           <div className="col-span-1 sm:col-span-2 lg:col-span-4 flex items-center gap-2 bg-paper/50 p-2 rounded border border-line">
             <span className="text-sm font-medium text-navy">Custom Time Slot:</span>
-            <input
-              type="time"
-              value={customStart}
-              onChange={(e) => setCustomStart(e.target.value)}
-              className="rounded border border-line px-2 py-1 text-sm bg-white"
-            />
+            <TimeSelect value={customStart} onChange={setCustomStart} />
             <span className="text-sm text-ink/60">to</span>
-            <input
-              type="time"
-              value={customEnd}
-              onChange={(e) => setCustomEnd(e.target.value)}
-              className="rounded border border-line px-2 py-1 text-sm bg-white"
-            />
+            <TimeSelect value={customEnd} onChange={setCustomEnd} />
             {slotError && <span className="text-xs font-medium text-brick">{slotError}</span>}
           </div>
         )}

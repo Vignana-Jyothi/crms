@@ -27,13 +27,6 @@ function toMinutes(timeVal) {
   return d.getUTCHours() * 60 + d.getUTCMinutes();
 }
 
-function formatTimeDisplay(timeVal) {
-  if (!timeVal) return '';
-  if (typeof timeVal === 'string' && !timeVal.includes('T')) return timeVal.substring(0, 5);
-  const d = new Date(timeVal);
-  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' });
-}
-
 function todayStr() {
   const d = new Date();
   const year = d.getFullYear();
@@ -146,7 +139,7 @@ export default function AvailabilityStrip({ availability, date }) {
                       : selectedBlock.data.status === 'Approved' ? 'Booked' : 'Booking waiting for approval'}
                   </h3>
                   <p className="text-xs font-mono text-ink/60 mt-0.5">
-                    {formatTimeDisplay(selectedBlock.data.startTime)} - {formatTimeDisplay(selectedBlock.data.endTime)}
+                    {fmtTimeSlot(selectedBlock.data.startTime, selectedBlock.data.endTime)}
                   </p>
                 </div>
                 <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${selectedBlock.type === 'class' ? 'bg-forest/20 text-forest' : selectedBlock.data.status === 'Approved' ? 'bg-brick/20 text-brick-dark' : 'bg-amber/30 text-amber-dark'}`}>

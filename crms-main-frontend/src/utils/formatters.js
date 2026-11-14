@@ -5,11 +5,11 @@
  */
 
 /**
- * Format a time value (e.g. "09:00:00", "1970-01-01T09:00:00.000Z") into "HH:mm".
+ * Format a time value (e.g. "09:00:00", "1970-01-01T09:00:00.000Z") into 12-hour "hh:mm AM/PM".
  * Returns "—" for invalid/empty inputs.
  *
  * @param {string|Date|number|null|undefined} val
- * @returns {string} e.g. "09:00" or "—"
+ * @returns {string} e.g. "09:00 AM" or "—"
  */
 export function fmtTime(val) {
   if (val === null || val === undefined || val === '') return '—';
@@ -156,11 +156,11 @@ export function fmtDateTime(val) {
 }
 
 /**
- * Format start and end time as a time slot range: "HH:mm–HH:mm".
+ * Format start and end time as a 12-hour time slot range: "hh:mm AM/PM–hh:mm AM/PM".
  *
  * @param {string|Date|null|undefined} startTime
  * @param {string|Date|null|undefined} endTime
- * @returns {string} e.g. "09:00–10:30" or "—"
+ * @returns {string} e.g. "09:00 AM–10:30 AM" or "—"
  */
 export function fmtTimeSlot(startTime, endTime) {
   const start = fmtTime(startTime);
